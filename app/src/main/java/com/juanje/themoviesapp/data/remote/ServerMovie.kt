@@ -1,4 +1,4 @@
-package com.juanje.themoviesapp
+package com.juanje.themoviesapp.data.remote
 
 data class ServerMovie(
     val adult: Boolean,
