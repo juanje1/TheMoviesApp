@@ -1,6 +1,6 @@
 package com.juanje.themoviesapp.data.remote
 
-data class MovieResult(
+data class MoviesResult(
     val page: Int,
     val results: List<ServerMovie>,
     val total_pages: Int,

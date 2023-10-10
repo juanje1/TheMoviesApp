@@ -12,13 +12,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.juanje.themoviesapp.data.local.MoviesDao
 import com.juanje.themoviesapp.ui.theme.TheMoviesAppTheme
 
 @Composable
-fun Home() {
+fun Home(moviesDao: MoviesDao) {
     TheMoviesAppTheme {
 
-        val viewModel: HomeViewModel = viewModel()
+        val viewModel: HomeViewModel = viewModel { HomeViewModel(moviesDao) }
         val state by viewModel.state.collectAsState()
 
         // A surface container using the 'background' color from the theme

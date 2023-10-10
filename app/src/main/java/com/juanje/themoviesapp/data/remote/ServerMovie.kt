@@ -1,5 +1,7 @@
 package com.juanje.themoviesapp.data.remote
 
+import com.juanje.themoviesapp.data.local.LocalMovie
+
 data class ServerMovie(
     val adult: Boolean,
     val backdrop_path: String,
@@ -16,4 +18,12 @@ data class ServerMovie(
     val vote_average: Double,
     val vote_count: Int,
     val favourite: Boolean = false
+)
+
+fun ServerMovie.toLocalMovie() = LocalMovie(
+    id = 0,
+    title = title,
+    overview = overview,
+    posterPath = poster_path,
+    favourite = favourite
 )
