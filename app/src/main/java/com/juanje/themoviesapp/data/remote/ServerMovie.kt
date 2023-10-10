@@ -1,6 +1,6 @@
 package com.juanje.themoviesapp.data.remote
 
-import com.juanje.themoviesapp.data.local.LocalMovie
+import com.juanje.themoviesapp.data.Movie
 
 data class ServerMovie(
     val adult: Boolean,
@@ -20,7 +20,7 @@ data class ServerMovie(
     val favourite: Boolean = false
 )
 
-fun ServerMovie.toLocalMovie() = LocalMovie(
+fun ServerMovie.toMovie() = Movie(
     id = 0,
     title = title,
     overview = overview,
