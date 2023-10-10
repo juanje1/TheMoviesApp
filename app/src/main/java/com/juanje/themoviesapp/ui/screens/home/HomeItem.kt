@@ -18,7 +18,7 @@ import coil.compose.AsyncImage
 import com.juanje.themoviesapp.data.Movie
 
 @Composable
-fun MovieItem(movie: Movie, onClick: () -> Unit) {
+fun HomeItem(movie: Movie, onClick: () -> Unit) {
     Column(
         modifier = Modifier.background(MaterialTheme.colors.secondary)
     ) {

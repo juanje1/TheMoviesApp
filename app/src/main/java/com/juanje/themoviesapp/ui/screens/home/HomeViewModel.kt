@@ -3,12 +3,12 @@ package com.juanje.themoviesapp.ui.screens.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanje.themoviesapp.data.Movie
-import com.juanje.themoviesapp.data.MoviesRepository
+import com.juanje.themoviesapp.data.MovieRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class HomeViewModel(private val repository: MoviesRepository) : ViewModel() {
+class HomeViewModel(private val repository: MovieRepository) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state

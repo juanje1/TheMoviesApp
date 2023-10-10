@@ -1,8 +1,8 @@
-package com.juanje.themoviesapp.data.remote
+package com.juanje.themoviesapp.data.server.dataclasses
 
 import com.juanje.themoviesapp.data.Movie
 
-data class ServerMovie(
+data class MovieServer(
     val adult: Boolean,
     val backdrop_path: String,
     val genre_ids: List<Int>,
@@ -20,7 +20,7 @@ data class ServerMovie(
     val favourite: Boolean = false
 )
 
-fun ServerMovie.toMovie() = Movie(
+fun MovieServer.toMovie() = Movie(
     id = 0,
     title = title,
     overview = overview,

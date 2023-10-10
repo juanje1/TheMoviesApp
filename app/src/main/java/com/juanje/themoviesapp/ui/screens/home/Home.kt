@@ -12,11 +12,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.juanje.themoviesapp.data.MoviesRepository
+import com.juanje.themoviesapp.data.MovieRepository
 import com.juanje.themoviesapp.ui.theme.TheMoviesAppTheme
 
 @Composable
-fun Home(moviesRepository: MoviesRepository) {
+fun Home(moviesRepository: MovieRepository) {
     TheMoviesAppTheme {
 
         val viewModel: HomeViewModel = viewModel { HomeViewModel(moviesRepository) }
@@ -47,7 +47,7 @@ fun Home(moviesRepository: MoviesRepository) {
                         contentPadding = PaddingValues(4.dp)
                     ) {
                         items(state.movies) { movie ->
-                            MovieItem(
+                            HomeItem(
                                 movie = movie,
                                 onClick = { viewModel.onMovieClick(movie) }
                             )
