@@ -15,9 +15,9 @@ class DataModule {
 
     @Provides
     fun movieRepositoryProvider(
-        databaseDataSource: LocalDataSource,
-        serverDataSource: RemoteDataSource,
+        movieDatabaseDataSource: LocalDataSource,
+        movieServerDataSource: RemoteDataSource,
         @Named("apiKey") apiKey: String
-    ) = MovieRepository(databaseDataSource, serverDataSource, apiKey)
+    ) = MovieRepository(movieDatabaseDataSource, movieServerDataSource, apiKey)
 
 }

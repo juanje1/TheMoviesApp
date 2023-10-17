@@ -4,11 +4,11 @@ import android.content.Context
 import androidx.room.Room
 import com.juanje.themoviesapp.data.datasources.LocalDataSource
 import com.juanje.themoviesapp.data.datasources.RemoteDataSource
-import com.juanje.themoviesapp.framework.data.database.DatabaseDataSource
+import com.juanje.themoviesapp.framework.data.database.MovieDatabaseDataSource
 import com.juanje.themoviesapp.framework.data.database.MovieDatabase
 import com.juanje.themoviesapp.framework.data.database.daos.MovieDao
 import com.juanje.themoviesapp.framework.data.server.MovieService
-import com.juanje.themoviesapp.framework.data.server.ServerDataSource
+import com.juanje.themoviesapp.framework.data.server.MovieServerDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -47,8 +47,8 @@ class FrameworkModule {
         retrofit.create(MovieService::class.java)
 
     @Provides
-    fun serverDataSourceProvider(movieService: MovieService): RemoteDataSource =
-        ServerDataSource(movieService)
+    fun movieServerDataSourceProvider(movieService: MovieService): RemoteDataSource =
+        MovieServerDataSource(movieService)
 
     @Provides
     @Singleton
@@ -65,7 +65,7 @@ class FrameworkModule {
         movieDatabase.movieDao()
 
     @Provides
-    fun databaseDataSourceProvider(movieDao: MovieDao): LocalDataSource =
-        DatabaseDataSource(movieDao)
+    fun movieDatabaseDataSourceProvider(movieDao: MovieDao): LocalDataSource =
+        MovieDatabaseDataSource(movieDao)
 
 }

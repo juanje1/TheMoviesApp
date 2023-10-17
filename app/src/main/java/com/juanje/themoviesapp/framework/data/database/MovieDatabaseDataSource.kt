@@ -8,7 +8,7 @@ import com.juanje.themoviesapp.framework.data.database.entities.toMovieEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class DatabaseDataSource(private val dao: MovieDao): LocalDataSource {
+class MovieDatabaseDataSource(private val dao: MovieDao): LocalDataSource {
 
     override suspend fun getMovies(): Flow<List<Movie>> {
         return dao.getMovies().map { movies ->
