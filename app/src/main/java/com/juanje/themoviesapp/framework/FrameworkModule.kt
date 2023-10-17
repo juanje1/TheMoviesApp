@@ -14,6 +14,8 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Named
@@ -35,16 +37,27 @@ class FrameworkModule {
 
     @Provides
     @Singleton
-    fun retrofitProvider(@Named("baseUrl") baseUrl: String): Retrofit =
-        Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+    @Named("okHttpClient")
+    fun okHttpClientProvider(): OkHttpClient = HttpLoggingInterceptor().run {
+        level = HttpLoggingInterceptor.Level.BODY
+        OkHttpClient.Builder().addInterceptor(this).build()
+    }
+
+    @Provides
+    @Singleton
+    fun retrofitProvider(
+        @Named("baseUrl") baseUrl: String,
+        @Named("okHttpClient") okHttpClient: OkHttpClient
+    ): Retrofit = Retrofit.Builder()
+        .baseUrl(baseUrl)
+        .client(okHttpClient)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
 
     @Provides
     @Singleton
     fun movieServiceProvider(retrofit: Retrofit): MovieService =
-        retrofit.create(MovieService::class.java)
+        retrofit.run { create(MovieService::class.java) }
 
     @Provides
     fun movieServerDataSourceProvider(movieService: MovieService): RemoteDataSource =
