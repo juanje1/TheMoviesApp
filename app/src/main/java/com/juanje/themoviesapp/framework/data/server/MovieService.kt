@@ -2,8 +2,9 @@ package com.juanje.themoviesapp.framework.data.server
 
 import com.juanje.themoviesapp.framework.data.server.dataclasses.MovieResult
 import retrofit2.http.GET
+import retrofit2.http.Query
 
 interface MovieService {
-    @GET("discover/movie?api_key=d30e1f350220f9aad6c4110df385d380")
-    suspend fun getMovies(): MovieResult
+    @GET("discover/movie")
+    suspend fun getMovies(@Query("api_key") apikey: String): MovieResult
 }

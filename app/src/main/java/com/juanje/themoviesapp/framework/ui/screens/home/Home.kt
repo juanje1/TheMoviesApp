@@ -13,13 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.juanje.themoviesapp.framework.ui.theme.TheMoviesAppTheme
-import com.juanje.themoviesapp.usecases.LoadPopularMovies
 
 @Composable
-fun Home(loadPopularMovies: LoadPopularMovies) {
+fun Home() {
     TheMoviesAppTheme {
 
-        val viewModel: HomeViewModel = viewModel { HomeViewModel(loadPopularMovies) }
+        val viewModel: HomeViewModel = viewModel()
         val state by viewModel.state.collectAsState()
 
         // A surface container using the 'background' color from the theme

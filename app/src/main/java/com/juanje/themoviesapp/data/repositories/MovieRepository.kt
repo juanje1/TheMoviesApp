@@ -7,13 +7,14 @@ import kotlinx.coroutines.flow.Flow
 
 class MovieRepository(
     private val localDataSource: LocalDataSource,
-    private val remoteDataSource: RemoteDataSource
+    private val remoteDataSource: RemoteDataSource,
+    private val apiKey: String
 ) {
 
-    suspend fun getPopularMovies(): Flow<List<Movie>> {
+    suspend fun getMovies(): Flow<List<Movie>> {
         val isDbEmpty = localDataSource.count() == 0
         if (isDbEmpty) {
-            localDataSource.insertAll(remoteDataSource.getMovies())
+            localDataSource.insertAll(remoteDataSource.getMovies(apiKey))
         }
         return localDataSource.getMovies()
     }

@@ -4,11 +4,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanje.themoviesapp.domain.Movie
 import com.juanje.themoviesapp.usecases.LoadPopularMovies
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HomeViewModel(private val loadPopularMovies: LoadPopularMovies) : ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(private val loadPopularMovies: LoadPopularMovies) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state
