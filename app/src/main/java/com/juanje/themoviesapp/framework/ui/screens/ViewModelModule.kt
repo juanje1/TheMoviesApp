@@ -1,4 +1,4 @@
-package com.juanje.themoviesapp.framework.ui.screens.home
+package com.juanje.themoviesapp.framework.ui.screens
 
 import com.juanje.themoviesapp.data.repositories.MovieRepository
 import com.juanje.themoviesapp.usecases.LoadPopularMovies
@@ -9,7 +9,7 @@ import dagger.hilt.android.components.ViewModelComponent
 
 @Module
 @InstallIn(ViewModelComponent::class)
-class HomeActivityModule {
+class ViewModelModule {
 
     @Provides
     fun loadPopularMoviesProvider(repository: MovieRepository) = LoadPopularMovies(repository)

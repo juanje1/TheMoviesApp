@@ -8,5 +8,7 @@ class LoadPopularMovies(private val repository: MovieRepository) {
 
     suspend fun invokeGetMovies(): Flow<List<Movie>> = repository.getMovies()
 
+    suspend fun invokeGetMoviesDetail(): Flow<List<Movie>> = repository.getMoviesDetail()
+
     suspend fun invokeUpdateMovie(movie: Movie) = repository.updateMovie(movie)
 }

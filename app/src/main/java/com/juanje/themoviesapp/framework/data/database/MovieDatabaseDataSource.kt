@@ -10,20 +10,15 @@ import kotlinx.coroutines.flow.map
 
 class MovieDatabaseDataSource(private val dao: MovieDao): LocalDataSource {
 
-    override suspend fun getMovies(): Flow<List<Movie>> {
-        return dao.getMovies().map { movies ->
-            movies.map { it.toMovie() } }
-    }
+    override suspend fun getMovies() =
+        dao.getMovies().map { movies -> movies.map { it.toMovie() } }
 
-    override suspend fun insertAll(movies: List<Movie>) {
+    override suspend fun insertAll(movies: List<Movie>) =
         dao.insertAll(movies.map { it.toMovieEntity() })
-    }
 
-    override suspend fun updateMovie(movie: Movie) {
+    override suspend fun updateMovie(movie: Movie) =
         dao.updateMovie(movie.toMovieEntity())
-    }
 
-    override suspend fun count(): Int {
-        return dao.count()
-    }
+    override suspend fun count() =
+        dao.count()
 }

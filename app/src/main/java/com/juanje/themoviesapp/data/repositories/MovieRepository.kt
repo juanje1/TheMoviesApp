@@ -19,7 +19,7 @@ class MovieRepository(
         return localDataSource.getMovies()
     }
 
-    suspend fun updateMovie(movie: Movie) {
-        localDataSource.updateMovie(movie)
-    }
+    suspend fun getMoviesDetail(): Flow<List<Movie>> = localDataSource.getMovies()
+
+    suspend fun updateMovie(movie: Movie) = localDataSource.updateMovie(movie)
 }

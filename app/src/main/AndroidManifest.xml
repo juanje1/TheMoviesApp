@@ -16,7 +16,7 @@
         android:theme="@style/Theme.TheMoviesApp"
         tools:targetApi="31">
         <activity
-            android:name=".framework.ui.screens.home.HomeActivity"
+            android:name=".framework.ui.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.TheMoviesApp">
             <intent-filter>

@@ -14,15 +14,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.juanje.themoviesapp.domain.Movie
 
 @Composable
-fun HomeItem(movie: Movie, onClick: () -> Unit) {
+fun HomeItem(movie: Movie, navController: NavHostController, onClick: () -> Unit) {
     Column(
         modifier = Modifier.background(MaterialTheme.colors.secondary)
     ) {
-        Box {
+        Box(
+            modifier = Modifier
+                .clickable {
+                    navController.navigate("detail/${movie.id}")
+                }
+        ) {
             AsyncImage(
                 model = "https://image.tmdb.org/t/p/w185/${movie.posterPath}",
                 contentDescription = movie.title,
