@@ -14,10 +14,21 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(private val loadPopularMovies: LoadPopularMovies)
     : ViewModel() {
 
+    companion object {
+        const val PAGE_THRESHOLD = 10
+    }
+
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state
 
+    val lastVisible = MutableStateFlow(0)
+
     init {
+        viewModelScope.launch {
+            lastVisible.collect {
+                notifyLastVisible(it)
+            }
+        }
         viewModelScope.launch {
             _state.value = UiState(loading = true)
 
@@ -30,6 +41,13 @@ class HomeViewModel @Inject constructor(private val loadPopularMovies: LoadPopul
     fun onMovieClick(movie: Movie) {
         viewModelScope.launch {
             loadPopularMovies.invokeUpdateMovie(movie.copy(favourite = !movie.favourite))
+        }
+    }
+
+    private suspend fun notifyLastVisible(lastVisible: Int) {
+        val size = loadPopularMovies.invokeGetCountMovies()
+        if(lastVisible >= size - PAGE_THRESHOLD) {
+            loadPopularMovies.invokeGetMovies()
         }
     }
 

@@ -6,8 +6,8 @@ import com.juanje.themoviesapp.framework.data.server.dataclasses.toMovie
 
 class MovieServerDataSource(private val movieService: MovieService): RemoteDataSource {
 
-    override suspend fun getMovies(apiKey: String): List<Movie> =
-        movieService.getMovies(apiKey)
+    override suspend fun getMovies(apiKey: String, page: Int): List<Movie> =
+        movieService.getMovies(apiKey, page)
             .results
             .map { it.toMovie() }
 }

@@ -1,9 +1,7 @@
 package com.juanje.themoviesapp.framework.ui.screens.home
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -34,7 +32,10 @@ fun HomeScreen(navController: NavHostController) {
             }
         }
         if(state.movies.isNotEmpty()) {
+            val listState = rememberLazyGridState()
+
             LazyVerticalGrid(
+                state = listState,
                 columns = GridCells.Adaptive(120.dp),
                 modifier = Modifier.padding(padding),
                 horizontalArrangement = Arrangement.spacedBy(4.dp),
@@ -47,8 +48,17 @@ fun HomeScreen(navController: NavHostController) {
                         navController = navController,
                         onClick = { viewModel.onMovieClick(movie) }
                     )
+                    val lastVisiblePosition = listState.isScrolledToTheEnd()
+
+                    if (lastVisiblePosition != null) {
+                        viewModel.lastVisible.value = lastVisiblePosition
+                    } else {
+                        viewModel.lastVisible.value = 0
+                    }
                 }
             }
         }
     }
 }
+
+fun LazyGridState.isScrolledToTheEnd() = layoutInfo.visibleItemsInfo.lastOrNull()?.index
