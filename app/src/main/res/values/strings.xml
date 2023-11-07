@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">TheMoviesApp</string>
+    <string name="name_database">movies-db</string>
+    <string name="base_url">https://api.themoviedb.org/3/</string>
+    <string name="image_url">https://image.tmdb.org/t/p/w185</string>
+    <string name="movies_text">Movies</string>
+    <string name="title_text">Title</string>
+    <string name="overview_text">Overview</string>
+    <string name="favourite_not_favourite_text">¿Favourite / Not Favourite?</string>
+    <string name="favourite_text">Favourite</string>
+    <string name="not_favourite_text">Not Favourite</string>
 </resources>

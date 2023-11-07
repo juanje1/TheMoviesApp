@@ -9,31 +9,35 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextDecoration
 import coil.compose.AsyncImage
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.domain.Movie
+import com.juanje.themoviesapp.framework.common.ImageAspectRatio
 
 @Composable
 fun DetailItem(padding: PaddingValues, movie: Movie) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .padding(padding)
             .verticalScroll(rememberScrollState())
     ) {
         AsyncImage(
-            model = "https://image.tmdb.org/t/p/w185/${movie.posterPath}",
+            model = context.getString(R.string.image_url)+movie.posterPath,
             contentDescription = movie.title,
             modifier = Modifier
                 .height(dimensionResource(R.dimen.cell_image_height))
-                .aspectRatio(2 / 3f)
+                .aspectRatio(ImageAspectRatio)
                 .align(Alignment.CenterHorizontally)
                 .padding(top = dimensionResource(R.dimen.padding_small)),
             contentScale = ContentScale.Crop
         )
         Text(
-            text = "Title",
+            text = context.getString(R.string.title_text),
             textDecoration = TextDecoration.Underline,
             style = MaterialTheme.typography.h6,
             modifier = Modifier.padding(
@@ -50,7 +54,7 @@ fun DetailItem(padding: PaddingValues, movie: Movie) {
             )
         )
         Text(
-            text = "Overview",
+            text = context.getString(R.string.overview_text),
             textDecoration = TextDecoration.Underline,
             style = MaterialTheme.typography.h6,
             modifier = Modifier.padding(
@@ -67,7 +71,7 @@ fun DetailItem(padding: PaddingValues, movie: Movie) {
             )
         )
         Text(
-            text = "¿Favourite / Not Favourite?",
+            text = context.getString(R.string.favourite_not_favourite_text),
             textDecoration = TextDecoration.Underline,
             style = MaterialTheme.typography.h6,
             modifier = Modifier.padding(
@@ -76,7 +80,9 @@ fun DetailItem(padding: PaddingValues, movie: Movie) {
             )
         )
         Text(
-            text = if (movie.favourite) "Favourite" else "Not Favourite",
+            text =
+                if (movie.favourite) context.getString(R.string.favourite_text)
+                else context.getString(R.string.not_favourite_text),
             modifier = Modifier.padding(
                 start = dimensionResource(R.dimen.padding_small),
                 top = dimensionResource(R.dimen.padding_xsmall),

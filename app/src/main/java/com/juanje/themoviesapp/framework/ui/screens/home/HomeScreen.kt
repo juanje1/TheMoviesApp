@@ -11,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -20,9 +21,10 @@ import com.juanje.themoviesapp.R
 fun HomeScreen(navController: NavHostController) {
     val viewModel: HomeViewModel = hiltViewModel()
     val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(text = "Movies") }) }
+        topBar = { TopAppBar(title = { Text(text = context.getString(R.string.movies_text)) }) }
     ) { padding ->
         if(state.loading) {
             Box(

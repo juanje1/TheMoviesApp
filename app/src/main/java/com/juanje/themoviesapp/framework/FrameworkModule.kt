@@ -2,6 +2,7 @@ package com.juanje.themoviesapp.framework
 
 import android.content.Context
 import androidx.room.Room
+import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.data.datasources.LocalDataSource
 import com.juanje.themoviesapp.data.datasources.RemoteDataSource
 import com.juanje.themoviesapp.framework.data.database.MovieDatabaseDataSource
@@ -28,12 +29,14 @@ class FrameworkModule {
     @Provides
     @Singleton
     @Named("apiKey")
-    fun apiKeyProvider(): String = "d30e1f350220f9aad6c4110df385d380"
+    fun apiKeyProvider(@ApplicationContext applicationContext: Context): String =
+        applicationContext.getString(R.string.api_key)
 
     @Provides
     @Singleton
     @Named("baseUrl")
-    fun baseUrlProvider(): String = "https://api.themoviedb.org/3/"
+    fun baseUrlProvider(@ApplicationContext applicationContext: Context): String =
+        applicationContext.getString(R.string.base_url)
 
     @Provides
     @Singleton
@@ -69,7 +72,7 @@ class FrameworkModule {
         Room.databaseBuilder(
             applicationContext,
             MovieDatabase::class.java,
-            name = "movies-db"
+            name = applicationContext.getString(R.string.name_database)
         ).build()
 
     @Provides
