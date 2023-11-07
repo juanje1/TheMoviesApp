@@ -11,9 +11,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.juanje.themoviesapp.R
 
 @Composable
 fun HomeScreen(navController: NavHostController) {
@@ -36,11 +37,15 @@ fun HomeScreen(navController: NavHostController) {
 
             LazyVerticalGrid(
                 state = listState,
-                columns = GridCells.Adaptive(120.dp),
+                columns = GridCells.Adaptive(
+                    dimensionResource(R.dimen.column_min_width)),
                 modifier = Modifier.padding(padding),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-                verticalArrangement = Arrangement.spacedBy(4.dp),
-                contentPadding = PaddingValues(4.dp)
+                horizontalArrangement = Arrangement.spacedBy(
+                    dimensionResource(R.dimen.padding_xsmall)),
+                verticalArrangement = Arrangement.spacedBy(
+                    dimensionResource(R.dimen.padding_xsmall)),
+                contentPadding = PaddingValues(
+                    dimensionResource(R.dimen.padding_xsmall))
             ) {
                 items(state.movies) { movie ->
                     HomeItem(
@@ -50,11 +55,10 @@ fun HomeScreen(navController: NavHostController) {
                     )
                     val lastVisiblePosition = listState.isScrolledToTheEnd()
 
-                    if (lastVisiblePosition != null) {
+                    if(lastVisiblePosition != null)
                         viewModel.lastVisible.value = lastVisiblePosition
-                    } else {
+                    else
                         viewModel.lastVisible.value = 0
-                    }
                 }
             }
         }

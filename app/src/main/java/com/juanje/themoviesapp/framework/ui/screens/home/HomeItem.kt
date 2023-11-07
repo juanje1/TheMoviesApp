@@ -12,10 +12,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.domain.Movie
 
 @Composable
@@ -43,7 +44,7 @@ fun HomeItem(movie: Movie, navController: NavHostController, onClick: () -> Unit
                 contentDescription = movie.title,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(4.dp)
+                    .padding(dimensionResource(R.dimen.padding_xsmall))
                     .clickable { onClick() },
                 tint = color
             )
@@ -53,8 +54,8 @@ fun HomeItem(movie: Movie, navController: NavHostController, onClick: () -> Unit
             textAlign = TextAlign.Center,
             color = MaterialTheme.colors.background,
             modifier = Modifier
-                .padding(4.dp)
-                .height(64.dp)
+                .padding(dimensionResource(R.dimen.padding_xsmall))
+                .height(dimensionResource(R.dimen.cell_title_height))
                 .align(Alignment.CenterHorizontally)
         )
     }

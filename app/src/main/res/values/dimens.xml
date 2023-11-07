@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="cell_thumb_height">200dp</dimen>
+    <dimen name="padding_xsmall">4dp</dimen>
+    <dimen name="padding_small">16dp</dimen>
+    <dimen name="padding_medium">32dp</dimen>
+    <dimen name="column_min_width">120dp</dimen>
+    <dimen name="cell_title_height">64dp</dimen>
+    <dimen name="cell_image_height">400dp</dimen>
 </resources>
