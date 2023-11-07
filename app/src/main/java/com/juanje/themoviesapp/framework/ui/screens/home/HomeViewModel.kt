@@ -26,13 +26,14 @@ class HomeViewModel @Inject constructor(private val loadPopularMovies: LoadPopul
     init {
         viewModelScope.launch {
             lastVisible.collect {
-                notifyLastVisible(it)
+                if(lastVisible.value != 0) notifyLastVisible(it)
             }
         }
         viewModelScope.launch {
             _state.value = UiState(loading = true)
 
-            loadPopularMovies.invokeGetMovies().collect {
+            val size = loadPopularMovies.invokeGetCountMovies()
+            loadPopularMovies.invokeGetMovies(lastVisible.value, size).collect {
                 _state.value = UiState(movies = it)
             }
         }
@@ -46,8 +47,8 @@ class HomeViewModel @Inject constructor(private val loadPopularMovies: LoadPopul
 
     private suspend fun notifyLastVisible(lastVisible: Int) {
         val size = loadPopularMovies.invokeGetCountMovies()
-        if(lastVisible >= size - PAGE_THRESHOLD) {
-            loadPopularMovies.invokeGetMovies()
+        if(lastVisible+1 >= size - PAGE_THRESHOLD) {
+            loadPopularMovies.invokeGetMovies(lastVisible+1, size)
         }
     }
 

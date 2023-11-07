@@ -6,11 +6,15 @@ import kotlinx.coroutines.flow.Flow
 
 class LoadPopularMovies(private val repository: MovieRepository) {
 
-    suspend fun invokeGetMovies(): Flow<List<Movie>> = repository.getMovies()
+    suspend fun invokeGetMovies(lastVisible: Int, size: Int): Flow<List<Movie>> =
+        repository.getMovies(lastVisible, size)
 
-    suspend fun invokeGetMoviesDetail(): Flow<List<Movie>> = repository.getMoviesDetail()
+    suspend fun invokeGetMoviesDetail(): Flow<List<Movie>> =
+        repository.getMoviesDetail()
 
-    suspend fun invokeGetCountMovies(): Int = repository.getCountMovies()
+    suspend fun invokeGetCountMovies(): Int =
+        repository.getCountMovies()
 
-    suspend fun invokeUpdateMovie(movie: Movie) = repository.updateMovie(movie)
+    suspend fun invokeUpdateMovie(movie: Movie) =
+        repository.updateMovie(movie)
 }
