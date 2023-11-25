@@ -1,8 +1,8 @@
 package com.juanje.themoviesapp.data
 
-import com.juanje.themoviesapp.data.datasources.LocalDataSource
-import com.juanje.themoviesapp.data.datasources.RemoteDataSource
-import com.juanje.themoviesapp.data.repositories.MovieRepository
+import com.juanje.data.datasources.LocalDataSource
+import com.juanje.data.datasources.RemoteDataSource
+import com.juanje.data.repositories.MovieRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

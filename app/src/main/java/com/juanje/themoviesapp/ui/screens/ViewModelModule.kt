@@ -1,0 +1,17 @@
+package com.juanje.themoviesapp.ui.screens
+
+import com.juanje.data.repositories.MovieRepository
+import com.juanje.usecases.LoadPopularMovies
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ViewModelComponent
+
+@Module
+@InstallIn(ViewModelComponent::class)
+class ViewModelModule {
+
+    @Provides
+    fun loadPopularMoviesProvider(repository: MovieRepository) = LoadPopularMovies(repository)
+
+}
