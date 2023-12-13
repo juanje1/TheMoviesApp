@@ -10,7 +10,8 @@ data class MovieEntity (
     val title: String,
     val overview: String,
     val posterPath: String,
-    val favourite: Boolean = false
+    val favourite: Boolean = false,
+    val userName: String
 )
 
 fun MovieEntity.toMovie() = Movie(
@@ -18,7 +19,8 @@ fun MovieEntity.toMovie() = Movie(
     title = title,
     overview = overview,
     posterPath = posterPath,
-    favourite = favourite
+    favourite = favourite,
+    userName = userName
 )
 
 fun Movie.toMovieEntity() = MovieEntity(
@@ -26,5 +28,6 @@ fun Movie.toMovieEntity() = MovieEntity(
     title = title,
     overview = overview,
     posterPath = posterPath,
-    favourite = favourite
+    favourite = favourite,
+    userName = userName
 )

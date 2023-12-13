@@ -30,9 +30,7 @@ fun HomeItem(movie: Movie, navController: NavHostController, onClick: () -> Unit
     ) {
         Box(
             modifier = Modifier
-                .clickable {
-                    navController.navigate("$Detail/${movie.id}")
-                }
+                .clickable { navController.navigate("$Detail/${movie.userName}/${movie.id}") }
         ) {
             AsyncImage(
                 model = context.getString(R.string.image_url)+movie.posterPath,

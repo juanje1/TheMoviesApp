@@ -1,7 +1,9 @@
 package com.juanje.themoviesapp.ui.screens
 
 import com.juanje.data.repositories.MovieRepository
-import com.juanje.usecases.LoadPopularMovies
+import com.juanje.data.repositories.UserRepository
+import com.juanje.usecases.LoadMovie
+import com.juanje.usecases.LoadUser
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,6 +14,9 @@ import dagger.hilt.android.components.ViewModelComponent
 class ViewModelModule {
 
     @Provides
-    fun loadPopularMoviesProvider(repository: MovieRepository) = LoadPopularMovies(repository)
+    fun loadUserProvider(userRepository: UserRepository) = LoadUser(userRepository)
+
+    @Provides
+    fun loadMovieProvider(movieRepository: MovieRepository) = LoadMovie(movieRepository)
 
 }

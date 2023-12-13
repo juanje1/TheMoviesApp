@@ -13,9 +13,14 @@ import androidx.navigation.navArgument
 import coil.annotation.ExperimentalCoilApi
 import com.juanje.themoviesapp.ui.navigation.Navigation.Detail
 import com.juanje.themoviesapp.ui.navigation.Navigation.Home
-import com.juanje.themoviesapp.ui.navigation.Navigation.MovieDetailArgs.MovieId
+import com.juanje.themoviesapp.ui.navigation.Navigation.Login
+import com.juanje.themoviesapp.ui.navigation.Navigation.MovieDetailsArgs.MovieId
+import com.juanje.themoviesapp.ui.navigation.Navigation.Register
+import com.juanje.themoviesapp.ui.navigation.Navigation.UserNameArgs.UserName
 import com.juanje.themoviesapp.ui.screens.detail.DetailScreen
 import com.juanje.themoviesapp.ui.screens.home.HomeScreen
+import com.juanje.themoviesapp.ui.screens.login.LoginScreen
+import com.juanje.themoviesapp.ui.screens.register.RegisterScreen
 import com.juanje.themoviesapp.ui.theme.TheMoviesAppTheme
 
 @ExperimentalCoilApi
@@ -28,19 +33,38 @@ fun TheMoviesAppNavHost() {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colors.background
         ) {
-            NavHost(navController = navController, startDestination = Home) {
-                composable(Home) {
-                    HomeScreen(navController)
+            NavHost(
+                navController = navController,
+                startDestination = Login
+            ) {
+                composable(Login) {
+                    LoginScreen(navController)
+                }
+                composable(Register) {
+                    RegisterScreen(navController)
                 }
                 composable(
-                    route = "$Detail/{$MovieId}",
+                    route = "$Home/{$UserName}",
                     arguments = listOf(
+                        navArgument(UserName) { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val userName = backStackEntry.arguments?.getString(UserName)
+                    requireNotNull(userName)
+                    HomeScreen(navController, userName)
+                }
+                composable(
+                    route = "$Detail/{$UserName}/{$MovieId}",
+                    arguments = listOf(
+                        navArgument(UserName) { type = NavType.StringType },
                         navArgument(MovieId) { type = NavType.IntType }
                     )
                 ) { backStackEntry ->
-                    val id = backStackEntry.arguments?.getInt(MovieId)
-                    requireNotNull(id)
-                    DetailScreen(id)
+                    val userName = backStackEntry.arguments?.getString(UserName)
+                    val movieId = backStackEntry.arguments?.getInt(MovieId)
+                    requireNotNull(userName)
+                    requireNotNull(movieId)
+                    DetailScreen(userName, movieId)
                 }
             }
         }

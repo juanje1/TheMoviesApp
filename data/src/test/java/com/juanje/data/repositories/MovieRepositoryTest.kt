@@ -1,7 +1,7 @@
 package com.juanje.data.repositories
 
-import com.juanje.data.datasources.LocalDataSource
-import com.juanje.data.datasources.RemoteDataSource
+import com.juanje.data.datasources.MovieLocalDataSource
+import com.juanje.data.datasources.MovieRemoteDataSource
 import com.juanje.domain.Movie
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.flow.first
@@ -23,9 +23,9 @@ class MovieRepositoryTest {
     private val page = 1
 
     @Mock
-    private lateinit var localDataSource: LocalDataSource
+    private lateinit var movieLocalDataSource: MovieLocalDataSource
     @Mock
-    private lateinit var remoteDataSource: RemoteDataSource
+    private lateinit var movieRemoteDataSource: MovieRemoteDataSource
     @Mock
     private lateinit var repository: MovieRepository
 
@@ -35,7 +35,7 @@ class MovieRepositoryTest {
 
         runBlocking { repository.getMovies(lastVisible, size) }
 
-        verifyBlocking(remoteDataSource) { getMovies(apiKey, page) }
+        verifyBlocking(movieRemoteDataSource) { getMovies(apiKey, page) }
     }
 
     @Test
@@ -44,7 +44,7 @@ class MovieRepositoryTest {
 
         runBlocking { repository.getMovies(lastVisible, size) }
 
-        verifyBlocking(localDataSource) { insertAll(serverMovies) }
+        verifyBlocking(movieLocalDataSource) { insertAll(serverMovies) }
     }
 
     @Test
@@ -53,7 +53,7 @@ class MovieRepositoryTest {
 
         runBlocking { repository.getMovies(lastVisible, size) }
 
-        verifyBlocking(remoteDataSource, times(0)) { getMovies(apiKey, page) }
+        verifyBlocking(movieRemoteDataSource, times(0)) { getMovies(apiKey, page) }
     }
 
     @Test
@@ -62,7 +62,7 @@ class MovieRepositoryTest {
 
         runBlocking { repository.getMovies(lastVisible, size) }
 
-        verifyBlocking(localDataSource, times(0)) { insertAll(any()) }
+        verifyBlocking(movieLocalDataSource, times(0)) { insertAll(any()) }
     }
 
     @Test
@@ -77,20 +77,20 @@ class MovieRepositoryTest {
     }
 
     private fun initializeMocks(sizeDatabase: Int, sizeServer: Int) {
-        localDataSource = mock {
+        movieLocalDataSource = mock {
             onBlocking { count() } doReturn sizeDatabase
             if(sizeDatabase > 0) {
                 initializeDatabaseMovies(sizeDatabase)
                 onBlocking { getMovies() } doReturn flowOf(databaseMovies)
             }
         }
-        remoteDataSource = mock {
+        movieRemoteDataSource = mock {
             if(sizeServer > 0) {
                 initializeServerMovies(sizeServer)
                 onBlocking { getMovies(apiKey, page) } doReturn serverMovies
             }
         }
-        repository = MovieRepository(localDataSource, remoteDataSource, apiKey)
+        repository = MovieRepository(movieLocalDataSource, movieRemoteDataSource, apiKey)
     }
 
     private fun initializeDatabaseMovies(sizeDatabase: Int) {

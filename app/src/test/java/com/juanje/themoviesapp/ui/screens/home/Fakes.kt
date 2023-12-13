@@ -1,7 +1,7 @@
 package com.juanje.themoviesapp.ui.screens.home
 
-import com.juanje.data.datasources.LocalDataSource
-import com.juanje.data.datasources.RemoteDataSource
+import com.juanje.data.datasources.MovieLocalDataSource
+import com.juanje.data.datasources.MovieRemoteDataSource
 import com.juanje.domain.Movie
 import kotlinx.coroutines.flow.flowOf
 
@@ -12,7 +12,7 @@ val fakeMovies = listOf(
     Movie(4, "Title 4", "Overview 4", "Poster Path 4", false)
 )
 
-class FakeLocalDataSource : LocalDataSource {
+class FakeMovieLocalDataSource : MovieLocalDataSource {
 
     private var movies = mutableListOf<Movie>()
 
@@ -29,7 +29,7 @@ class FakeLocalDataSource : LocalDataSource {
     override suspend fun count(): Int = movies.size
 }
 
-class FakeRemoteDataSource(private val movies: List<Movie> = emptyList()) : RemoteDataSource {
+class FakeMovieRemoteDataSource(private val movies: List<Movie> = emptyList()) : MovieRemoteDataSource {
 
     override suspend fun getMovies(apiKey: String, page: Int) = movies
 

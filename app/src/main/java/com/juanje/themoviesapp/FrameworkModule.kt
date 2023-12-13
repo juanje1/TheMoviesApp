@@ -2,13 +2,18 @@ package com.juanje.themoviesapp
 
 import android.content.Context
 import androidx.room.Room
-import com.juanje.data.datasources.LocalDataSource
-import com.juanje.data.datasources.RemoteDataSource
-import com.juanje.themoviesapp.data.database.MovieDatabaseDataSource
-import com.juanje.themoviesapp.data.database.MovieDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.juanje.data.datasources.MovieLocalDataSource
+import com.juanje.data.datasources.MovieRemoteDataSource
+import com.juanje.data.datasources.UserLocalDataSource
+import com.juanje.themoviesapp.data.database.TheMoviesAppDatabase
 import com.juanje.themoviesapp.data.database.daos.MovieDao
-import com.juanje.themoviesapp.data.server.MovieService
+import com.juanje.themoviesapp.data.database.daos.UserDao
+import com.juanje.themoviesapp.data.database.datasources.MovieDatabaseDataSource
+import com.juanje.themoviesapp.data.database.datasources.UserDatabaseDataSource
 import com.juanje.themoviesapp.data.server.MovieServerDataSource
+import com.juanje.themoviesapp.data.server.MovieService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,6 +25,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Named
 import javax.inject.Singleton
+
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -62,25 +68,45 @@ class FrameworkModule {
         retrofit.run { create(MovieService::class.java) }
 
     @Provides
-    fun movieServerDataSourceProvider(movieService: MovieService): RemoteDataSource =
+    fun movieServerDataSourceProvider(movieService: MovieService): MovieRemoteDataSource =
         MovieServerDataSource(movieService)
 
     @Provides
     @Singleton
-    fun movieDatabaseProvider(@ApplicationContext applicationContext: Context): MovieDatabase =
-        Room.databaseBuilder(
-            applicationContext,
-            MovieDatabase::class.java,
-            name = applicationContext.getString(R.string.name_database)
-        ).build()
+    fun getMigration1To2(): Migration =
+        object : Migration(1, 2) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    "ALTER TABLE MovieEntity ADD COLUMN userName TEXT NOT NULL DEFAULT ''"
+                )
+            }
+        }
 
     @Provides
     @Singleton
-    fun movieDaoProvider(movieDatabase: MovieDatabase): MovieDao =
-        movieDatabase.movieDao()
+    fun theMoviesAppDatabaseProvider(@ApplicationContext applicationContext: Context)
+    : TheMoviesAppDatabase = Room.databaseBuilder(
+        applicationContext,
+        TheMoviesAppDatabase::class.java,
+        name = applicationContext.getString(R.string.name_database)
+    ).addMigrations(getMigration1To2()).build()
 
     @Provides
-    fun movieDatabaseDataSourceProvider(movieDao: MovieDao): LocalDataSource =
-        MovieDatabaseDataSource(movieDao)
+    @Singleton
+    fun movieDaoProvider(theMoviesAppDatabase: TheMoviesAppDatabase): MovieDao =
+        theMoviesAppDatabase.movieDao()
+
+    @Provides
+    @Singleton
+    fun userDaoProvider(theMoviesAppDatabase: TheMoviesAppDatabase): UserDao =
+        theMoviesAppDatabase.userDao()
+
+    @Provides
+    fun movieDatabaseDataSourceProvider(movieDao: MovieDao)
+    : MovieLocalDataSource = MovieDatabaseDataSource(movieDao)
+
+    @Provides
+    fun userDatabaseDataSourceProvider(userDao: UserDao)
+    : UserLocalDataSource = UserDatabaseDataSource(userDao)
 
 }

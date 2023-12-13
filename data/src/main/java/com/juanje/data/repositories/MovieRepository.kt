@@ -1,13 +1,13 @@
 package com.juanje.data.repositories
 
-import com.juanje.data.datasources.LocalDataSource
-import com.juanje.data.datasources.RemoteDataSource
+import com.juanje.data.datasources.MovieLocalDataSource
+import com.juanje.data.datasources.MovieRemoteDataSource
 import com.juanje.domain.Movie
 import kotlinx.coroutines.flow.Flow
 
 class MovieRepository(
-    private val localDataSource: LocalDataSource,
-    private val remoteDataSource: RemoteDataSource,
+    private val movieLocalDataSource: MovieLocalDataSource,
+    private val movieRemoteDataSource: MovieRemoteDataSource,
     private val apiKey: String
 ) {
     companion object {
@@ -15,18 +15,20 @@ class MovieRepository(
         const val PAGE_SIZE = 20
     }
 
-    suspend fun getMovies(lastVisible: Int, size: Int): Flow<List<Movie>> {
+    suspend fun getMovies(userName: String, lastVisible: Int, size: Int): Flow<List<Movie>> {
         if(lastVisible >= size - PAGE_THRESHOLD) {
-            val page = getCountMovies() / PAGE_SIZE + 1
-            localDataSource.insertAll(remoteDataSource.getMovies(apiKey, page))
+            val page = getCountMovies(userName) / PAGE_SIZE + 1
+            movieLocalDataSource.insertAll(movieRemoteDataSource.getMovies(userName, apiKey, page))
         }
-
-        return localDataSource.getMovies()
+        return movieLocalDataSource.getMovies(userName)
     }
 
-    suspend fun getMoviesDetail(): Flow<List<Movie>> = localDataSource.getMovies()
+    suspend fun getMoviesDetail(userName: String): Flow<List<Movie>> =
+        movieLocalDataSource.getMovies(userName)
 
-    suspend fun getCountMovies(): Int = localDataSource.count()
+    suspend fun getCountMovies(userName: String): Int =
+        movieLocalDataSource.count(userName)
 
-    suspend fun updateMovie(movie: Movie) = localDataSource.updateMovie(movie)
+    suspend fun updateMovie(movie: Movie) =
+        movieLocalDataSource.updateMovie(movie)
 }

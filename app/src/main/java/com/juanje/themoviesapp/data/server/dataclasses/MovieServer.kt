@@ -20,10 +20,11 @@ data class MovieServer(
     val favourite: Boolean = false
 )
 
-fun MovieServer.toMovie() = Movie(
+fun MovieServer.toMovie(userName: String) = Movie(
     id = 0,
     title = title,
     overview = overview,
     posterPath = poster_path,
-    favourite = favourite
+    favourite = favourite,
+    userName = userName
 )

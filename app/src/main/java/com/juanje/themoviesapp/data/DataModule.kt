@@ -1,8 +1,10 @@
 package com.juanje.themoviesapp.data
 
-import com.juanje.data.datasources.LocalDataSource
-import com.juanje.data.datasources.RemoteDataSource
+import com.juanje.data.datasources.MovieLocalDataSource
+import com.juanje.data.datasources.UserLocalDataSource
+import com.juanje.data.datasources.MovieRemoteDataSource
 import com.juanje.data.repositories.MovieRepository
+import com.juanje.data.repositories.UserRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,10 +16,15 @@ import javax.inject.Named
 class DataModule {
 
     @Provides
+    fun userRepositoryProvider(
+        userLocalDataSource: UserLocalDataSource
+    ) = UserRepository(userLocalDataSource)
+
+    @Provides
     fun movieRepositoryProvider(
-        movieDatabaseDataSource: LocalDataSource,
-        movieServerDataSource: RemoteDataSource,
+        movieLocalDataSource: MovieLocalDataSource,
+        movieRemoteDataSource: MovieRemoteDataSource,
         @Named("apiKey") apiKey: String
-    ) = MovieRepository(movieDatabaseDataSource, movieServerDataSource, apiKey)
+    ) = MovieRepository(movieLocalDataSource, movieRemoteDataSource, apiKey)
 
 }

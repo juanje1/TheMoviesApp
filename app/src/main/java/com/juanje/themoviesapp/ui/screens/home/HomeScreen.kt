@@ -18,13 +18,24 @@ import androidx.navigation.NavHostController
 import com.juanje.themoviesapp.R
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(navController: NavHostController, userName: String) {
     val viewModel: HomeViewModel = hiltViewModel()
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
 
+    if (state.isInit) {
+        viewModel.resetInit()
+        viewModel.getMovies(userName)
+    }
+
     Scaffold(
-        topBar = { TopAppBar(title = { Text(text = context.getString(R.string.movies_text)) }) }
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = context.getString(R.string.movies_text)+" @${userName}")
+                }
+            )
+        }
     ) { padding ->
         if(state.loading) {
             Box(

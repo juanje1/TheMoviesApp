@@ -1,7 +1,7 @@
 package com.juanje.themoviesapp.ui.screens.home
 
 import com.juanje.data.repositories.MovieRepository
-import com.juanje.usecases.LoadPopularMovies
+import com.juanje.usecases.LoadMovie
 import kotlinx.coroutines.test.*
 import org.junit.*
 import org.junit.runner.RunWith
@@ -18,13 +18,13 @@ class HomeViewModelTest {
     @Test
     fun `Listening to movies flow emits the list of movies from the server`() = runTest {
         val repository = MovieRepository(
-            FakeLocalDataSource(),
-            FakeRemoteDataSource(fakeMovies),
+            FakeMovieLocalDataSource(),
+            FakeMovieRemoteDataSource(fakeMovies),
             apiKey
         )
-        val loadPopularMovies = LoadPopularMovies(repository)
+        val loadMovie = LoadMovie(repository)
 
-        val homeViewModel = HomeViewModel(loadPopularMovies)
+        val homeViewModel = HomeViewModel(loadMovie)
 
         val movies = homeViewModel.state.value.movies
         Assert.assertEquals(fakeMovies, movies)
