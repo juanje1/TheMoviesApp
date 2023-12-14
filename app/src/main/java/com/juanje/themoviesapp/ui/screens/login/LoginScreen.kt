@@ -11,17 +11,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavController
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.ui.screens.common.*
+import com.juanje.themoviesapp.ui.screens.common.EmailLogin
+import com.juanje.themoviesapp.ui.screens.common.LoginAction
+import com.juanje.themoviesapp.ui.screens.common.PasswordLogin
+import com.juanje.themoviesapp.ui.screens.common.RegisterNow
 
 @Composable
 fun LoginScreen(navController: NavController) {
+    val context = LocalContext.current
+
     Column (
         modifier = Modifier
             .fillMaxWidth()
@@ -38,29 +44,45 @@ fun LoginScreen(navController: NavController) {
                 .fillMaxHeight()
         ) {
             val (ref1, ref2) = createRefs()
-            Text(text = "TheMoviesApp | Login",
+            Text(text = context.getString(R.string.login_title),
                 color = Color.White,
                 modifier = Modifier
-                    .padding(top = 16.dp, start = 16.dp)
+                    .padding(
+                        top = dimensionResource(R.dimen.padding_medium),
+                        start = dimensionResource(R.dimen.padding_medium)
+                    )
                     .constrainAs(ref1) {
-                        linkTo(parent.top, ref2.top, bias = 0.6f)
-                        linkTo(parent.start, parent.end, bias = 0f)
+                        linkTo(
+                            parent.top,
+                            ref2.top,
+                            bias = context.getString(R.string.bias_medium).toFloat()
+                        )
+                        linkTo(
+                            parent.start,
+                            parent.end,
+                            bias = context.getString(R.string.bias_small).toFloat()
+                        )
                     },
-                fontSize = 30.sp,
+                fontSize = dimensionResource(R.dimen.font_size_large).value.sp,
                 fontWeight = FontWeight.Bold
             )
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(600.dp)
+                    .height(dimensionResource(R.dimen.cell_image_height))
                     .constrainAs(ref2) {
                         bottom.linkTo(parent.bottom)
                     }
                     .background(
-                        color = Color(parseColor("#E0E0E0")),
-                        shape = RoundedCornerShape(topStart = 40.dp, topEnd = 40.dp)
+                        color = Color(
+                            parseColor(context.getString(R.string.color_background_login))
+                        ),
+                        shape = RoundedCornerShape(
+                            topStart = dimensionResource(R.dimen.rounded_corner_shape_medium),
+                            topEnd = dimensionResource(R.dimen.rounded_corner_shape_medium)
+                        )
                     )
-                    .padding(32.dp)
+                    .padding(dimensionResource(R.dimen.padding_xlarge))
             ) {
                 LoginAction(
                     navController,

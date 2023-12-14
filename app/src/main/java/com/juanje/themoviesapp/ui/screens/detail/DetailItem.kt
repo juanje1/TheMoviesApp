@@ -30,63 +30,63 @@ fun DetailItem(padding: PaddingValues, movie: Movie) {
             model = context.getString(R.string.image_url)+movie.posterPath,
             contentDescription = movie.title,
             modifier = Modifier
-                .height(dimensionResource(R.dimen.cell_image_height))
+                .height(dimensionResource(R.dimen.cell_image_medium))
                 .aspectRatio(ImageAspectRatio)
                 .align(Alignment.CenterHorizontally)
-                .padding(top = dimensionResource(R.dimen.padding_small)),
+                .padding(top = dimensionResource(R.dimen.padding_medium)),
             contentScale = ContentScale.Crop
         )
         Text(
-            text = context.getString(R.string.title_text),
+            text = context.getString(R.string.title),
             textDecoration = TextDecoration.Underline,
             style = MaterialTheme.typography.h6,
             modifier = Modifier.padding(
-                start = dimensionResource(R.dimen.padding_small),
-                top = dimensionResource(R.dimen.padding_medium)
+                start = dimensionResource(R.dimen.padding_medium),
+                top = dimensionResource(R.dimen.padding_xlarge)
             )
         )
         Text(
             text = movie.title,
             modifier = Modifier.padding(
-                start = dimensionResource(R.dimen.padding_small),
+                start = dimensionResource(R.dimen.padding_medium),
                 top = dimensionResource(R.dimen.padding_xsmall),
-                end = dimensionResource(R.dimen.padding_small)
+                end = dimensionResource(R.dimen.padding_medium)
             )
         )
         Text(
-            text = context.getString(R.string.overview_text),
+            text = context.getString(R.string.overview),
             textDecoration = TextDecoration.Underline,
             style = MaterialTheme.typography.h6,
             modifier = Modifier.padding(
-                start = dimensionResource(R.dimen.padding_small),
-                top = dimensionResource(R.dimen.padding_small)
+                start = dimensionResource(R.dimen.padding_medium),
+                top = dimensionResource(R.dimen.padding_medium)
             )
         )
         Text(
             text = movie.overview,
             modifier = Modifier.padding(
-                start = dimensionResource(R.dimen.padding_small),
+                start = dimensionResource(R.dimen.padding_medium),
                 top = dimensionResource(R.dimen.padding_xsmall),
-                end = dimensionResource(R.dimen.padding_small)
+                end = dimensionResource(R.dimen.padding_medium)
             )
         )
         Text(
-            text = context.getString(R.string.favourite_not_favourite_text),
+            text = context.getString(R.string.favourite_not_favourite),
             textDecoration = TextDecoration.Underline,
             style = MaterialTheme.typography.h6,
             modifier = Modifier.padding(
-                start = dimensionResource(R.dimen.padding_small),
-                top = dimensionResource(R.dimen.padding_small)
+                start = dimensionResource(R.dimen.padding_medium),
+                top = dimensionResource(R.dimen.padding_medium)
             )
         )
         Text(
             text =
-                if (movie.favourite) context.getString(R.string.favourite_text)
-                else context.getString(R.string.not_favourite_text),
+                if (movie.favourite) context.getString(R.string.favourite)
+                else context.getString(R.string.not_favourite),
             modifier = Modifier.padding(
-                start = dimensionResource(R.dimen.padding_small),
+                start = dimensionResource(R.dimen.padding_medium),
                 top = dimensionResource(R.dimen.padding_xsmall),
-                bottom = dimensionResource(R.dimen.padding_small)
+                bottom = dimensionResource(R.dimen.padding_medium)
             )
         )
     }

@@ -1,9 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Padding -->
     <dimen name="padding_xsmall">4dp</dimen>
-    <dimen name="padding_small">16dp</dimen>
-    <dimen name="padding_medium">32dp</dimen>
-    <dimen name="column_min_width">120dp</dimen>
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_medium">16dp</dimen>
+    <dimen name="padding_large">24dp</dimen>
+    <dimen name="padding_xlarge">32dp</dimen>
+
+    <!-- Font Size -->
+    <dimen name="font_size_xsmall">14dp</dimen>
+    <dimen name="font_size_small">20dp</dimen>
+    <dimen name="font_size_medium">22dp</dimen>
+    <dimen name="font_size_large">30dp</dimen>
+
+    <!-- Others -->
     <dimen name="cell_title_height">64dp</dimen>
-    <dimen name="cell_image_height">400dp</dimen>
+    <dimen name="cell_image_medium">400dp</dimen>
+    <dimen name="cell_image_height">600dp</dimen>
+    <dimen name="rounded_corner_shape_small">10dp</dimen>
+    <dimen name="rounded_corner_shape_medium">40dp</dimen>
+    <dimen name="button_height">55dp</dimen>
+    <dimen name="column_min_width">120dp</dimen>
+    <dimen name="column_register_height">600dp</dimen>
+    <dimen name="line_height">1dp</dimen>
 </resources>

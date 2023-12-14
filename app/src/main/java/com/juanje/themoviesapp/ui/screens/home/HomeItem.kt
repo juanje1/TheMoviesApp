@@ -25,6 +25,7 @@ import com.juanje.themoviesapp.ui.navigation.Navigation.Detail
 @Composable
 fun HomeItem(movie: Movie, navController: NavHostController, onClick: () -> Unit) {
     val context = LocalContext.current
+
     Column(
         modifier = Modifier.background(MaterialTheme.colors.secondary)
     ) {

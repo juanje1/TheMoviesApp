@@ -16,24 +16,27 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.juanje.themoviesapp.R
 
 @Composable
 fun PasswordLogin(): String {
     var textPasswordLogin by rememberSaveable { mutableStateOf("") }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
 
     Text(
-        text = "Password",
-        fontSize = 20.sp,
+        text = context.getString(R.string.password),
+        fontSize = dimensionResource(R.dimen.font_size_small).value.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier
-            .padding(top = 16.dp),
+            .padding(top = dimensionResource(R.dimen.padding_medium)),
         color = Color.Black
     )
     TextField(
@@ -41,8 +44,8 @@ fun PasswordLogin(): String {
         onValueChange = {
             textPasswordLogin = it
         },
-        label = { Text(text = "Type your Password") },
-        shape = RoundedCornerShape(10.dp),
+        label = { Text(text = context.getString(R.string.password_label)) },
+        shape = RoundedCornerShape(dimensionResource(R.dimen.rounded_corner_shape_small)),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         visualTransformation =
         if (passwordVisible) VisualTransformation.None
@@ -51,19 +54,19 @@ fun PasswordLogin(): String {
             backgroundColor = Color.White,
             focusedBorderColor = Color.Transparent,
             unfocusedBorderColor = Color.Transparent,
-            textColor = Color(parseColor("#5E5E5E")),
-            unfocusedLabelColor = Color(parseColor("#5E5E5E"))
+            textColor = Color(parseColor(context.getString(R.string.color_text_fields))),
+            unfocusedLabelColor = Color(parseColor(context.getString(R.string.color_text_fields)))
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp),
+            .padding(top = dimensionResource(R.dimen.padding_small)),
         trailingIcon = {
             val image =
                 if (passwordVisible) Icons.Filled.Visibility
                 else Icons.Filled.VisibilityOff
             val description =
-                if (passwordVisible) "Hide password"
-                else "Show password"
+                if (passwordVisible) context.getString(R.string.password_hide)
+                else context.getString(R.string.password_show)
             IconButton(onClick = { passwordVisible = !passwordVisible }){
                 Icon(imageVector = image, description)
             }

@@ -15,10 +15,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.ui.navigation.Navigation.Login
 import com.juanje.themoviesapp.ui.screens.register.RegisterViewModel
 
@@ -33,14 +35,15 @@ fun RegisterAction(
     password: String
 ) {
     val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
 
     if (state.timeExecution > 0) {
         if (state.userValid) {
-            showToast(navController.context, "User created successfully")
+            showToast(navController.context, context.getString(R.string.register_success))
             navController.navigate(Login)
         }
         else {
-            showToast(navController.context, "Error creating the user")
+            showToast(navController.context, context.getString(R.string.register_error))
         }
         viewModel.resetState()
     }
@@ -48,18 +51,23 @@ fun RegisterAction(
     Button(
         onClick = { viewModel.onRegisterClick(userName, firstName, lastName, email, password) },
         modifier = Modifier
-            .padding(top = 32.dp, bottom = 16.dp)
+            .padding(
+                top = dimensionResource(R.dimen.padding_xlarge),
+                bottom = dimensionResource(R.dimen.padding_medium)
+            )
             .fillMaxWidth()
-            .height(55.dp),
+            .height(dimensionResource(R.dimen.button_height)),
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color(parseColor("#FA951A")),
+            backgroundColor = Color(
+                parseColor(context.getString(R.string.color_background_button))
+            )
         ),
-        shape = RoundedCornerShape(10.dp)
+        shape = RoundedCornerShape(dimensionResource(R.dimen.rounded_corner_shape_small))
     ) {
         Text(
-            text = "Register",
+            text = context.getString(R.string.register_button),
             color = Color.White,
-            fontSize = 22.sp,
+            fontSize = dimensionResource(R.dimen.font_size_medium).value.sp,
             fontWeight = FontWeight.Bold
         )
     }

@@ -1,12 +1,67 @@
 <resources>
+    <!-- General Strings -->
     <string name="app_name">TheMoviesApp</string>
     <string name="name_database">TheMoviesApp-db</string>
     <string name="base_url">https://api.themoviedb.org/3/</string>
     <string name="image_url">https://image.tmdb.org/t/p/w185</string>
-    <string name="movies_text">Movies</string>
-    <string name="title_text">Title</string>
-    <string name="overview_text">Overview</string>
-    <string name="favourite_not_favourite_text">¿Favourite / Not Favourite?</string>
-    <string name="favourite_text">Favourite</string>
-    <string name="not_favourite_text">Not Favourite</string>
+
+    <!-- General Fields -->
+    <string name="username">User Name</string>
+    <string name="username_label">User Name</string>
+    <string name="username_error_messages">UserName</string>
+    <string name="username_error_field_description">Error</string>
+
+    <string name="firstname">First Name</string>
+    <string name="firstname_label">First Name</string>
+    <string name="firstname_error_messages">FirstName</string>
+    <string name="firstname_error_field_description">Error</string>
+
+    <string name="lastname">Last Name</string>
+    <string name="lastname_label">Last Name</string>
+    <string name="lastname_error_messages">LastName</string>
+    <string name="lastname_error_field_description">Error</string>
+
+    <string name="email">Email</string>
+    <string name="email_label">example@gmail.com</string>
+    <string name="email_error_messages">Email</string>
+    <string name="email_error_field_description">Error</string>
+
+    <string name="password">Password</string>
+    <string name="password_label">Type your Password</string>
+    <string name="password_error_messages">Password</string>
+    <string name="password_error_field_description">Error</string>
+    <string name="password_hide">Hide Password</string>
+    <string name="password_show">Show Password</string>
+
+    <string name="color_background_button">#FA951A</string>
+    <string name="color_text_fields">#5E5E5E</string>
+
+    <!-- Login Screen Strings -->
+    <string name="login_title">TheMoviesApp | Login</string>
+    <string name="login_button">Login</string>
+    <string name="login_error">Email/Password not valid</string>
+    <string name="color_background_login">#E0E0E0</string>
+
+    <!-- Register Screen Strings -->
+    <string name="or_register_now">Or Register Now</string>
+    <string name="register_title">TheMoviesApp | Register</string>
+    <string name="register_button">Register</string>
+    <string name="register_success">User created successfully</string>
+    <string name="register_error">Error creating the user</string>
+    <string name="color_text_register_now">#4D4D4D</string>
+
+    <!-- Home Screen Strings -->
+    <string name="movies_title">Movies</string>
+
+    <!-- Detail Screen Strings -->
+    <string name="title">Title</string>
+    <string name="overview">Overview</string>
+    <string name="favourite_not_favourite">¿Favourite / Not Favourite?</string>
+    <string name="favourite">Favourite</string>
+    <string name="not_favourite">Not Favourite</string>
+
+    <!-- Float Values -->
+    <string name="bias_small">0f</string>
+    <string name="bias_medium">0.6f</string>
+    <string name="line_weight">1f</string>
 </resources>

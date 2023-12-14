@@ -11,55 +11,67 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.ui.navigation.Navigation
 
 @Composable
 fun RegisterNow(navController: NavController) {
+    val context = LocalContext.current
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 24.dp),
+            .padding(top = dimensionResource(R.dimen.padding_large)),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
             modifier = Modifier
-                .height(1.dp)
-                .weight(1f)
-                .background(Color(parseColor("#4D4D4D")))
+                .height(dimensionResource(R.dimen.line_height))
+                .weight(context.getString(R.string.line_weight).toFloat())
+                .background(Color(parseColor(context.getString(R.string.color_text_register_now))))
         )
         Text(
-            text = "Or Register Now",
-            fontSize = 14.sp,
+            text = context.getString(R.string.or_register_now),
+            fontSize = dimensionResource(R.dimen.font_size_xsmall).value.sp,
             modifier = Modifier
-                .padding(start = 8.dp, end = 8.dp),
-            color = Color(parseColor("#4D4D4D"))
+                .padding(
+                    start = dimensionResource(R.dimen.padding_small),
+                    end = dimensionResource(R.dimen.padding_small)
+                ),
+            color = Color(parseColor(context.getString(R.string.color_text_register_now))),
         )
         Box(
             modifier = Modifier
-                .height(1.dp)
-                .weight(1f)
-                .background(Color(parseColor("#4D4D4D")))
+                .height(dimensionResource(R.dimen.line_height))
+                .weight(context.getString(R.string.line_weight).toFloat())
+                .background(Color(parseColor(context.getString(R.string.color_text_register_now))))
         )
     }
     Button(
         onClick = { navController.navigate(Navigation.Register) },
         modifier = Modifier
-            .padding(top = 16.dp, bottom = 16.dp)
+            .padding(
+                top = dimensionResource(R.dimen.padding_medium),
+                bottom = dimensionResource(R.dimen.padding_medium)
+            )
             .fillMaxWidth()
-            .height(55.dp),
+            .height(dimensionResource(R.dimen.button_height)),
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color(parseColor("#FA951A")),
+            backgroundColor = Color(
+                parseColor(context.getString(R.string.color_background_button))
+            )
         ),
-        shape = RoundedCornerShape(10.dp)
+        shape = RoundedCornerShape(dimensionResource(R.dimen.rounded_corner_shape_small))
     ) {
         Text(
-            text = "Register",
+            text = context.getString(R.string.register_button),
             color = Color.White,
-            fontSize = 22.sp,
+            fontSize = dimensionResource(R.dimen.font_size_medium).value.sp,
             fontWeight = FontWeight.Bold
         )
     }

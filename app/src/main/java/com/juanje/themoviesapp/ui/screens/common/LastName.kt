@@ -11,9 +11,12 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.ui.screens.register.RegisterViewModel
 
 @Composable
@@ -21,17 +24,21 @@ fun LastName(viewModel: RegisterViewModel): String {
     val state by viewModel.state.collectAsState()
     var textLastName by rememberSaveable { mutableStateOf("") }
     var isEdited by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
 
     if (isEdited) {
         isEdited = false
-        viewModel.checkFieldValid("LastName", textLastName)
+        viewModel.checkFieldValid(
+            context.getString(R.string.lastname_error_messages),
+            textLastName
+        )
     }
     Text(
-        text = "Last Name",
-        fontSize = 20.sp,
+        text = context.getString(R.string.lastname),
+        fontSize = dimensionResource(R.dimen.font_size_small).value.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier
-            .padding(top = 16.dp),
+            .padding(top = dimensionResource(R.dimen.padding_medium)),
         color = Color.Black
     )
 
@@ -41,35 +48,38 @@ fun LastName(viewModel: RegisterViewModel): String {
             textLastName = it
             isEdited = true
         },
-        label = { Text(text = "Last Name") },
-        shape = RoundedCornerShape(10.dp),
+        label = { Text(text = context.getString(R.string.lastname_label)) },
+        shape = RoundedCornerShape(dimensionResource(R.dimen.rounded_corner_shape_small)),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             backgroundColor = Color.White,
             focusedBorderColor = Color.Transparent,
             unfocusedBorderColor = Color.Transparent,
-            textColor = Color(parseColor("#5E5E5E")),
-            unfocusedLabelColor = Color(parseColor("#5E5E5E"))
+            textColor = Color(parseColor(context.getString(R.string.color_text_fields))),
+            unfocusedLabelColor = Color(parseColor(context.getString(R.string.color_text_fields)))
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp),
+            .padding(top = dimensionResource(R.dimen.padding_small)),
         trailingIcon = {
-            if (state.errorMessages["LastName"]?.isNotEmpty() == true)
+            if (state.errorMessages[context.getString(R.string.lastname_error_messages)]?.
+                isNotEmpty() == true)
                 Icon(
                     Icons.Filled.Error,
-                    "Error",
+                    context.getString(R.string.lastname_error_field_description),
                     tint = MaterialTheme.colors.error
                 )
         },
-        isError = state.errorMessages["LastName"]?.isNotEmpty() == true
+        isError = state.errorMessages[context.getString(R.string.lastname_error_messages)]?.
+            isNotEmpty() == true
     )
-    if (state.errorMessages["LastName"]?.isNotEmpty() == true) {
+    if (state.errorMessages[context.getString(R.string.lastname_error_messages)]?.
+        isNotEmpty() == true) {
         Text(
-            text = state.errorMessages["LastName"] ?: "",
+            text = state.errorMessages[context.getString(R.string.lastname_error_messages)] ?: "",
             color = MaterialTheme.colors.error,
             style = MaterialTheme.typography.caption,
             modifier = Modifier
-                .padding(start = 16.dp)
+                .padding(start = dimensionResource(R.dimen.padding_medium))
         )
     }
     return textLastName

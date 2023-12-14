@@ -32,7 +32,7 @@ fun HomeScreen(navController: NavHostController, userName: String) {
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = context.getString(R.string.movies_text)+" @${userName}")
+                    Text(text = context.getString(R.string.movies_title)+" @${userName}")
                 }
             )
         }
