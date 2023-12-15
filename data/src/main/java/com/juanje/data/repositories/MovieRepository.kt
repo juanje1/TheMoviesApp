@@ -23,8 +23,8 @@ class MovieRepository(
         return movieLocalDataSource.getMovies(userName)
     }
 
-    suspend fun getMoviesDetail(userName: String): Flow<List<Movie>> =
-        movieLocalDataSource.getMovies(userName)
+    suspend fun getMovieDetail(userName: String, movieId: Int): Movie =
+        movieLocalDataSource.getMovie(userName, movieId)
 
     suspend fun getCountMovies(userName: String): Int =
         movieLocalDataSource.count(userName)

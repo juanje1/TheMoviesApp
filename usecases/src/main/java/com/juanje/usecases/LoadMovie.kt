@@ -9,8 +9,8 @@ class LoadMovie(private val movieRepository: MovieRepository) {
     suspend fun invokeGetMovies(userName: String, lastVisible: Int, size: Int): Flow<List<Movie>> =
         movieRepository.getMovies(userName, lastVisible, size)
 
-    suspend fun invokeGetMoviesDetail(userName: String): Flow<List<Movie>> =
-        movieRepository.getMoviesDetail(userName)
+    suspend fun invokeGetMovieDetail(userName: String, movieId: Int): Movie =
+        movieRepository.getMovieDetail(userName, movieId)
 
     suspend fun invokeGetCountMovies(userName: String): Int =
         movieRepository.getCountMovies(userName)

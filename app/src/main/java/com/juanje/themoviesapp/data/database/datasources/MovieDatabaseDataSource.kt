@@ -12,6 +12,9 @@ class MovieDatabaseDataSource(private val movieDao: MovieDao): MovieLocalDataSou
     override suspend fun getMovies(userName: String) =
         movieDao.getMovies(userName).map { movies -> movies.map { it.toMovie() } }
 
+    override suspend fun getMovie(userName: String, movieId: Int) =
+        movieDao.getMovie(userName, movieId).toMovie()
+
     override suspend fun count(userName: String) =
         movieDao.count(userName)
 

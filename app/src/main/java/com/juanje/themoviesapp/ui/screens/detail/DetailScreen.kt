@@ -6,7 +6,6 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
@@ -16,22 +15,20 @@ fun DetailScreen(userName: String, movieId: Int) {
 
     if (state.isInit) {
         viewModel.resetInit()
-        viewModel.getMoviesDetail(userName)
+        viewModel.getMovieDetail(userName, movieId)
     }
 
-    if (state.movies.isNotEmpty()) {
-        val movie = remember { state.movies.first { it.id == movieId } }
-
+    state.movie?.let {
         Scaffold(
             topBar = {
                 TopAppBar(
                     title = {
-                        Text(text = movie.title)
+                        Text(text = it.title)
                     }
                 )
             }
         ) { padding ->
-            DetailItem(padding, movie)
+            DetailItem(padding, it)
         }
     }
 }

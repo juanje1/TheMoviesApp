@@ -22,16 +22,14 @@ class DetailViewModel @Inject constructor(private val loadMovie: LoadMovie) : Vi
 
     fun resetInit() { _state.value = UiState() }
 
-    fun getMoviesDetail(userName: String) {
+    fun getMovieDetail(userName: String, movieId: Int) {
         viewModelScope.launch {
-            loadMovie.invokeGetMoviesDetail(userName).collect {
-                _state.value = UiState(movies = it)
-            }
+            _state.value = UiState(movie = loadMovie.invokeGetMovieDetail(userName, movieId))
         }
     }
 
     data class UiState(
-        val movies: List<Movie> = emptyList(),
+        val movie: Movie ?= null,
         val isInit: Boolean = false
     )
 }

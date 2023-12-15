@@ -10,6 +10,9 @@ interface MovieDao {
     @Query("SELECT * FROM MovieEntity WHERE userName = :userName")
     fun getMovies(userName: String): Flow<List<MovieEntity>>
 
+    @Query("SELECT * FROM MovieEntity WHERE userName = :userName AND id = :movieId")
+    suspend fun getMovie(userName: String, movieId: Int): MovieEntity
+
     @Query("SELECT COUNT(*) FROM MovieEntity WHERE userName = :userName")
     suspend fun count(userName: String): Int
 
