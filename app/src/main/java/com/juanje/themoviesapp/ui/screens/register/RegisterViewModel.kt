@@ -1,11 +1,15 @@
 package com.juanje.themoviesapp.ui.screens.register
 
+import android.annotation.SuppressLint
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanje.domain.User
+import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.common.initializeErrorMessages
 import com.juanje.usecases.LoadUser
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,7 +19,10 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
-class RegisterViewModel @Inject constructor(private val loadUser: LoadUser) : ViewModel() {
+class RegisterViewModel @Inject constructor(
+    private val loadUser: LoadUser,
+    @field:SuppressLint("StaticFieldLeak") @ApplicationContext val context: Context
+) : ViewModel(){
 
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state
@@ -29,8 +36,8 @@ class RegisterViewModel @Inject constructor(private val loadUser: LoadUser) : Vi
                 timeExecution = _state.value.timeExecution + 1
             )
             checkUserNameValid(userName)
-            checkFieldValid("FirstName", firstName)
-            checkFieldValid("LastName", lastName)
+            checkFieldValid(context.getString(R.string.firstname_error_messages), firstName)
+            checkFieldValid(context.getString(R.string.lastname_error_messages), lastName)
             checkEmailValid(email)
             checkPasswordValid(password)
 
@@ -42,7 +49,7 @@ class RegisterViewModel @Inject constructor(private val loadUser: LoadUser) : Vi
 
     private fun checkEmptyField(field: String, text: String) {
         if (text.isEmpty()) {
-            _state.value.errorMessages[field] = "The field cannot be empty"
+            _state.value.errorMessages[field] = context.getString(R.string.field_not_empty)
             _state.value = UiState(
                 timeExecution = _state.value.timeExecution,
                 errorMessages = _state.value.errorMessages
@@ -56,13 +63,14 @@ class RegisterViewModel @Inject constructor(private val loadUser: LoadUser) : Vi
             loadUser.invokeExistsUserName(userName)
         }
         if (existsUserName) {
-            _state.value.errorMessages["UserName"] = "The UserName already exists"
+            _state.value.errorMessages[context.getString(R.string.username_error_messages)] =
+                context.getString(R.string.username_exists)
             _state.value = UiState(
                 timeExecution = _state.value.timeExecution,
                 errorMessages = _state.value.errorMessages
             )
         }
-        else resetMessageError("UserName")
+        else resetMessageError(context.getString(R.string.username_error_messages))
     }
 
     private fun checkEmailExists(email: String) = runBlocking {
@@ -70,29 +78,32 @@ class RegisterViewModel @Inject constructor(private val loadUser: LoadUser) : Vi
             loadUser.invokeExistsEmail(email)
         }
         if (existsEmail) {
-            _state.value.errorMessages["Email"] = "The Email already exists"
+            _state.value.errorMessages[context.getString(R.string.email_error_messages)] =
+                context.getString(R.string.email_exists)
             _state.value = UiState(
                 timeExecution = _state.value.timeExecution,
                 errorMessages = _state.value.errorMessages
             )
         }
-        else resetMessageError("Email")
+        else resetMessageError(context.getString(R.string.email_error_messages))
     }
 
     private fun checkMinimumLengthPassword(password: String) {
         if (password.length < 8) {
-            _state.value.errorMessages["Password"] = "The Password must have at least 8 characters"
+            _state.value.errorMessages[context.getString(R.string.password_error_messages)] =
+                context.getString(R.string.password_length)
             _state.value = UiState(
                 timeExecution = _state.value.timeExecution,
                 errorMessages = _state.value.errorMessages
             )
         }
-        else resetMessageError("Password")
+        else resetMessageError(context.getString(R.string.password_error_messages))
     }
 
     fun checkUserNameValid(userName: String) {
-        checkEmptyField("UserName", userName)
-        if (_state.value.errorMessages["UserName"]?.isEmpty() == true)
+        checkEmptyField(context.getString(R.string.username_error_messages), userName)
+        if (_state.value.errorMessages[context.getString(R.string.username_error_messages)]
+                ?.isEmpty() == true)
             checkUserNameExists(userName)
     }
 
@@ -101,8 +112,9 @@ class RegisterViewModel @Inject constructor(private val loadUser: LoadUser) : Vi
     }
 
     fun checkEmailValid(email: String) {
-        checkEmptyField("Email", email)
-        if (_state.value.errorMessages["Email"]?.isEmpty() == true)
+        checkEmptyField(context.getString(R.string.email_error_messages), email)
+        if (_state.value.errorMessages[context.getString(R.string.email_error_messages)]
+                ?.isEmpty() == true)
             checkEmailExists(email)
     }
 

@@ -48,6 +48,10 @@
     <string name="register_button">Register</string>
     <string name="register_success">User created successfully</string>
     <string name="register_error">Error creating the user</string>
+    <string name="field_not_empty">The field cannot be empty</string>
+    <string name="username_exists">The UserName already exists</string>
+    <string name="email_exists">The Email already exists</string>
+    <string name="password_length">The Password must have at least 8 characters</string>
     <string name="color_text_register_now">#4D4D4D</string>
 
     <!-- Home Screen Strings -->
