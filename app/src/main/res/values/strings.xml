@@ -46,6 +46,7 @@
     <string name="or_register_now">Or Register Now</string>
     <string name="register_title">TheMoviesApp | Register</string>
     <string name="register_button">Register</string>
+    <string name="cancel_button">Cancel</string>
     <string name="register_success">User created successfully</string>
     <string name="register_error">Error creating the user</string>
     <string name="field_not_empty">The field cannot be empty</string>
@@ -68,4 +69,7 @@
     <string name="bias_small">0f</string>
     <string name="bias_medium">0.6f</string>
     <string name="line_weight">1f</string>
+
+    <!-- Others -->
+    <string name="arrow_back_content_description">Arrow back</string>
 </resources>

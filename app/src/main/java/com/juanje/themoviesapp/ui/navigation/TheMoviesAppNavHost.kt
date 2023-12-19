@@ -64,7 +64,7 @@ fun TheMoviesAppNavHost() {
                     val movieId = backStackEntry.arguments?.getInt(MovieId)
                     requireNotNull(userName)
                     requireNotNull(movieId)
-                    DetailScreen(userName, movieId)
+                    DetailScreen(navController, userName, movieId)
                 }
             }
         }

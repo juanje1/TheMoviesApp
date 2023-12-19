@@ -3,7 +3,9 @@ package com.juanje.themoviesapp.ui.screens.login
 import android.graphics.Color.parseColor
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -70,6 +72,7 @@ fun LoginScreen(navController: NavController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(dimensionResource(R.dimen.cell_image_height))
+                    .verticalScroll(rememberScrollState())
                     .constrainAs(ref2) {
                         bottom.linkTo(parent.bottom)
                     }
