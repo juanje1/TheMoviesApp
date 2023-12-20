@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.ui.navigation.Navigation.Home
+import com.juanje.themoviesapp.ui.navigation.NavigationRoutes.Home
 import com.juanje.themoviesapp.ui.screens.login.LoginViewModel
 
 @Composable

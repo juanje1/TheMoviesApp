@@ -20,7 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.ui.navigation.Navigation.Login
+import com.juanje.themoviesapp.ui.navigation.NavigationRoutes.Login
 import com.juanje.themoviesapp.ui.screens.register.RegisterViewModel
 
 @Composable

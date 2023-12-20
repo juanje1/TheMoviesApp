@@ -17,7 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.ui.navigation.Navigation
+import com.juanje.themoviesapp.ui.navigation.NavigationRoutes.Register
 
 @Composable
 fun RegisterNow(navController: NavController) {
@@ -53,7 +53,7 @@ fun RegisterNow(navController: NavController) {
         )
     }
     Button(
-        onClick = { navController.navigate(Navigation.Register) },
+        onClick = { navController.navigate(Register) },
         modifier = Modifier
             .padding(
                 top = dimensionResource(R.dimen.padding_medium),

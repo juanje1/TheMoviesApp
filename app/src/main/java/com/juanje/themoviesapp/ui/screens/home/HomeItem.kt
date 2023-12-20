@@ -20,7 +20,7 @@ import coil.compose.AsyncImage
 import com.juanje.themoviesapp.R
 import com.juanje.domain.Movie
 import com.juanje.themoviesapp.common.ImageAspectRatio
-import com.juanje.themoviesapp.ui.navigation.Navigation.Detail
+import com.juanje.themoviesapp.ui.navigation.NavigationRoutes.Detail
 
 @Composable
 fun HomeItem(movie: Movie, navController: NavHostController, onClick: () -> Unit) {
