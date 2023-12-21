@@ -15,23 +15,24 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.juanje.themoviesapp.R
 import com.juanje.domain.Movie
+import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.common.ImageAspectRatio
-import com.juanje.themoviesapp.ui.navigation.NavigationRoutes.Detail
 
 @Composable
-fun HomeItem(movie: Movie, navController: NavHostController, onClick: () -> Unit) {
+fun HomeItem(
+    onClickMovie: (Movie) -> Unit,
+    onClickFavourite: () -> Unit,
+    movie: Movie,
+) {
     val context = LocalContext.current
 
     Column(
         modifier = Modifier.background(MaterialTheme.colors.secondary)
     ) {
         Box(
-            modifier = Modifier
-                .clickable { navController.navigate("$Detail/${movie.userName}/${movie.id}") }
+            modifier = Modifier.clickable { onClickMovie(movie) }
         ) {
             AsyncImage(
                 model = context.getString(R.string.image_url)+movie.posterPath,
@@ -48,7 +49,7 @@ fun HomeItem(movie: Movie, navController: NavHostController, onClick: () -> Unit
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(dimensionResource(R.dimen.padding_xsmall))
-                    .clickable { onClick() },
+                    .clickable { onClickFavourite() },
                 tint = color
             )
         }

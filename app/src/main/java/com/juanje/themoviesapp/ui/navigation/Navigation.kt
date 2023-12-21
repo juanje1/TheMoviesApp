@@ -16,7 +16,6 @@ import com.juanje.themoviesapp.ui.screens.home.HomeScreen
 import com.juanje.themoviesapp.ui.screens.login.LoginScreen
 import com.juanje.themoviesapp.ui.screens.register.RegisterScreen
 import com.juanje.themoviesapp.ui.theme.TheMoviesAppTheme
-import java.lang.IllegalArgumentException
 
 @ExperimentalCoilApi
 @Composable
@@ -33,20 +32,41 @@ fun Navigation() {
                 startDestination = NavItem.Login.route
             ) {
                 composable(NavItem.Login) {
-                    LoginScreen(navController)
+                    LoginScreen (
+                        onLoginClick = {
+                            navController.navigate(NavItem.Home.createRoute(it.user!!.userName))
+                        },
+                        onRegisterClick = {
+                            navController.navigate(NavigationRoutes.Register)
+                        }
+                    )
                 }
                 composable(NavItem.Register) {
-                    RegisterScreen(navController)
+                    RegisterScreen(
+                        onClickRegistered = {
+                            navController.navigate(NavigationRoutes.Login)
+                        },
+                        onClickCancel = {
+                            navController.popBackStack()
+                        }
+                    )
                 }
                 composable(NavItem.Home) { backStackEntry ->
                     HomeScreen(
-                        navController = navController,
+                        onClickMovie = {
+                            navController.navigate(NavItem.Detail.createRoute(it.userName, it.id))
+                        },
+                        onClickBack = {
+                            navController.popBackStack()
+                        },
                         userName = backStackEntry.findArg(NavArg.UserName)
                     )
                 }
                 composable(NavItem.Detail) { backStackEntry ->
                     DetailScreen(
-                        navController = navController,
+                        onClickBack = {
+                            navController.popBackStack()
+                        },
                         userName = backStackEntry.findArg(NavArg.UserName),
                         movieId = backStackEntry.findArg(NavArg.MovieId)
                     )

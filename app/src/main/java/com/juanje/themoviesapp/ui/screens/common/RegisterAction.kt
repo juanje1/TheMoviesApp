@@ -18,14 +18,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.ui.navigation.NavigationRoutes.Login
 import com.juanje.themoviesapp.ui.screens.register.RegisterViewModel
 
 @Composable
 fun RegisterAction(
-    navController: NavController,
+    onClickRegistered: () -> Unit,
+    onClickCancel: () -> Unit,
     viewModel: RegisterViewModel,
     userName: String,
     firstName: String,
@@ -38,20 +37,18 @@ fun RegisterAction(
 
     if (state.timeExecution > 0) {
         if (state.userValid) {
-            showToast(navController.context, context.getString(R.string.register_success))
-            navController.navigate(Login)
+            showToast(context, context.getString(R.string.register_success))
+            onClickRegistered()
         }
         else {
-            showToast(navController.context, context.getString(R.string.register_error))
+            showToast(context, context.getString(R.string.register_error))
         }
         viewModel.resetState()
     }
 
     Row {
         Button(
-            onClick = {
-                viewModel.onRegisterClick(userName, firstName, lastName, email, password)
-            },
+            onClick = { viewModel.onRegisterClick(userName, firstName, lastName, email, password) },
             modifier = Modifier
                 .weight(1f)
                 .padding(
@@ -76,9 +73,7 @@ fun RegisterAction(
             )
         }
         Button(
-            onClick = {
-                navController.popBackStack()
-            },
+            onClick = { onClickCancel() },
             modifier = Modifier
                 .weight(1f)
                 .padding(

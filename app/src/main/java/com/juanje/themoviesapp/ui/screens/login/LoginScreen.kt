@@ -19,7 +19,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.navigation.NavController
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.ui.screens.common.EmailLogin
 import com.juanje.themoviesapp.ui.screens.common.LoginAction
@@ -27,7 +26,10 @@ import com.juanje.themoviesapp.ui.screens.common.PasswordLogin
 import com.juanje.themoviesapp.ui.screens.common.RegisterNow
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(
+    onLoginClick: (LoginViewModel.UiState) -> Unit,
+    onRegisterClick: () -> Unit
+) {
     val context = LocalContext.current
 
     Column (
@@ -87,12 +89,15 @@ fun LoginScreen(navController: NavController) {
                     )
                     .padding(dimensionResource(R.dimen.padding_xlarge))
             ) {
+                val email = EmailLogin()
+                val password = PasswordLogin()
+
                 LoginAction(
-                    navController,
-                    EmailLogin(),
-                    PasswordLogin()
+                    onLoginClick = onLoginClick,
+                    email = email,
+                    password = password
                 )
-                RegisterNow(navController)
+                RegisterNow(onRegisterClick = onRegisterClick)
             }
         }
     }

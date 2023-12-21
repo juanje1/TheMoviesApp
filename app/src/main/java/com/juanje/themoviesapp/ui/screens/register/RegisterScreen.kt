@@ -20,12 +20,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.ui.screens.common.*
 
 @Composable
-fun RegisterScreen(navController: NavController) {
+fun RegisterScreen(
+    onClickRegistered: () -> Unit,
+    onClickCancel: () -> Unit
+) {
     val viewModel: RegisterViewModel = hiltViewModel()
     val context = LocalContext.current
 
@@ -86,14 +88,21 @@ fun RegisterScreen(navController: NavController) {
                     )
                     .padding(dimensionResource(R.dimen.padding_xlarge))
             ) {
+                val userName = UserName(viewModel = viewModel)
+                val firstName = FirstName(viewModel = viewModel)
+                val lastName = LastName(viewModel = viewModel)
+                val email = Email(viewModel = viewModel)
+                val password = Password(viewModel = viewModel)
+
                 RegisterAction(
-                    navController,
-                    viewModel,
-                    UserName(viewModel),
-                    FirstName(viewModel),
-                    LastName(viewModel),
-                    Email(viewModel),
-                    Password(viewModel)
+                    onClickRegistered = onClickRegistered,
+                    onClickCancel = onClickCancel,
+                    viewModel = viewModel,
+                    userName = userName,
+                    firstName = firstName,
+                    lastName = lastName,
+                    email = email,
+                    password = password
                 )
             }
         }

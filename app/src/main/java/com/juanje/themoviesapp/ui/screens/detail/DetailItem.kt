@@ -18,7 +18,10 @@ import com.juanje.domain.Movie
 import com.juanje.themoviesapp.common.ImageAspectRatio
 
 @Composable
-fun DetailItem(padding: PaddingValues, movie: Movie) {
+fun DetailItem(
+    padding: PaddingValues,
+    movie: Movie
+) {
     val context = LocalContext.current
 
     Column(

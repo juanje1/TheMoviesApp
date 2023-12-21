@@ -19,24 +19,26 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.ui.navigation.NavigationRoutes.Home
 import com.juanje.themoviesapp.ui.screens.login.LoginViewModel
 
 @Composable
-fun LoginAction(navController: NavController, email: String, password: String) {
+fun LoginAction(
+    onLoginClick: (LoginViewModel.UiState) -> Unit,
+    email: String,
+    password: String
+) {
     val viewModel: LoginViewModel = hiltViewModel()
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
 
     if (state.timeExecution > 0) {
         if (state.isUserValid)
-            navController.navigate("${Home}/${state.user!!.userName}")
+            onLoginClick(state)
         else
             Toast.makeText(
-                navController.context,
-                    context.getString(R.string.login_error),
+                context,
+                context.getString(R.string.login_error),
                 Toast.LENGTH_LONG
             ).show()
         viewModel.resetState()

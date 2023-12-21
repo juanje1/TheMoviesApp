@@ -16,11 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.juanje.themoviesapp.R
 
 @Composable
-fun DetailScreen(navController: NavHostController, userName: String, movieId: Int) {
+fun DetailScreen(
+    onClickBack: () -> Unit,
+    userName: String,
+    movieId: Int
+) {
     val viewModel: DetailViewModel = hiltViewModel()
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -35,14 +38,15 @@ fun DetailScreen(navController: NavHostController, userName: String, movieId: In
             TopAppBar {
                 Icon(imageVector = Icons.Default.ArrowBack,
                     contentDescription = context.getString(R.string.arrow_back_content_description),
-                    modifier = Modifier.clickable {
-                        navController.popBackStack()
-                    })
+                    modifier = Modifier.clickable { onClickBack() })
                 Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding_small)))
                 Text(text = it.title)
             }
         }) { padding ->
-            DetailItem(padding, it)
+            DetailItem(
+                padding = padding,
+                movie = it
+            )
         }
     }
 }

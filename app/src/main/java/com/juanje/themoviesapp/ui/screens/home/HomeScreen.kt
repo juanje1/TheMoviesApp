@@ -14,11 +14,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
+import com.juanje.domain.Movie
 import com.juanje.themoviesapp.R
 
 @Composable
-fun HomeScreen(navController: NavHostController, userName: String) {
+fun HomeScreen(
+    onClickMovie: (Movie) -> Unit,
+    onClickBack: () -> Unit,
+    userName: String
+) {
     val viewModel: HomeViewModel = hiltViewModel()
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -32,9 +36,8 @@ fun HomeScreen(navController: NavHostController, userName: String) {
         TopAppBar {
             Icon(imageVector = Icons.Default.ArrowBack,
                 contentDescription = context.getString(R.string.arrow_back_content_description),
-                modifier = Modifier.clickable {
-                    navController.popBackStack()
-                })
+                modifier = Modifier.clickable { onClickBack() }
+            )
             Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding_small)))
             Text(text = context.getString(R.string.movies_title)+" @${userName}")
         }
@@ -52,21 +55,19 @@ fun HomeScreen(navController: NavHostController, userName: String) {
 
             LazyVerticalGrid(
                 state = listState,
-                columns = GridCells.Adaptive(
-                    dimensionResource(R.dimen.column_min_width)),
+                columns = GridCells.Adaptive(dimensionResource(R.dimen.column_min_width)),
                 modifier = Modifier.padding(padding),
-                horizontalArrangement = Arrangement.spacedBy(
-                    dimensionResource(R.dimen.padding_xsmall)),
-                verticalArrangement = Arrangement.spacedBy(
-                    dimensionResource(R.dimen.padding_xsmall)),
-                contentPadding = PaddingValues(
-                    dimensionResource(R.dimen.padding_xsmall))
+                horizontalArrangement = Arrangement
+                    .spacedBy(dimensionResource(R.dimen.padding_xsmall)),
+                verticalArrangement = Arrangement
+                    .spacedBy(dimensionResource(R.dimen.padding_xsmall)),
+                contentPadding = PaddingValues(dimensionResource(R.dimen.padding_xsmall))
             ) {
                 items(state.movies) { movie ->
                     HomeItem(
-                        movie = movie,
-                        navController = navController,
-                        onClick = { viewModel.onMovieClick(movie) }
+                        onClickMovie = onClickMovie,
+                        onClickFavourite = { viewModel.onMovieClick(movie) },
+                        movie = movie
                     )
                     val lastVisiblePosition = listState.isScrolledToTheEnd()
 

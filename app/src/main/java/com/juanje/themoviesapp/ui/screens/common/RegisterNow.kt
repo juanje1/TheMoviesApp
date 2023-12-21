@@ -15,12 +15,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.ui.navigation.NavigationRoutes.Register
 
 @Composable
-fun RegisterNow(navController: NavController) {
+fun RegisterNow(onRegisterClick: () -> Unit) {
     val context = LocalContext.current
 
     Row(
@@ -53,7 +51,7 @@ fun RegisterNow(navController: NavController) {
         )
     }
     Button(
-        onClick = { navController.navigate(Register) },
+        onClick = { onRegisterClick() },
         modifier = Modifier
             .padding(
                 top = dimensionResource(R.dimen.padding_medium),

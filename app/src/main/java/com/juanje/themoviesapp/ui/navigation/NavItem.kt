@@ -4,7 +4,7 @@ import androidx.navigation.NavType
 import androidx.navigation.navArgument
 
 sealed class NavItem(
-    private val baseRoute: String,
+    val baseRoute: String,
     private val navArgs: List<NavArg> = emptyList()
 ) {
     val route = run {
@@ -19,8 +19,12 @@ sealed class NavItem(
 
     object Login: NavItem(NavigationRoutes.Login)
     object Register: NavItem(NavigationRoutes.Register)
-    object Home: NavItem(NavigationRoutes.Home, listOf(NavArg.UserName))
-    object Detail: NavItem(NavigationRoutes.Detail, listOf(NavArg.UserName, NavArg.MovieId))
+    object Home: NavItem(NavigationRoutes.Home, listOf(NavArg.UserName)) {
+        fun createRoute(userName: String) = "$baseRoute/$userName"
+    }
+    object Detail: NavItem(NavigationRoutes.Detail, listOf(NavArg.UserName, NavArg.MovieId)) {
+        fun createRoute(userName: String, movieId: Int) = "$baseRoute/$userName/$movieId"
+    }
 }
 
 enum class NavArg(val key: String, val navType: NavType<*>, val type: String) {
