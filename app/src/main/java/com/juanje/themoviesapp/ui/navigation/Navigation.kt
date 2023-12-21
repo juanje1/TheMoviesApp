@@ -1,10 +1,6 @@
 package com.juanje.themoviesapp.ui.navigation
 
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
@@ -15,63 +11,55 @@ import com.juanje.themoviesapp.ui.screens.detail.DetailScreen
 import com.juanje.themoviesapp.ui.screens.home.HomeScreen
 import com.juanje.themoviesapp.ui.screens.login.LoginScreen
 import com.juanje.themoviesapp.ui.screens.register.RegisterScreen
-import com.juanje.themoviesapp.ui.theme.TheMoviesAppTheme
 
 @ExperimentalCoilApi
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
 
-    TheMoviesAppTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colors.background
-        ) {
-            NavHost(
-                navController = navController,
-                startDestination = NavItem.Login.route
-            ) {
-                composable(NavItem.Login) {
-                    LoginScreen (
-                        onLoginClick = {
-                            navController.navigate(NavItem.Home.createRoute(it.user!!.userName))
-                        },
-                        onRegisterClick = {
-                            navController.navigate(NavigationRoutes.Register)
-                        }
-                    )
+    NavHost(
+        navController = navController,
+        startDestination = NavItem.Login.route
+    ) {
+        composable(NavItem.Login) {
+            LoginScreen (
+                onLoginClick = {
+                    navController.navigate(NavItem.Home.createRoute(it.user!!.userName))
+                },
+                onRegisterClick = {
+                    navController.navigate(NavigationRoutes.Register)
                 }
-                composable(NavItem.Register) {
-                    RegisterScreen(
-                        onClickRegistered = {
-                            navController.navigate(NavigationRoutes.Login)
-                        },
-                        onClickCancel = {
-                            navController.popBackStack()
-                        }
-                    )
+            )
+        }
+        composable(NavItem.Register) {
+            RegisterScreen(
+                onClickRegistered = {
+                    navController.navigate(NavigationRoutes.Login)
+                },
+                onClickCancel = {
+                    navController.popBackStack()
                 }
-                composable(NavItem.Home) { backStackEntry ->
-                    HomeScreen(
-                        onClickMovie = {
-                            navController.navigate(NavItem.Detail.createRoute(it.userName, it.id))
-                        },
-                        onClickBack = {
-                            navController.popBackStack()
-                        },
-                        userName = backStackEntry.findArg(NavArg.UserName)
-                    )
-                }
-                composable(NavItem.Detail) { backStackEntry ->
-                    DetailScreen(
-                        onClickBack = {
-                            navController.popBackStack()
-                        },
-                        userName = backStackEntry.findArg(NavArg.UserName),
-                        movieId = backStackEntry.findArg(NavArg.MovieId)
-                    )
-                }
-            }
+            )
+        }
+        composable(NavItem.Home) { backStackEntry ->
+            HomeScreen(
+                onClickMovie = {
+                    navController.navigate(NavItem.Detail.createRoute(it.userName, it.id))
+                },
+                onClickBack = {
+                    navController.popBackStack()
+                },
+                userName = backStackEntry.findArg(NavArg.UserName)
+            )
+        }
+        composable(NavItem.Detail) { backStackEntry ->
+            DetailScreen(
+                onClickBack = {
+                    navController.popBackStack()
+                },
+                userName = backStackEntry.findArg(NavArg.UserName),
+                movieId = backStackEntry.findArg(NavArg.MovieId)
+            )
         }
     }
 }
