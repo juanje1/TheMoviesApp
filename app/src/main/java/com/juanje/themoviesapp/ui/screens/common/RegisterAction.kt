@@ -1,8 +1,6 @@
 package com.juanje.themoviesapp.ui.screens.common
 
-import android.content.Context
 import android.graphics.Color.parseColor
-import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
@@ -19,6 +17,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.juanje.themoviesapp.R
+import com.juanje.themoviesapp.common.showToast
 import com.juanje.themoviesapp.ui.screens.register.RegisterViewModel
 
 @Composable
@@ -40,9 +39,8 @@ fun RegisterAction(
             showToast(context, context.getString(R.string.register_success))
             onClickRegistered()
         }
-        else {
+        else
             showToast(context, context.getString(R.string.register_error))
-        }
         viewModel.resetState()
     }
 
@@ -98,8 +96,4 @@ fun RegisterAction(
             )
         }
     }
-}
-
-private fun showToast(context: Context, message: String) {
-    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
 }

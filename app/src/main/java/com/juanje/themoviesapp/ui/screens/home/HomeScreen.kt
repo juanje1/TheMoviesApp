@@ -1,11 +1,11 @@
 package com.juanje.themoviesapp.ui.screens.home
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -16,6 +16,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.juanje.domain.Movie
 import com.juanje.themoviesapp.R
+import com.juanje.themoviesapp.ui.screens.common.ArrowBackIcon
 
 @Composable
 fun HomeScreen(
@@ -32,16 +33,14 @@ fun HomeScreen(
         viewModel.getMovies(userName)
     }
 
-    Scaffold(topBar = {
-        TopAppBar {
-            Icon(imageVector = Icons.Default.ArrowBack,
-                contentDescription = context.getString(R.string.arrow_back_content_description),
-                modifier = Modifier.clickable { onClickBack() }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = context.getString(R.string.movies_title)+" @${userName}") },
+                navigationIcon = { ArrowBackIcon(onClickBack, context) }
             )
-            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.padding_small)))
-            Text(text = context.getString(R.string.movies_title)+" @${userName}")
         }
-    }) { padding ->
+    ) { padding ->
         if(state.loading) {
             Box(
                 modifier = Modifier.fillMaxSize(),

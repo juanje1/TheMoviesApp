@@ -1,7 +1,6 @@
 package com.juanje.themoviesapp.ui.screens.common
 
 import android.graphics.Color.parseColor
-import android.widget.Toast
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.juanje.themoviesapp.R
+import com.juanje.themoviesapp.common.showToast
 import com.juanje.themoviesapp.ui.screens.login.LoginViewModel
 
 @Composable
@@ -36,11 +36,7 @@ fun LoginAction(
         if (state.isUserValid)
             onLoginClick(state)
         else
-            Toast.makeText(
-                context,
-                context.getString(R.string.login_error),
-                Toast.LENGTH_LONG
-            ).show()
+            showToast(context, context.getString(R.string.login_error))
         viewModel.resetState()
     }
 
