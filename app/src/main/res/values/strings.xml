@@ -37,8 +37,13 @@
     <string name="color_text_fields">#5E5E5E</string>
 
     <!-- Login Screen Strings -->
-    <string name="login_title">TheMoviesApp | Login</string>
-    <string name="login_button">Login</string>
+    <string name="login_image_description">Login Imagen</string>
+    <string name="login_title_text">TheMoviesApp | Login</string>
+    <string name="login_email_text">Email (minúsculas)</string>
+    <string name="login_password_text">Contraseña</string>
+    <string name="login_password_text_visibility_description">Visibilidad de Icono de Contraseña</string>
+    <string name="login_login_button">Iniciar Sesión</string>
+    <string name="login_register_text">¿No tienes una cuenta? Regístrate</string>
     <string name="login_error">Email/Password not valid</string>
     <string name="color_background_login">#E0E0E0</string>
 
@@ -70,6 +75,7 @@
     <string name="bias_medium">0.6f</string>
     <string name="line_weight">1f</string>
 
-    <!-- Others -->
+    <!-- Others Strings -->
     <string name="arrow_back_content_description">Arrow back</string>
+    <string name="max_lines">1</string>
 </resources>

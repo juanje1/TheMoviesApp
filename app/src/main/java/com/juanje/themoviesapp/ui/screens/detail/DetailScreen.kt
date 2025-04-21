@@ -6,19 +6,17 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.juanje.themoviesapp.ui.screens.common.ArrowBackIcon
 
 @Composable
 fun DetailScreen(
-    onClickBack: () -> Unit,
+    onHomeClick: (String) -> Unit,
     userName: String,
     movieId: Int
 ) {
     val viewModel: DetailViewModel = hiltViewModel()
     val state by viewModel.state.collectAsState()
-    val context = LocalContext.current
 
     if (state.isInit) {
         viewModel.resetInit()
@@ -30,7 +28,7 @@ fun DetailScreen(
             topBar = {
                 TopAppBar(
                     title = { Text(text = it.title) },
-                    navigationIcon = { ArrowBackIcon(onClickBack, context) }
+                    navigationIcon = { ArrowBackIcon(onHomeClick, userName) }
                 )
             }
         ) { padding ->

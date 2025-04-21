@@ -16,18 +16,13 @@ class LoginViewModel @Inject constructor(private val loadUser: LoadUser) : ViewM
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state
 
-    fun onLoginClick(
-        email: String,
-        password: String
-    ) {
-        viewModelScope.launch {
-            val user = loadUser.invokeGetUser(email, password)
-            _state.value = UiState(
-                user = user,
-                timeExecution = state.value.timeExecution+1,
-                isUserValid = user.getIsUserValid(email, password)
-            )
-        }
+    fun onLoginClick(email: String, password: String) = viewModelScope.launch {
+        val user = loadUser.invokeGetUser(email, password)
+        _state.value = UiState(
+            user = user,
+            timeExecution = state.value.timeExecution+1,
+            isUserValid = user.getIsUserValid(email, password)
+        )
     }
 
     fun resetState() { _state.value = UiState() }
