@@ -25,8 +25,8 @@ import com.juanje.themoviesapp.ui.screens.common.*
 
 @Composable
 fun RegisterScreen(
-    onClickRegistered: () -> Unit,
-    onClickCancel: () -> Unit
+    onRegisteredClick: () -> Unit,
+    onLoginClick: () -> Unit
 ) {
     val viewModel: RegisterViewModel = hiltViewModel()
     val context = LocalContext.current
@@ -95,8 +95,8 @@ fun RegisterScreen(
                 val password = Password(viewModel = viewModel)
 
                 RegisterAction(
-                    onClickRegistered = onClickRegistered,
-                    onClickCancel = onClickCancel,
+                    onClickRegistered = onRegisteredClick,
+                    onClickCancel = onLoginClick,
                     viewModel = viewModel,
                     userName = userName,
                     firstName = firstName,

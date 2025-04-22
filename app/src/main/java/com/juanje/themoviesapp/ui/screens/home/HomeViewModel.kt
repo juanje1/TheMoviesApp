@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.Collections.emptyList
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,27 +32,23 @@ class HomeViewModel @Inject constructor(private val loadMovie: LoadMovie) : View
         _state.value = UiState(isInit = true)
     }
 
-    fun resetInit() { _state.value = UiState() }
+    fun getMovies(userName: String) =viewModelScope.launch {
+        _state.value = UiState(loading = true)
 
-    fun getMovies(userName: String) {
-        viewModelScope.launch {
-            _state.value = UiState(loading = true)
-
-            val size = loadMovie.invokeGetCountMovies(userName)
-            loadMovie.invokeGetMovies(userName, lastVisible.value, size).collect {
-                _state.value = UiState(
-                    movies = it,
-                    userName = userName
-                )
-            }
+        val size = loadMovie.invokeGetCountMovies(userName)
+        loadMovie.invokeGetMovies(userName, lastVisible.value, size).collect {
+            _state.value = UiState(
+                movies = it,
+                userName = userName
+            )
         }
     }
 
-    fun onMovieClick(movie: Movie) {
-        viewModelScope.launch {
-            loadMovie.invokeUpdateMovie(movie.copy(favourite = !movie.favourite))
-        }
+    fun onMovieClick(movie: Movie) = viewModelScope.launch {
+        loadMovie.invokeUpdateMovie(movie.copy(favourite = !movie.favourite))
     }
+
+    fun resetState() { _state.value = UiState() }
 
     private suspend fun notifyLastVisible(lastVisible: Int) {
         val size = loadMovie.invokeGetCountMovies(_state.value.userName)

@@ -22,8 +22,8 @@ import com.juanje.themoviesapp.common.ImageAspectRatio
 
 @Composable
 fun HomeItem(
-    onClickMovie: (Movie) -> Unit,
-    onClickFavourite: () -> Unit,
+    onDetailClick: (String, Int) -> Unit,
+    onFavouriteClick: () -> Unit,
     movie: Movie,
 ) {
     val context = LocalContext.current
@@ -32,7 +32,7 @@ fun HomeItem(
         modifier = Modifier.background(MaterialTheme.colors.secondary)
     ) {
         Box(
-            modifier = Modifier.clickable { onClickMovie(movie) }
+            modifier = Modifier.clickable { onDetailClick(movie.userName, movie.id) }
         ) {
             AsyncImage(
                 model = context.getString(R.string.image_url)+movie.posterPath,
@@ -49,7 +49,7 @@ fun HomeItem(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(dimensionResource(R.dimen.padding_xsmall))
-                    .clickable { onClickFavourite() },
+                    .clickable { onFavouriteClick() },
                 tint = color
             )
         }

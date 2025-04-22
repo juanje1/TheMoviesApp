@@ -16,6 +16,10 @@ import com.juanje.themoviesapp.ui.screens.register.RegisterScreen
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
+    val navToLogin = navToLogin(navController)
+    val navToRegister = navToRegister(navController)
+    val navToHome = navToHome(navController)
+    val navToDetail = navToDetail(navController)
 
     NavHost(
         navController = navController,
@@ -23,40 +27,26 @@ fun Navigation() {
     ) {
         composable(NavItem.Login) {
             LoginScreen (
-                onLoginClick = {
-                    navController.navigate(NavItem.Home.createRoute(it.user!!.userName))
-                },
-                onRegisterClick = {
-                    navController.navigate(NavigationRoutes.Register)
-                }
+                onHomeClick = navToHome,
+                onRegisterClick = navToRegister
             )
         }
         composable(NavItem.Register) {
             RegisterScreen(
-                onClickRegistered = {
-                    navController.navigate(NavigationRoutes.Login)
-                },
-                onClickCancel = {
-                    navController.popBackStack()
-                }
+                onRegisteredClick = navToLogin,
+                onLoginClick = navToLogin
             )
         }
         composable(NavItem.Home) { backStackEntry ->
             HomeScreen(
-                onClickMovie = {
-                    navController.navigate(NavItem.Detail.createRoute(it.userName, it.id))
-                },
-                onClickBack = {
-                    navController.popBackStack()
-                },
+                onLoginClick = navToLogin,
+                onDetailClick = navToDetail,
                 userName = backStackEntry.findArg(NavArg.UserName)
             )
         }
         composable(NavItem.Detail) { backStackEntry ->
             DetailScreen(
-                onClickBack = {
-                    navController.popBackStack()
-                },
+                onHomeClick = navToHome,
                 userName = backStackEntry.findArg(NavArg.UserName),
                 movieId = backStackEntry.findArg(NavArg.MovieId)
             )
