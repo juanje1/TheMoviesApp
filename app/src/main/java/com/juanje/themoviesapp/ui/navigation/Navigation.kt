@@ -16,10 +16,6 @@ import com.juanje.themoviesapp.ui.screens.register.RegisterScreen
 @Composable
 fun Navigation() {
     val navController = rememberNavController()
-    val navToLogin = navToLogin(navController)
-    val navToRegister = navToRegister(navController)
-    val navToHome = navToHome(navController)
-    val navToDetail = navToDetail(navController)
 
     NavHost(
         navController = navController,
@@ -27,26 +23,40 @@ fun Navigation() {
     ) {
         composable(NavItem.Login) {
             LoginScreen (
-                onHomeClick = navToHome,
-                onRegisterClick = navToRegister
+                onLoginClick = {
+                    navController.navigate(NavItem.Home.createRoute(it.user!!.userName))
+                },
+                onRegisterClick = {
+                    navController.navigate(NavigationRoutes.Register)
+                }
             )
         }
         composable(NavItem.Register) {
             RegisterScreen(
-                onRegisteredClick = navToLogin,
-                onLoginClick = navToLogin
+                onClickRegistered = {
+                    navController.navigate(NavigationRoutes.Login)
+                },
+                onClickCancel = {
+                    navController.popBackStack()
+                }
             )
         }
         composable(NavItem.Home) { backStackEntry ->
             HomeScreen(
-                onLoginClick = navToLogin,
-                onDetailClick = navToDetail,
+                onClickMovie = {
+                    navController.navigate(NavItem.Detail.createRoute(it.userName, it.id))
+                },
+                onClickBack = {
+                    navController.popBackStack()
+                },
                 userName = backStackEntry.findArg(NavArg.UserName)
             )
         }
         composable(NavItem.Detail) { backStackEntry ->
             DetailScreen(
-                onHomeClick = navToHome,
+                onClickBack = {
+                    navController.popBackStack()
+                },
                 userName = backStackEntry.findArg(NavArg.UserName),
                 movieId = backStackEntry.findArg(NavArg.MovieId)
             )

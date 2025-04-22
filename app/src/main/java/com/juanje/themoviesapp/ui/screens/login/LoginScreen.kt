@@ -1,222 +1,103 @@
 package com.juanje.themoviesapp.ui.screens.login
 
-import androidx.compose.foundation.Image
+import android.graphics.Color.parseColor
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.constraintlayout.compose.ConstraintLayout
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.common.showToast
-import com.juanje.themoviesapp.ui.theme.Purple200
+import com.juanje.themoviesapp.ui.screens.common.EmailLogin
+import com.juanje.themoviesapp.ui.screens.common.LoginAction
+import com.juanje.themoviesapp.ui.screens.common.PasswordLogin
+import com.juanje.themoviesapp.ui.screens.common.RegisterNow
 
 @Composable
 fun LoginScreen(
-    onHomeClick: (String) -> Unit,
+    onLoginClick: (LoginViewModel.UiState) -> Unit,
     onRegisterClick: () -> Unit
 ) {
-    var emailText by rememberSaveable { mutableStateOf("") }
-    var passwordText by rememberSaveable { mutableStateOf("") }
-    var passwordTextVisibility by rememberSaveable { mutableStateOf(false) }
-
-    val loginViewModel: LoginViewModel = hiltViewModel()
-    val stateLogin by loginViewModel.state.collectAsState()
-
-    val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-    val scaffoldState = rememberScaffoldState()
 
-    if (stateLogin.timeExecution > 0) {
-        if (stateLogin.isUserValid) onHomeClick(stateLogin.user?.userName!!)
-        else showToast(context, context.getString(R.string.login_error))
-        loginViewModel.resetState()
-    }
-
-    Scaffold(
-        scaffoldState = scaffoldState
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colors.background)
-                .padding(it)
-        ){
-            Image(
+    Column (
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .paint(
                 painter = painterResource(id = R.drawable.background_page),
-                contentDescription = context.getString(R.string.login_image_description),
-                contentScale = ContentScale.FillBounds,
+                contentScale = ContentScale.FillWidth
+            ),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        ConstraintLayout (
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+        ) {
+            val (ref1, ref2) = createRefs()
+            Text(text = context.getString(R.string.login_title),
+                color = Color.White,
+                modifier = Modifier
+                    .padding(
+                        top = dimensionResource(R.dimen.padding_medium),
+                        start = dimensionResource(R.dimen.padding_medium)
+                    )
+                    .constrainAs(ref1) {
+                        linkTo(
+                            parent.top,
+                            ref2.top,
+                            bias = context.getString(R.string.bias_medium).toFloat()
+                        )
+                        linkTo(
+                            parent.start,
+                            parent.end,
+                            bias = context.getString(R.string.bias_small).toFloat()
+                        )
+                    },
+                fontSize = dimensionResource(R.dimen.font_size_large).value.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(dimensionResource(R.dimen.image_height_large))
-            )
-            Surface(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = dimensionResource(R.dimen.padding_image)),
-                color = Color.White,
-                shape = RoundedCornerShape(
-                    topStartPercent = dimensionResource(R.dimen.surface_rounded_corner).value.toInt(),
-                    topEndPercent = dimensionResource(R.dimen.surface_rounded_corner).value.toInt()
-                )
+                    .height(dimensionResource(R.dimen.cell_image_height))
+                    .verticalScroll(rememberScrollState())
+                    .constrainAs(ref2) {
+                        bottom.linkTo(parent.bottom)
+                    }
+                    .background(
+                        color = Color(
+                            parseColor(context.getString(R.string.color_background_login))
+                        ),
+                        shape = RoundedCornerShape(
+                            topStart = dimensionResource(R.dimen.rounded_corner_shape_medium),
+                            topEnd = dimensionResource(R.dimen.rounded_corner_shape_medium)
+                        )
+                    )
+                    .padding(dimensionResource(R.dimen.padding_xlarge))
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Spacer(modifier = Modifier.weight(0.8f))
-                    Text(
-                        text = context.getString(R.string.login_title_text),
-                        style = MaterialTheme.typography.h5.copy(
-                            color = MaterialTheme.colors.primary,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
-                        )
-                    )
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacer_xsmall)))
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = dimensionResource(R.dimen.padding_large)),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spaced_by))
-                    ) {
-                        OutlinedTextField(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(
-                                    start = dimensionResource(R.dimen.padding_small),
-                                    end = dimensionResource(R.dimen.padding_small)
-                                ),
-                            value = emailText,
-                            onValueChange = { newEmail -> emailText = newEmail },
-                            maxLines = context.getString(R.string.max_lines).toInt(),
-                            singleLine = true,
-                            label = { Text(text = context.getString(R.string.login_email_text)) },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Email,
-                                imeAction = ImeAction.Next
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onNext = { focusManager.moveFocus(FocusDirection.Down) }
-                            )
-                        )
-                        OutlinedTextField(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(
-                                    start = dimensionResource(R.dimen.padding_small),
-                                    end = dimensionResource(R.dimen.padding_small)
-                                ),
-                            value = passwordText,
-                            onValueChange = { newPassword -> passwordText = newPassword },
-                            maxLines = context.getString(R.string.max_lines).toInt(),
-                            singleLine = true,
-                            label = { Text(context.getString(R.string.login_password_text)) },
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Password,
-                                imeAction = ImeAction.Done
-                            ),
-                            keyboardActions = KeyboardActions(
-                                onDone = { focusManager.clearFocus() }
-                            ),
-                            trailingIcon = {
-                                IconButton(
-                                    onClick = { passwordTextVisibility = !passwordTextVisibility }
-                                ) {
-                                    Icon(
-                                        imageVector =
-                                        if (passwordTextVisibility) Icons.Default.Visibility
-                                        else Icons.Default.VisibilityOff,
-                                        contentDescription = context.getString(R.string.login_password_text_visibility_description)
-                                    )
-                                }
-                            },
-                            visualTransformation =
-                            if (passwordTextVisibility) VisualTransformation.None
-                            else PasswordVisualTransformation()
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacer_medium)))
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = dimensionResource(R.dimen.padding_large)),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Button(
-                            modifier = Modifier
-                                .width(dimensionResource(R.dimen.button_width_medium))
-                                .height(dimensionResource(R.dimen.button_height)),
-                            onClick = {
-                                loginViewModel.onLoginClick(
-                                    email = emailText,
-                                    password = passwordText
-                                )
-                            },
-                            shape = RoundedCornerShape(dimensionResource(R.dimen.button_rounded_corner).value.toInt()),
-                        ) {
-                            Text(
-                                text = context.getString(R.string.login_login_button).uppercase()
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.weight(0.6f))
-                    ClickableText(
-                        text = AnnotatedString(context.getString(R.string.login_register_text)),
-                        onClick = { onRegisterClick() },
-                        style = TextStyle(
-                            fontSize = dimensionResource(R.dimen.font_size_xsmall).value.sp,
-                            fontFamily = FontFamily.Default,
-                            textDecoration = TextDecoration.Underline,
-                            color = Purple200
-                        )
-                    )
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacer_medium)))
-                }
+                val email = EmailLogin()
+                val password = PasswordLogin()
+
+                LoginAction(
+                    onLoginClick = onLoginClick,
+                    email = email,
+                    password = password
+                )
+                RegisterNow(onRegisterClick = onRegisterClick)
             }
         }
     }
