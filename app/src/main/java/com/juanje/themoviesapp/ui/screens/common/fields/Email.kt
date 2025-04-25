@@ -1,4 +1,4 @@
-package com.juanje.themoviesapp.ui.screens.common
+package com.juanje.themoviesapp.ui.screens.common.fields
 
 import android.graphics.Color.parseColor
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,7 +30,7 @@ fun Email(viewModel: RegisterViewModel): String {
         viewModel.checkEmailValid(textEmail)
     }
     Text(
-        text = context.getString(R.string.email),
+        text = context.getString(R.string.register_email),
         fontSize = dimensionResource(R.dimen.font_size_small).value.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier
@@ -43,7 +43,7 @@ fun Email(viewModel: RegisterViewModel): String {
             textEmail = it
             isEdited = true
         },
-        label = { Text(text = context.getString(R.string.email_label)) },
+        label = { Text(text = context.getString(R.string.register_email_label)) },
         shape = RoundedCornerShape(dimensionResource(R.dimen.rounded_corner_shape_small)),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             backgroundColor = Color.White,
@@ -56,21 +56,21 @@ fun Email(viewModel: RegisterViewModel): String {
             .fillMaxWidth()
             .padding(top = dimensionResource(R.dimen.padding_small)),
         trailingIcon = {
-            if (state.errorMessages[context.getString(R.string.email_error_messages)]?.
+            if (state.errorMessages[context.getString(R.string.register_email_error_messages)]?.
                 isNotEmpty() == true)
                 Icon(
                     Icons.Filled.Error,
-                    context.getString(R.string.email_error_field_description),
+                    context.getString(R.string.register_email_error_field_description),
                     tint = MaterialTheme.colors.error
                 )
         },
-        isError = state.errorMessages[context.getString(R.string.email_error_messages)]?.
+        isError = state.errorMessages[context.getString(R.string.register_email_error_messages)]?.
             isNotEmpty() == true
     )
-    if (state.errorMessages[context.getString(R.string.email_error_messages)]?.
+    if (state.errorMessages[context.getString(R.string.register_email_error_messages)]?.
         isNotEmpty() == true) {
         Text(
-            text = state.errorMessages[context.getString(R.string.email_error_messages)] ?: "",
+            text = state.errorMessages[context.getString(R.string.register_email_error_messages)] ?: "",
             color = MaterialTheme.colors.error,
             style = MaterialTheme.typography.caption,
             modifier = Modifier

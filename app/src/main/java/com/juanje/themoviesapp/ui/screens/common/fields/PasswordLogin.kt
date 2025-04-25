@@ -1,4 +1,4 @@
-package com.juanje.themoviesapp.ui.screens.common
+package com.juanje.themoviesapp.ui.screens.common.fields
 
 import android.graphics.Color.parseColor
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,7 +32,7 @@ fun PasswordLogin(): String {
     val context = LocalContext.current
 
     Text(
-        text = context.getString(R.string.password),
+        text = context.getString(R.string.register_password),
         fontSize = dimensionResource(R.dimen.font_size_small).value.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier
@@ -44,7 +44,7 @@ fun PasswordLogin(): String {
         onValueChange = {
             textPasswordLogin = it
         },
-        label = { Text(text = context.getString(R.string.password_label)) },
+        label = { Text(text = context.getString(R.string.register_password_label)) },
         shape = RoundedCornerShape(dimensionResource(R.dimen.rounded_corner_shape_small)),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
         visualTransformation =
@@ -65,8 +65,8 @@ fun PasswordLogin(): String {
                 if (passwordVisible) Icons.Filled.Visibility
                 else Icons.Filled.VisibilityOff
             val description =
-                if (passwordVisible) context.getString(R.string.password_hide)
-                else context.getString(R.string.password_show)
+                if (passwordVisible) context.getString(R.string.register_password_hide)
+                else context.getString(R.string.register_password_show)
             IconButton(onClick = { passwordVisible = !passwordVisible }){
                 Icon(imageVector = image, description)
             }

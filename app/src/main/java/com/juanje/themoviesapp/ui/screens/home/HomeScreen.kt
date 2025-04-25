@@ -24,6 +24,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.juanje.themoviesapp.R
+import com.juanje.themoviesapp.ui.screens.common.dialogs.LogoutAlertDialog
+import com.juanje.themoviesapp.ui.screens.common.others.MyTopAppBar
 
 @Composable
 fun HomeScreen(
@@ -34,24 +36,32 @@ fun HomeScreen(
     var showLogoutAlertDialog by rememberSaveable { mutableStateOf(false) }
 
     val homeViewModel: HomeViewModel = hiltViewModel()
-    val state by homeViewModel.state.collectAsState()
+    val homeState by homeViewModel.state.collectAsState()
 
-    if (state.isInit) {
+    if (homeState.isInit) {
         homeViewModel.resetState()
         homeViewModel.getMovies(userName)
+    }
+
+    if (showLogoutAlertDialog) {
+        LogoutAlertDialog(
+            onAccept = { onLoginClick() },
+            onCancel = { showLogoutAlertDialog = false },
+            onDismiss = { showLogoutAlertDialog = false }
+        )
     }
 
     Scaffold(
         topBar = {
             Surface(shadowElevation = dimensionResource(R.dimen.shadow_elevation_topBar)) {
-                /**MyTopAppBar(
-                    user = userName,
+                MyTopAppBar(
+                    userName = userName,
                     onLogoutClick = { showLogoutAlertDialog = true }
-                )**/
+                )
             }
         }
     ) { padding ->
-        if(state.loading) {
+        if(homeState.loading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -59,7 +69,7 @@ fun HomeScreen(
                 CircularProgressIndicator()
             }
         }
-        //if (state.movies.isNotEmpty()) {
+        if (homeState.movies.isNotEmpty()) {
             val listState = rememberLazyGridState()
 
             LazyVerticalGrid(
@@ -70,19 +80,19 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xsmall)),
                 contentPadding = PaddingValues(dimensionResource(R.dimen.padding_xsmall))
             ) {
-                items(state.movies) { movie ->
+                items(homeState.movies) { movie ->
                     HomeItem(
                         onDetailClick = onDetailClick,
-                        onFavouriteClick = { homeViewModel.onMovieClick(movie) },
+                        onFavouriteClick = { homeViewModel.updateMovie(movie) },
                         movie = movie
                     )
                     val lastVisiblePosition = listState.isScrolledToTheEnd()
 
-                    if (lastVisiblePosition != null) homeViewModel.lastVisible.value = lastVisiblePosition
-                    else homeViewModel.lastVisible.value = 0
+                    if (lastVisiblePosition != null) homeViewModel.setLastVisible(lastVisiblePosition)
+                    else homeViewModel.setLastVisible(0)
                 }
             }
-        //}
+        }
     }
 }
 

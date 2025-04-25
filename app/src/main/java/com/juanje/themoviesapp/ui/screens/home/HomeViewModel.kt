@@ -21,22 +21,20 @@ class HomeViewModel @Inject constructor(private val loadMovie: LoadMovie) : View
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state
 
-    val lastVisible = MutableStateFlow(0)
-
     init {
         viewModelScope.launch {
-            lastVisible.collect {
-                if(lastVisible.value != 0) notifyLastVisible(it)
+            _state.value.lastVisible.collect {
+                if (_state.value.lastVisible.value != 0) notifyLastVisible(it)
             }
         }
         _state.value = UiState(isInit = true)
     }
 
-    fun getMovies(userName: String) =viewModelScope.launch {
+    fun getMovies(userName: String) = viewModelScope.launch {
         _state.value = UiState(loading = true)
 
         val size = loadMovie.invokeGetCountMovies(userName)
-        loadMovie.invokeGetMovies(userName, lastVisible.value, size).collect {
+        loadMovie.invokeGetMovies(userName, _state.value.lastVisible.value, size).collect {
             _state.value = UiState(
                 movies = it,
                 userName = userName
@@ -44,11 +42,17 @@ class HomeViewModel @Inject constructor(private val loadMovie: LoadMovie) : View
         }
     }
 
-    fun onMovieClick(movie: Movie) = viewModelScope.launch {
+    fun updateMovie(movie: Movie) = viewModelScope.launch {
         loadMovie.invokeUpdateMovie(movie.copy(favourite = !movie.favourite))
     }
 
-    fun resetState() { _state.value = UiState() }
+    fun setLastVisible(lastVisible: Int) {
+        _state.value.lastVisible.value = lastVisible
+    }
+
+    fun resetState() {
+        _state.value = UiState()
+    }
 
     private suspend fun notifyLastVisible(lastVisible: Int) {
         val size = loadMovie.invokeGetCountMovies(_state.value.userName)
@@ -59,8 +63,9 @@ class HomeViewModel @Inject constructor(private val loadMovie: LoadMovie) : View
 
     data class UiState(
         val loading: Boolean = false,
-        val movies: List<Movie> = emptyList(),
         val isInit: Boolean = false,
+        val movies: List<Movie> = emptyList(),
+        val lastVisible: MutableStateFlow<Int> = MutableStateFlow(0),
         val userName: String = ""
     )
 }

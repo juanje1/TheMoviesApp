@@ -2,25 +2,32 @@ package com.juanje.themoviesapp.ui.screens.login
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -66,25 +73,22 @@ fun LoginScreen(
 
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-    val scaffoldState = rememberScaffoldState()
 
     if (stateLogin.timeExecution > 0) {
         if (stateLogin.isUserValid) onHomeClick(stateLogin.user?.userName!!)
-        else showToast(context, context.getString(R.string.login_error))
+        else showToast(context, context.getString(R.string.error_login_incorrect))
         loginViewModel.resetState()
     }
 
-    Scaffold(
-        scaffoldState = scaffoldState
-    ) {
+    Scaffold {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colors.background)
+                .background(MaterialTheme.colorScheme.background)
                 .padding(it)
         ){
             Image(
-                painter = painterResource(id = R.drawable.background_page),
+                painter = painterResource(id = R.drawable.login),
                 contentDescription = context.getString(R.string.login_image_description),
                 contentScale = ContentScale.FillBounds,
                 modifier = Modifier
@@ -107,16 +111,16 @@ fun LoginScreen(
                         .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Spacer(modifier = Modifier.weight(0.8f))
+                    Spacer(modifier = Modifier.weight(0.5f))
                     Text(
                         text = context.getString(R.string.login_title_text),
-                        style = MaterialTheme.typography.h5.copy(
-                            color = MaterialTheme.colors.primary,
+                        style = MaterialTheme.typography.headlineLarge.copy(
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold,
                             textAlign = TextAlign.Center
                         )
                     )
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacer_xsmall)))
+                    Spacer(modifier = Modifier.weight(0.2f))
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -169,18 +173,18 @@ fun LoginScreen(
                                 ) {
                                     Icon(
                                         imageVector =
-                                        if (passwordTextVisibility) Icons.Default.Visibility
-                                        else Icons.Default.VisibilityOff,
+                                            if (passwordTextVisibility) Icons.Default.Visibility
+                                            else Icons.Default.VisibilityOff,
                                         contentDescription = context.getString(R.string.login_password_text_visibility_description)
                                     )
                                 }
                             },
                             visualTransformation =
-                            if (passwordTextVisibility) VisualTransformation.None
-                            else PasswordVisualTransformation()
+                                if (passwordTextVisibility) VisualTransformation.None
+                                else PasswordVisualTransformation()
                         )
                     }
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacer_medium)))
+                    Spacer(modifier = Modifier.weight(0.4f))
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -204,10 +208,10 @@ fun LoginScreen(
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.weight(0.6f))
-                    ClickableText(
+                    Spacer(modifier = Modifier.weight(0.5f))
+                    Text(
+                        modifier = Modifier.clickable { onRegisterClick() },
                         text = AnnotatedString(context.getString(R.string.login_register_text)),
-                        onClick = { onRegisterClick() },
                         style = TextStyle(
                             fontSize = dimensionResource(R.dimen.font_size_xsmall).value.sp,
                             fontFamily = FontFamily.Default,
@@ -215,7 +219,7 @@ fun LoginScreen(
                             color = Purple200
                         )
                     )
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacer_medium)))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacer_large)))
                 }
             }
         }

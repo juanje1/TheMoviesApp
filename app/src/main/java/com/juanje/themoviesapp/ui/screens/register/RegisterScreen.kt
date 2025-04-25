@@ -21,7 +21,12 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.ui.screens.common.*
+import com.juanje.themoviesapp.ui.screens.common.fields.Email
+import com.juanje.themoviesapp.ui.screens.common.fields.FirstName
+import com.juanje.themoviesapp.ui.screens.common.fields.LastName
+import com.juanje.themoviesapp.ui.screens.common.fields.Password
+import com.juanje.themoviesapp.ui.screens.common.fields.RegisterAction
+import com.juanje.themoviesapp.ui.screens.common.fields.UserName
 
 @Composable
 fun RegisterScreen(
@@ -36,7 +41,7 @@ fun RegisterScreen(
             .fillMaxWidth()
             .fillMaxHeight()
             .paint(
-                painter = painterResource(id = R.drawable.background_page),
+                painter = painterResource(id = R.drawable.register),
                 contentScale = ContentScale.FillWidth
             ),
         horizontalAlignment = Alignment.CenterHorizontally

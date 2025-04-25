@@ -1,15 +1,12 @@
-package com.juanje.themoviesapp.ui.screens.common
+package com.juanje.themoviesapp.ui.screens.common.fields
 
 import android.graphics.Color.parseColor
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
@@ -17,45 +14,41 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.sp
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.ui.screens.register.RegisterViewModel
 
 @Composable
-fun Password(viewModel: RegisterViewModel): String {
+fun FirstName(viewModel: RegisterViewModel): String {
     val state by viewModel.state.collectAsState()
-    var textPassword by rememberSaveable { mutableStateOf("") }
-    var passwordVisible by rememberSaveable { mutableStateOf(false) }
+    var textFirstName by rememberSaveable { mutableStateOf("") }
     var isEdited by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
 
     if (isEdited) {
         isEdited = false
-        viewModel.checkPasswordValid(textPassword)
+        viewModel.checkFieldValid(
+            context.getString(R.string.register_firstname_error_messages),
+            textFirstName
+        )
     }
     Text(
-        text = context.getString(R.string.password),
+        text = context.getString(R.string.register_firstname),
         fontSize = dimensionResource(R.dimen.font_size_small).value.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier
             .padding(top = dimensionResource(R.dimen.padding_medium)),
         color = Color.Black
     )
+
     TextField(
-        value = textPassword,
+        value = textFirstName,
         onValueChange = {
-            textPassword = it
+            textFirstName = it
             isEdited = true
         },
-        label = { Text(text = context.getString(R.string.password_label)) },
+        label = { Text(text = context.getString(R.string.register_firstname_label)) },
         shape = RoundedCornerShape(dimensionResource(R.dimen.rounded_corner_shape_small)),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        visualTransformation =
-            if (passwordVisible) VisualTransformation.None
-            else PasswordVisualTransformation(),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             backgroundColor = Color.White,
             focusedBorderColor = Color.Transparent,
@@ -67,35 +60,26 @@ fun Password(viewModel: RegisterViewModel): String {
             .fillMaxWidth()
             .padding(top = dimensionResource(R.dimen.padding_small)),
         trailingIcon = {
-            val image =
-                if (passwordVisible) Icons.Filled.Visibility
-                else Icons.Filled.VisibilityOff
-            val description =
-                if (passwordVisible) context.getString(R.string.password_hide)
-                else context.getString(R.string.password_show)
-            IconButton(onClick = { passwordVisible = !passwordVisible }){
-                Icon(imageVector = image, description)
-            }
-            if (state.errorMessages[context.getString(R.string.password_error_messages)]?.
+            if (state.errorMessages[context.getString(R.string.register_firstname_error_messages)]?.
                 isNotEmpty() == true)
                 Icon(
                     Icons.Filled.Error,
-                    context.getString(R.string.password_error_field_description),
+                    context.getString(R.string.register_firstname_error_field_description),
                     tint = MaterialTheme.colors.error
                 )
         },
-        isError = state.errorMessages[context.getString(R.string.password_error_messages)]?.
+        isError = state.errorMessages[context.getString(R.string.register_firstname_error_messages)]?.
             isNotEmpty() == true
     )
-    if (state.errorMessages[context.getString(R.string.password_error_messages)]?.
+    if (state.errorMessages[context.getString(R.string.register_firstname_error_messages)]?.
         isNotEmpty() == true) {
         Text(
-            text = state.errorMessages[context.getString(R.string.password_error_messages)] ?: "",
+            text = state.errorMessages[context.getString(R.string.register_firstname_error_messages)] ?: "",
             color = MaterialTheme.colors.error,
             style = MaterialTheme.typography.caption,
             modifier = Modifier
                 .padding(start = dimensionResource(R.dimen.padding_medium))
         )
     }
-    return textPassword
+    return textFirstName
 }

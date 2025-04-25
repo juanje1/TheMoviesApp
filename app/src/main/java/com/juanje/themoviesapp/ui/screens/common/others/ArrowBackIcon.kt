@@ -1,4 +1,4 @@
-package com.juanje.themoviesapp.ui.screens.common
+package com.juanje.themoviesapp.ui.screens.common.others
 
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton

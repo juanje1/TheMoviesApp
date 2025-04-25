@@ -40,7 +40,7 @@ fun DetailItem(
             contentScale = ContentScale.Crop
         )
         Text(
-            text = context.getString(R.string.title),
+            text = context.getString(R.string.detail_title),
             textDecoration = TextDecoration.Underline,
             style = MaterialTheme.typography.h6,
             modifier = Modifier.padding(
@@ -57,7 +57,7 @@ fun DetailItem(
             )
         )
         Text(
-            text = context.getString(R.string.overview),
+            text = context.getString(R.string.detail_overview),
             textDecoration = TextDecoration.Underline,
             style = MaterialTheme.typography.h6,
             modifier = Modifier.padding(
@@ -74,7 +74,7 @@ fun DetailItem(
             )
         )
         Text(
-            text = context.getString(R.string.favourite_not_favourite),
+            text = context.getString(R.string.detail_favourite_not_favourite),
             textDecoration = TextDecoration.Underline,
             style = MaterialTheme.typography.h6,
             modifier = Modifier.padding(
@@ -84,8 +84,8 @@ fun DetailItem(
         )
         Text(
             text =
-                if (movie.favourite) context.getString(R.string.favourite)
-                else context.getString(R.string.not_favourite),
+                if (movie.favourite) context.getString(R.string.detail_favourite)
+                else context.getString(R.string.detail_not_favourite),
             modifier = Modifier.padding(
                 start = dimensionResource(R.dimen.padding_medium),
                 top = dimensionResource(R.dimen.padding_xsmall),

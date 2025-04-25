@@ -1,4 +1,4 @@
-package com.juanje.themoviesapp.ui.screens.common
+package com.juanje.themoviesapp.ui.screens.common.fields
 
 import android.graphics.Color.parseColor
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,7 +26,7 @@ fun EmailLogin(): String {
     val context = LocalContext.current
 
     Text(
-        text = context.getString(R.string.email),
+        text = context.getString(R.string.register_email),
         fontSize = dimensionResource(R.dimen.font_size_small).value.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier
@@ -38,7 +38,7 @@ fun EmailLogin(): String {
         onValueChange = {
             textEmailLogin = it
         },
-        label = { Text(text = context.getString(R.string.email_label)) },
+        label = { Text(text = context.getString(R.string.register_email_label)) },
         shape = RoundedCornerShape(dimensionResource(R.dimen.rounded_corner_shape_small)),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             backgroundColor = Color.White,

@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.juanje.themoviesapp.ui.screens.common.ArrowBackIcon
+import com.juanje.themoviesapp.ui.screens.common.others.ArrowBackIcon
 
 @Composable
 fun DetailScreen(

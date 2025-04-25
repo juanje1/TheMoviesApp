@@ -1,4 +1,4 @@
-package com.juanje.themoviesapp.ui.screens.common
+package com.juanje.themoviesapp.ui.screens.common.fields
 
 import android.graphics.Color.parseColor
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,31 +19,35 @@ import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.ui.screens.register.RegisterViewModel
 
 @Composable
-fun UserName(viewModel: RegisterViewModel): String {
+fun LastName(viewModel: RegisterViewModel): String {
     val state by viewModel.state.collectAsState()
-    var textUserName by rememberSaveable { mutableStateOf("") }
+    var textLastName by rememberSaveable { mutableStateOf("") }
     var isEdited by rememberSaveable { mutableStateOf(false) }
     val context = LocalContext.current
 
     if (isEdited) {
         isEdited = false
-        viewModel.checkUserNameValid(textUserName)
+        viewModel.checkFieldValid(
+            context.getString(R.string.register_lastname_error_messages),
+            textLastName
+        )
     }
     Text(
-        text = context.getString(R.string.username),
+        text = context.getString(R.string.register_lastname),
         fontSize = dimensionResource(R.dimen.font_size_small).value.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier
             .padding(top = dimensionResource(R.dimen.padding_medium)),
         color = Color.Black
     )
+
     TextField(
-        value = textUserName,
+        value = textLastName,
         onValueChange = {
-            textUserName = it
+            textLastName = it
             isEdited = true
         },
-        label = { Text(text = context.getString(R.string.username_label)) },
+        label = { Text(text = context.getString(R.string.register_lastname_label)) },
         shape = RoundedCornerShape(dimensionResource(R.dimen.rounded_corner_shape_small)),
         colors = TextFieldDefaults.outlinedTextFieldColors(
             backgroundColor = Color.White,
@@ -56,26 +60,26 @@ fun UserName(viewModel: RegisterViewModel): String {
             .fillMaxWidth()
             .padding(top = dimensionResource(R.dimen.padding_small)),
         trailingIcon = {
-            if (state.errorMessages[context.getString(R.string.username_error_messages)]?.
+            if (state.errorMessages[context.getString(R.string.register_lastname_error_messages)]?.
                 isNotEmpty() == true)
                 Icon(
                     Icons.Filled.Error,
-                    context.getString(R.string.username_error_field_description),
+                    context.getString(R.string.register_lastname_error_field_description),
                     tint = MaterialTheme.colors.error
                 )
         },
-        isError = state.errorMessages[context.getString(R.string.username_error_messages)]?.
+        isError = state.errorMessages[context.getString(R.string.register_lastname_error_messages)]?.
             isNotEmpty() == true
     )
-    if (state.errorMessages[context.getString(R.string.username_error_messages)]?.
+    if (state.errorMessages[context.getString(R.string.register_lastname_error_messages)]?.
         isNotEmpty() == true) {
         Text(
-            text = state.errorMessages[context.getString(R.string.username_error_messages)] ?: "",
+            text = state.errorMessages[context.getString(R.string.register_lastname_error_messages)] ?: "",
             color = MaterialTheme.colors.error,
             style = MaterialTheme.typography.caption,
             modifier = Modifier
                 .padding(start = dimensionResource(R.dimen.padding_medium))
         )
     }
-    return textUserName
+    return textLastName
 }

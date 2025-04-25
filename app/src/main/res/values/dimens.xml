@@ -9,8 +9,9 @@
     <dimen name="padding_2xlarge">64dp</dimen>
 
     <!-- Spacer -->
-    <dimen name="spacer_xsmall">10dp</dimen>
-    <dimen name="spacer_medium">20dp</dimen>
+    <dimen name="spacer_small">5dp</dimen>
+    <dimen name="spacer_medium">10dp</dimen>
+    <dimen name="spacer_large">20dp</dimen>
 
     <!-- Font Size -->
     <dimen name="font_size_xsmall">14dp</dimen>
@@ -20,11 +21,12 @@
 
     <!-- Others -->
     <dimen name="shadow_elevation_topBar">3dp</dimen>
+    <dimen name="cell_profile_image_width">50dp</dimen>
     <dimen name="cell_title_height">64dp</dimen>
     <dimen name="cell_image_medium">400dp</dimen>
     <dimen name="cell_image_height">600dp</dimen>
-    <dimen name="image_height_large">220dp</dimen>
-    <dimen name="padding_image">188dp</dimen>
+    <dimen name="image_height_large">300dp</dimen>
+    <dimen name="padding_image">270dp</dimen>
     <dimen name="surface_rounded_corner">8dp</dimen>
     <dimen name="rounded_corner_shape_small">10dp</dimen>
     <dimen name="rounded_corner_shape_medium">40dp</dimen>

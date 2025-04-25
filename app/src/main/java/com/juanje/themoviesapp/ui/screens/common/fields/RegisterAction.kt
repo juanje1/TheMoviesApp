@@ -1,4 +1,4 @@
-package com.juanje.themoviesapp.ui.screens.common
+package com.juanje.themoviesapp.ui.screens.common.fields
 
 import android.graphics.Color.parseColor
 import androidx.compose.foundation.layout.*
@@ -36,11 +36,11 @@ fun RegisterAction(
 
     if (state.timeExecution > 0) {
         if (state.userValid) {
-            showToast(context, context.getString(R.string.register_success))
+            showToast(context, context.getString(R.string.info_register_success))
             onClickRegistered()
         }
         else
-            showToast(context, context.getString(R.string.register_error))
+            showToast(context, context.getString(R.string.error_register))
         viewModel.resetState()
     }
 
