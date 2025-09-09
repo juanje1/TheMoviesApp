@@ -1,7 +1,8 @@
-package com.juanje.themoviesapp.data.server
+package com.juanje.themoviesapp.data.server.datasources
 
 import com.juanje.data.datasources.MovieRemoteDataSource
 import com.juanje.domain.Movie
+import com.juanje.themoviesapp.data.server.services.MovieService
 import com.juanje.themoviesapp.data.server.dataclasses.toMovie
 
 class MovieServerDataSource(private val movieService: MovieService): MovieRemoteDataSource {

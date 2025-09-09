@@ -17,12 +17,12 @@ sealed class NavItem(
         navArgument(it.key) { type = it.navType }
     }
 
-    object Login: NavItem(NavigationRoutes.Login)
-    object Register: NavItem(NavigationRoutes.Register)
-    object Home: NavItem(NavigationRoutes.Home, listOf(NavArg.UserName)) {
+    data object Login: NavItem(NavigationRoutes.Login)
+    data object Register: NavItem(NavigationRoutes.Register)
+    data object Home: NavItem(NavigationRoutes.Home, listOf(NavArg.UserName)) {
         fun createRoute(userName: String) = "$baseRoute/$userName"
     }
-    object Detail: NavItem(NavigationRoutes.Detail, listOf(NavArg.UserName, NavArg.MovieId)) {
+    data object Detail: NavItem(NavigationRoutes.Detail, listOf(NavArg.UserName, NavArg.MovieId)) {
         fun createRoute(userName: String, movieId: Int) = "$baseRoute/$userName/$movieId"
     }
 }

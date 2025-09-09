@@ -18,6 +18,7 @@ class LoginViewModel @Inject constructor(private val loadUser: LoadUser) : ViewM
 
     fun onLoginClick(email: String, password: String) = viewModelScope.launch {
         val user = loadUser.invokeGetUser(email, password)
+
         _state.value = UiState(
             user = user,
             timeExecution = state.value.timeExecution+1,

@@ -6,36 +6,37 @@
     <string name="image_url">https://image.tmdb.org/t/p/w185</string>
 
     <!-- Login Screen Strings -->
-    <string name="login_image_description">Login Imagen</string>
+    <string name="login_image_description">Login Image</string>
     <string name="login_title_text">TheMoviesApp | Login</string>
-    <string name="login_email_text">Email (minúsculas)</string>
+    <string name="login_email_text">Email</string>
     <string name="login_password_text">Contraseña</string>
     <string name="login_password_text_visibility_description">Visibilidad de Icono de Contraseña</string>
     <string name="login_login_button">Iniciar Sesión</string>
     <string name="login_register_text">¿No tienes una cuenta? Regístrate</string>
 
     <!-- Register Screen Strings -->
-    <string name="register_title">TheMoviesApp | Register</string>
-    <string name="register_username">User Name</string>
-    <string name="register_username_label">User Name</string>
-    <string name="register_username_error_messages">UserName</string>
-    <string name="register_username_error_field_description">Error</string>
-    <string name="register_firstname">First Name</string>
-    <string name="register_firstname_label">First Name</string>
-    <string name="register_firstname_error_messages">FirstName</string>
-    <string name="register_firstname_error_field_description">Error</string>
-    <string name="register_lastname">Last Name</string>
-    <string name="register_lastname_label">Last Name</string>
-    <string name="register_lastname_error_messages">LastName</string>
-    <string name="register_lastname_error_field_description">Error</string>
-    <string name="register_email">Email</string>
-    <string name="register_email_label">example@gmail.com</string>
-    <string name="register_email_error_messages">Email</string>
-    <string name="register_email_error_field_description">Error</string>
-    <string name="register_password">Password</string>
-    <string name="register_password_label">Type your Password</string>
-    <string name="register_password_error_messages">Password</string>
-    <string name="register_password_error_field_description">Error</string>
+    <string name="register_image_description">Register Image</string>
+    <string name="register_title_text">TheMoviesApp | Register</string>
+
+    <string name="register_user_name_label">User Name</string>
+    <string name="register_user_name_error_messages">userName</string>
+    <string name="register_user_name_error_field_description">error</string>
+
+    <string name="register_first_name_label">First Name</string>
+    <string name="register_first_name_error_messages">firstName</string>
+    <string name="register_first_name_error_field_description">error</string>
+
+    <string name="register_last_name_label">Last Name</string>
+    <string name="register_last_name_error_messages">lastName</string>
+    <string name="register_last_name_error_field_description">error</string>
+
+    <string name="register_email_label">Email</string>
+    <string name="register_email_error_messages">email</string>
+    <string name="register_email_error_field_description">error</string>
+
+    <string name="register_password_label">Password</string>
+    <string name="register_password_error_messages">password</string>
+    <string name="register_password_error_field_description">error</string>
     <string name="register_password_hide">Hide Password</string>
     <string name="register_password_show">Show Password</string>
 
@@ -82,7 +83,6 @@
     <!-- Others Strings -->
     <string name="arrow_back_content_description">Arrow back</string>
     <string name="color_background_login">#E0E0E0</string>
-    <string name="color_background_button">#FA951A</string>
     <string name="color_text_fields">#5E5E5E</string>
     <string name="color_text_register_now">#4D4D4D</string>
     <string name="max_lines">1</string>

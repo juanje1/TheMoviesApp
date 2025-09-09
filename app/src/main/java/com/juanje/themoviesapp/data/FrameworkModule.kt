@@ -1,4 +1,4 @@
-package com.juanje.themoviesapp
+package com.juanje.themoviesapp.data
 
 import android.content.Context
 import androidx.room.Room
@@ -7,13 +7,14 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.juanje.data.datasources.MovieLocalDataSource
 import com.juanje.data.datasources.MovieRemoteDataSource
 import com.juanje.data.datasources.UserLocalDataSource
+import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.data.database.TheMoviesAppDatabase
 import com.juanje.themoviesapp.data.database.daos.MovieDao
 import com.juanje.themoviesapp.data.database.daos.UserDao
 import com.juanje.themoviesapp.data.database.datasources.MovieDatabaseDataSource
 import com.juanje.themoviesapp.data.database.datasources.UserDatabaseDataSource
-import com.juanje.themoviesapp.data.server.MovieServerDataSource
-import com.juanje.themoviesapp.data.server.MovieService
+import com.juanje.themoviesapp.data.server.datasources.MovieServerDataSource
+import com.juanje.themoviesapp.data.server.services.MovieService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,7 +26,6 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Named
 import javax.inject.Singleton
-
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -64,21 +64,11 @@ class FrameworkModule {
 
     @Provides
     @Singleton
-    fun movieServiceProvider(retrofit: Retrofit): MovieService =
-        retrofit.run { create(MovieService::class.java) }
-
-    @Provides
-    fun movieServerDataSourceProvider(movieService: MovieService): MovieRemoteDataSource =
-        MovieServerDataSource(movieService)
-
-    @Provides
-    @Singleton
-    fun getMigration1To2(): Migration =
-        object : Migration(1, 2) {
+    fun getMigration2To3(): Migration =
+        object : Migration(2, 3) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL(
-                    "ALTER TABLE MovieEntity ADD COLUMN userName TEXT NOT NULL DEFAULT ''"
-                )
+                database.execSQL("ALTER TABLE MovieEntity RENAME TO MovieDatabase;")
+                database.execSQL("ALTER TABLE UserEntity RENAME TO UserDatabase;")
             }
         }
 
@@ -89,7 +79,7 @@ class FrameworkModule {
         applicationContext,
         TheMoviesAppDatabase::class.java,
         name = applicationContext.getString(R.string.name_database)
-    ).addMigrations(getMigration1To2()).build()
+    ).addMigrations(getMigration2To3()).build()
 
     @Provides
     @Singleton
@@ -102,11 +92,19 @@ class FrameworkModule {
         theMoviesAppDatabase.userDao()
 
     @Provides
-    fun movieDatabaseDataSourceProvider(movieDao: MovieDao)
-    : MovieLocalDataSource = MovieDatabaseDataSource(movieDao)
+    @Singleton
+    fun movieServiceProvider(retrofit: Retrofit): MovieService =
+        retrofit.run { create(MovieService::class.java) }
 
     @Provides
-    fun userDatabaseDataSourceProvider(userDao: UserDao)
-    : UserLocalDataSource = UserDatabaseDataSource(userDao)
+    fun movieDatabaseDataSourceProvider(movieDao: MovieDao): MovieLocalDataSource =
+        MovieDatabaseDataSource(movieDao)
 
+    @Provides
+    fun userDatabaseDataSourceProvider(userDao: UserDao): UserLocalDataSource =
+        UserDatabaseDataSource(userDao)
+
+    @Provides
+    fun movieServerDataSourceProvider(movieService: MovieService): MovieRemoteDataSource =
+        MovieServerDataSource(movieService)
 }

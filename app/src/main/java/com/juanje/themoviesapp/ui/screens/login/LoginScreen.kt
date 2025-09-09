@@ -98,7 +98,7 @@ fun LoginScreen(
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = dimensionResource(R.dimen.padding_image)),
+                    .padding(top = dimensionResource(R.dimen.padding_image_large)),
                 color = Color.White,
                 shape = RoundedCornerShape(
                     topStartPercent = dimensionResource(R.dimen.surface_rounded_corner).value.toInt(),
@@ -140,6 +140,7 @@ fun LoginScreen(
                             maxLines = context.getString(R.string.max_lines).toInt(),
                             singleLine = true,
                             label = { Text(text = context.getString(R.string.login_email_text)) },
+                            shape = RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_small)),
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Email,
                                 imeAction = ImeAction.Next
@@ -160,6 +161,7 @@ fun LoginScreen(
                             maxLines = context.getString(R.string.max_lines).toInt(),
                             singleLine = true,
                             label = { Text(context.getString(R.string.login_password_text)) },
+                            shape = RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_small)),
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Password,
                                 imeAction = ImeAction.Done
@@ -194,14 +196,14 @@ fun LoginScreen(
                         Button(
                             modifier = Modifier
                                 .width(dimensionResource(R.dimen.button_width_medium))
-                                .height(dimensionResource(R.dimen.button_height)),
+                                .height(dimensionResource(R.dimen.button_height_medium)),
                             onClick = {
                                 loginViewModel.onLoginClick(
                                     email = emailText,
                                     password = passwordText
                                 )
                             },
-                            shape = RoundedCornerShape(dimensionResource(R.dimen.button_rounded_corner).value.toInt()),
+                            shape = RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_medium).value.toInt()),
                         ) {
                             Text(
                                 text = context.getString(R.string.login_login_button).uppercase()

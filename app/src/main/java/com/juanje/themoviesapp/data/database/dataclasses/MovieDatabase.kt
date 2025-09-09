@@ -1,11 +1,11 @@
-package com.juanje.themoviesapp.data.database.entities
+package com.juanje.themoviesapp.data.database.dataclasses
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.juanje.domain.Movie
 
 @Entity
-data class MovieEntity (
+data class MovieDatabase (
     @PrimaryKey(autoGenerate = true) val id: Int,
     val title: String,
     val overview: String,
@@ -14,7 +14,7 @@ data class MovieEntity (
     val userName: String
 )
 
-fun MovieEntity.toMovie() = Movie(
+fun MovieDatabase.toMovie() = Movie(
     id = id,
     title = title,
     overview = overview,
@@ -23,7 +23,7 @@ fun MovieEntity.toMovie() = Movie(
     userName = userName
 )
 
-fun Movie.toMovieEntity() = MovieEntity(
+fun Movie.toMovieDatabase() = MovieDatabase(
     id = id,
     title = title,
     overview = overview,

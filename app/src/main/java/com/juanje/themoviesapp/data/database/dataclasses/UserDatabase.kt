@@ -1,11 +1,11 @@
-package com.juanje.themoviesapp.data.database.entities
+package com.juanje.themoviesapp.data.database.dataclasses
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.juanje.domain.User
 
 @Entity
-data class UserEntity(
+data class UserDatabase(
     @PrimaryKey val userName: String,
     val firstName: String,
     val lastName: String,
@@ -13,7 +13,7 @@ data class UserEntity(
     val password: String
 )
 
-fun UserEntity.toUser() = User(
+fun UserDatabase.toUser() = User(
     userName = userName,
     firstName = firstName,
     lastName = lastName,
@@ -21,7 +21,7 @@ fun UserEntity.toUser() = User(
     password = password
 )
 
-fun User.toUserEntity() = UserEntity(
+fun User.toUserDatabase() = UserDatabase(
     userName = userName,
     firstName = firstName,
     lastName = lastName,

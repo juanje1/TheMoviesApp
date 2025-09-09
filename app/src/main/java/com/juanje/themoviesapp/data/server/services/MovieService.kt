@@ -1,6 +1,6 @@
-package com.juanje.themoviesapp.data.server
+package com.juanje.themoviesapp.data.server.services
 
-import com.juanje.themoviesapp.data.server.dataclasses.MovieResult
+import com.juanje.themoviesapp.data.server.dataclasses.MovieServer
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -9,5 +9,5 @@ interface MovieService {
     suspend fun getMovies(
         @Query("api_key") apikey: String,
         @Query("page") page: Int
-    ): MovieResult
+    ): MovieServer
 }
