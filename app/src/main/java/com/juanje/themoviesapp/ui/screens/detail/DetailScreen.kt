@@ -27,7 +27,7 @@ fun DetailScreen(
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(text = it.title) },
+                    title = { Text(text = it.title ?: "") },
                     navigationIcon = { ArrowBackIcon(onHomeClick, userName) }
                 )
             }

@@ -7,7 +7,7 @@ import com.juanje.themoviesapp.data.database.daos.UserDao
 import com.juanje.themoviesapp.data.database.dataclasses.MovieDatabase
 import com.juanje.themoviesapp.data.database.dataclasses.UserDatabase
 
-@Database(entities = [UserDatabase::class, MovieDatabase::class], version = 3)
+@Database(entities = [UserDatabase::class, MovieDatabase::class], version = 5)
 abstract class TheMoviesAppDatabase: RoomDatabase() {
     abstract fun userDao(): UserDao
     abstract fun movieDao(): MovieDao

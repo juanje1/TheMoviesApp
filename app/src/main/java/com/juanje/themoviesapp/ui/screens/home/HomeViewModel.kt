@@ -21,10 +21,14 @@ class HomeViewModel @Inject constructor(private val loadMovie: LoadMovie) : View
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state
 
+    private val lastVisible = MutableStateFlow(0)
+
     init {
         viewModelScope.launch {
-            _state.value.lastVisible.collect {
-                if (_state.value.lastVisible.value != 0) notifyLastVisible(it)
+            lastVisible.collect {
+                if (lastVisible.value != 0) {
+                    notifyLastVisible(it)
+                }
             }
         }
         _state.value = UiState(isInit = true)
@@ -34,7 +38,7 @@ class HomeViewModel @Inject constructor(private val loadMovie: LoadMovie) : View
         _state.value = UiState(loading = true)
 
         val size = loadMovie.invokeGetCountMovies(userName)
-        loadMovie.invokeGetMovies(userName, _state.value.lastVisible.value, size).collect {
+        loadMovie.invokeGetMovies(userName, lastVisible.value, size).collect {
             _state.value = UiState(
                 movies = it,
                 userName = userName
@@ -46,8 +50,8 @@ class HomeViewModel @Inject constructor(private val loadMovie: LoadMovie) : View
         loadMovie.invokeUpdateMovie(movie.copy(favourite = !movie.favourite))
     }
 
-    fun setLastVisible(lastVisible: Int) {
-        _state.value.lastVisible.value = lastVisible
+    fun updateLastVisible(lastVisiblePosition: Int) {
+        lastVisible.value = lastVisiblePosition
     }
 
     fun resetState() {
@@ -56,7 +60,7 @@ class HomeViewModel @Inject constructor(private val loadMovie: LoadMovie) : View
 
     private suspend fun notifyLastVisible(lastVisible: Int) {
         val size = loadMovie.invokeGetCountMovies(_state.value.userName)
-        if(lastVisible+1 >= size - PAGE_THRESHOLD) {
+        if (lastVisible+1 >= size - PAGE_THRESHOLD) {
             loadMovie.invokeGetMovies(_state.value.userName, lastVisible+1, size)
         }
     }
@@ -65,7 +69,6 @@ class HomeViewModel @Inject constructor(private val loadMovie: LoadMovie) : View
         val loading: Boolean = false,
         val isInit: Boolean = false,
         val movies: List<Movie> = emptyList(),
-        val lastVisible: MutableStateFlow<Int> = MutableStateFlow(0),
         val userName: String = ""
     )
 }

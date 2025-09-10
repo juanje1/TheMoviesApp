@@ -54,7 +54,7 @@ fun HomeItem(
             )
         }
         Text(
-            text = movie.title,
+            text = movie.title ?: "",
             textAlign = TextAlign.Center,
             color = MaterialTheme.colors.background,
             modifier = Modifier

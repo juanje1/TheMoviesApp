@@ -49,7 +49,7 @@ fun DetailItem(
             )
         )
         Text(
-            text = movie.title,
+            text = movie.title ?: "",
             modifier = Modifier.padding(
                 start = dimensionResource(R.dimen.padding_medium),
                 top = dimensionResource(R.dimen.padding_xsmall),
@@ -66,7 +66,7 @@ fun DetailItem(
             )
         )
         Text(
-            text = movie.overview,
+            text = movie.overview ?: "",
             modifier = Modifier.padding(
                 start = dimensionResource(R.dimen.padding_medium),
                 top = dimensionResource(R.dimen.padding_xsmall),

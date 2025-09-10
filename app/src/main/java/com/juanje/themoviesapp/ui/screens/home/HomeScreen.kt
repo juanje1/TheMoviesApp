@@ -88,12 +88,15 @@ fun HomeScreen(
                     )
                     val lastVisiblePosition = listState.isScrolledToTheEnd()
 
-                    if (lastVisiblePosition != null) homeViewModel.setLastVisible(lastVisiblePosition)
-                    else homeViewModel.setLastVisible(0)
+                    if (lastVisiblePosition != null)
+                        homeViewModel.updateLastVisible(lastVisiblePosition)
+                    else
+                        homeViewModel.updateLastVisible(0)
                 }
             }
         }
     }
 }
 
-fun LazyGridState.isScrolledToTheEnd() = layoutInfo.visibleItemsInfo.lastOrNull()?.index
+fun LazyGridState.isScrolledToTheEnd() =
+    layoutInfo.visibleItemsInfo.lastOrNull()?.index

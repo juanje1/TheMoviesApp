@@ -7,9 +7,9 @@ import com.juanje.domain.Movie
 @Entity
 data class MovieDatabase (
     @PrimaryKey(autoGenerate = true) val id: Int,
-    val title: String,
-    val overview: String,
-    val posterPath: String,
+    val title: String ?= null,
+    val overview: String ?= null,
+    val posterPath: String ?= null,
     val favourite: Boolean = false,
     val userName: String
 )

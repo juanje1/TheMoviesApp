@@ -64,11 +64,10 @@ class FrameworkModule {
 
     @Provides
     @Singleton
-    fun getMigration2To3(): Migration =
-        object : Migration(2, 3) {
+    fun getMigration4To5(): Migration =
+        object : Migration(4, 5) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("ALTER TABLE MovieEntity RENAME TO MovieDatabase;")
-                database.execSQL("ALTER TABLE UserEntity RENAME TO UserDatabase;")
+                database.execSQL("ALTER TABLE MovieDatabaseNew RENAME TO MovieDatabase;")
             }
         }
 
@@ -79,7 +78,7 @@ class FrameworkModule {
         applicationContext,
         TheMoviesAppDatabase::class.java,
         name = applicationContext.getString(R.string.name_database)
-    ).addMigrations(getMigration2To3()).build()
+    ).addMigrations(getMigration4To5()).build()
 
     @Provides
     @Singleton
