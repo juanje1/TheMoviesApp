@@ -21,6 +21,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.juanje.themoviesapp.R
@@ -29,14 +30,16 @@ import com.juanje.themoviesapp.ui.screens.common.others.MyTopAppBar
 
 @Composable
 fun HomeScreen(
-    onLoginClick: () -> Unit,
-    onDetailClick: (String, Int) -> Unit,
+    onLogin: () -> Unit,
+    onDetail: (String, Int) -> Unit,
     userName: String
 ) {
     var showLogoutAlertDialog by rememberSaveable { mutableStateOf(false) }
 
     val homeViewModel: HomeViewModel = hiltViewModel()
     val homeState by homeViewModel.state.collectAsState()
+
+    val context = LocalContext.current
 
     if (homeState.isInit) {
         homeViewModel.resetState()
@@ -45,7 +48,7 @@ fun HomeScreen(
 
     if (showLogoutAlertDialog) {
         LogoutAlertDialog(
-            onAccept = { onLoginClick() },
+            onAccept = { onLogin() },
             onCancel = { showLogoutAlertDialog = false },
             onDismiss = { showLogoutAlertDialog = false }
         )
@@ -56,12 +59,13 @@ fun HomeScreen(
             Surface(shadowElevation = dimensionResource(R.dimen.shadow_elevation_topBar)) {
                 MyTopAppBar(
                     userName = userName,
-                    onLogoutClick = { showLogoutAlertDialog = true }
+                    origin = context.getString(R.string.origin_from_home),
+                    onLogout = { showLogoutAlertDialog = true }
                 )
             }
         }
     ) { padding ->
-        if(homeState.loading) {
+        if (homeState.loading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -82,8 +86,8 @@ fun HomeScreen(
             ) {
                 items(homeState.movies) { movie ->
                     HomeItem(
-                        onDetailClick = onDetailClick,
-                        onFavouriteClick = { homeViewModel.updateMovie(movie) },
+                        onDetail = onDetail,
+                        onFavourite = { homeViewModel.updateMovie(movie) },
                         movie = movie
                     )
                     val lastVisiblePosition = listState.isScrolledToTheEnd()

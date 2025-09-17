@@ -61,8 +61,8 @@ import com.juanje.themoviesapp.ui.theme.Purple200
 
 @Composable
 fun LoginScreen(
-    onHomeClick: (String) -> Unit,
-    onRegisterClick: () -> Unit
+    onHome: (String) -> Unit,
+    onRegister: () -> Unit
 ) {
     var emailText by rememberSaveable { mutableStateOf("") }
     var passwordText by rememberSaveable { mutableStateOf("") }
@@ -75,7 +75,7 @@ fun LoginScreen(
     val context = LocalContext.current
 
     if (stateLogin.timeExecution > 0) {
-        if (stateLogin.isUserValid) onHomeClick(stateLogin.user?.userName!!)
+        if (stateLogin.isUserValid) onHome(stateLogin.user?.userName!!)
         else showToast(context, context.getString(R.string.error_login_incorrect))
         loginViewModel.resetState()
     }
@@ -198,7 +198,7 @@ fun LoginScreen(
                                 .width(dimensionResource(R.dimen.button_width_medium))
                                 .height(dimensionResource(R.dimen.button_height_medium)),
                             onClick = {
-                                loginViewModel.onLoginClick(
+                                loginViewModel.onLogin(
                                     email = emailText,
                                     password = passwordText
                                 )
@@ -212,10 +212,10 @@ fun LoginScreen(
                     }
                     Spacer(modifier = Modifier.weight(0.5f))
                     Text(
-                        modifier = Modifier.clickable { onRegisterClick() },
+                        modifier = Modifier.clickable { onRegister() },
                         text = AnnotatedString(context.getString(R.string.login_register_text)),
                         style = TextStyle(
-                            fontSize = dimensionResource(R.dimen.font_size_xsmall).value.sp,
+                            fontSize = dimensionResource(R.dimen.font_size_small).value.sp,
                             fontFamily = FontFamily.Default,
                             textDecoration = TextDecoration.Underline,
                             color = Purple200

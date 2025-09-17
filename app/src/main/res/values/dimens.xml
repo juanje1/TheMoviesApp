@@ -14,10 +14,9 @@
     <dimen name="spacer_large">20dp</dimen>
 
     <!-- Font Size -->
-    <dimen name="font_size_xsmall">14dp</dimen>
-    <dimen name="font_size_small">20dp</dimen>
-    <dimen name="font_size_medium">22dp</dimen>
-    <dimen name="font_size_large">30dp</dimen>
+    <dimen name="font_size_small">14dp</dimen>
+    <dimen name="font_size_medium">20dp</dimen>
+    <dimen name="font_size_large">22dp</dimen>
 
     <!-- Others -->
     <dimen name="shadow_elevation_topBar">3dp</dimen>

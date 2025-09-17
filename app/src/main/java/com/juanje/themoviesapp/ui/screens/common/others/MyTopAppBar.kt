@@ -4,11 +4,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ExitToApp
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -16,6 +16,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,17 +34,24 @@ import com.juanje.themoviesapp.R
 @Composable
 fun MyTopAppBar(
     userName: String,
-    onLogoutClick: () -> Unit
+    titleMovie: String = "",
+    origin: String,
+    onBack: () -> Unit = {},
+    onLogout: () -> Unit = {}
 ) {
     val context = LocalContext.current
 
     TopAppBar(
         title = {
-            Column {
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+            Row(
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (origin == context.getString(R.string.origin_from_other)) {
+                    VerticalDivider()
+                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacer_medium)))
+                }
+                if (titleMovie.isEmpty()) {
                     AsyncImage(
                         model = ImageRequest.Builder(context)
                             .data(R.drawable.profile)
@@ -59,19 +67,37 @@ fun MyTopAppBar(
                     Column {
                         Text(
                             text = userName.ifEmpty { context.getString(R.string.anonymous_username_text) },
-                            fontSize = dimensionResource(R.dimen.font_size_large).value.sp,
+                            fontSize = dimensionResource(R.dimen.font_size_medium).value.sp,
+                            maxLines = context.getString(R.string.max_lines).toInt(),
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                } else {
+                    Column {
+                        Text(
+                            text = titleMovie,
+                            fontSize = dimensionResource(R.dimen.font_size_medium).value.sp,
                             maxLines = context.getString(R.string.max_lines).toInt(),
                             overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacer_small)))
+            }
+        },
+        navigationIcon = {
+            if (origin == context.getString(R.string.origin_from_other)) {
+                IconButton(onClick = { onBack() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = context.getString(R.string.arrow_back_content_description)
+                    )
+                }
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(),
         actions = {
             IconButton(
-                onClick = onLogoutClick
+                onClick = onLogout
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Outlined.ExitToApp,

@@ -24,7 +24,7 @@ class RegisterViewModel @Inject constructor(
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state
 
-    fun onRegisterClick(user: User) = viewModelScope.launch {
+    fun onRegister(user: User) = viewModelScope.launch {
         _state.value = UiState(
             userValid = true,
             timeExecution = _state.value.timeExecution + 1

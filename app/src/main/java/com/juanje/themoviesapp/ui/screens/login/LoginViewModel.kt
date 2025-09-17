@@ -16,7 +16,7 @@ class LoginViewModel @Inject constructor(private val loadUser: LoadUser) : ViewM
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state
 
-    fun onLoginClick(email: String, password: String) = viewModelScope.launch {
+    fun onLogin(email: String, password: String) = viewModelScope.launch {
         val user = loadUser.invokeGetUser(email, password)
 
         _state.value = UiState(

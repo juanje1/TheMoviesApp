@@ -2,12 +2,17 @@ package com.juanje.themoviesapp.ui.screens.home
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.Favorite
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,17 +27,17 @@ import com.juanje.themoviesapp.common.ImageAspectRatio
 
 @Composable
 fun HomeItem(
-    onDetailClick: (String, Int) -> Unit,
-    onFavouriteClick: () -> Unit,
-    movie: Movie,
+    onDetail: (String, Int) -> Unit,
+    onFavourite: () -> Unit,
+    movie: Movie
 ) {
     val context = LocalContext.current
 
     Column(
-        modifier = Modifier.background(MaterialTheme.colors.secondary)
+        modifier = Modifier.background(MaterialTheme.colorScheme.secondary)
     ) {
         Box(
-            modifier = Modifier.clickable { onDetailClick(movie.userName, movie.id) }
+            modifier = Modifier.clickable { onDetail(movie.userName, movie.id) }
         ) {
             AsyncImage(
                 model = context.getString(R.string.image_url)+movie.posterPath,
@@ -42,21 +47,21 @@ fun HomeItem(
                     .aspectRatio(ImageAspectRatio)
             )
             var color: Color = Color.White
-            if(movie.favourite) color = Color.Red
+            if (movie.favourite) color = Color.Red
             Icon(
                 imageVector = Icons.TwoTone.Favorite,
                 contentDescription = movie.title,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(dimensionResource(R.dimen.padding_xsmall))
-                    .clickable { onFavouriteClick() },
+                    .clickable { onFavourite() },
                 tint = color
             )
         }
         Text(
             text = movie.title ?: "",
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.background,
+            color = MaterialTheme.colorScheme.background,
             modifier = Modifier
                 .padding(dimensionResource(R.dimen.padding_xsmall))
                 .height(dimensionResource(R.dimen.cell_title_height))

@@ -53,6 +53,9 @@
     <!-- TopAppBar Strings -->
     <string name="profile_default_image_description">Foto de perfil por defecto</string>
     <string name="anonymous_username_text">Bienvenidx</string>
+    <string name="anonymous_title_movie_text">Unknown</string>
+    <string name="origin_from_home">home</string>
+    <string name="origin_from_other">other</string>
 
     <!-- Common Buttons Strings -->
     <string name="accept_button_dialog">Aceptar</string>

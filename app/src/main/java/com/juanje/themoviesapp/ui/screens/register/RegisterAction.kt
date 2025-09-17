@@ -21,8 +21,8 @@ import com.juanje.themoviesapp.common.showToast
 
 @Composable
 fun RegisterAction(
-    onClickRegistered: () -> Unit,
-    onClickCancel: () -> Unit,
+    onRegister: () -> Unit,
+    onCancel: () -> Unit,
     registerViewModel: RegisterViewModel,
     user: User
 ) {
@@ -32,7 +32,7 @@ fun RegisterAction(
     if (stateRegister.timeExecution > 0) {
         if (stateRegister.userValid) {
             showToast(context, context.getString(R.string.info_register_success))
-            onClickRegistered()
+            onRegister()
         }
         else
             showToast(context, context.getString(R.string.error_register))
@@ -49,7 +49,7 @@ fun RegisterAction(
             modifier = Modifier
                 .width(dimensionResource(R.dimen.button_width_small))
                 .height(dimensionResource(R.dimen.button_height_medium)),
-            onClick = { registerViewModel.onRegisterClick(user) },
+            onClick = { registerViewModel.onRegister(user) },
             shape = RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_medium))
         ) {
             Text(
@@ -60,7 +60,7 @@ fun RegisterAction(
             modifier = Modifier
                 .width(dimensionResource(R.dimen.button_width_small))
                 .height(dimensionResource(R.dimen.button_height_medium)),
-            onClick = { onClickCancel() },
+            onClick = { onCancel() },
             shape = RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_medium))
         ) {
             Text(

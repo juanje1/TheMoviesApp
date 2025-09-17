@@ -38,8 +38,8 @@ import com.juanje.themoviesapp.ui.screens.common.fields.email
 
 @Composable
 fun RegisterScreen(
-    onRegisteredClick: () -> Unit,
-    onLoginClick: () -> Unit
+    onRegister: () -> Unit,
+    onLogin: () -> Unit
 ) {
     val registerViewModel: RegisterViewModel = hiltViewModel()
 
@@ -98,8 +98,8 @@ fun RegisterScreen(
                         val password = password(registerViewModel)
 
                         RegisterAction(
-                            onClickRegistered = onRegisteredClick,
-                            onClickCancel = onLoginClick,
+                            onRegister = onRegister,
+                            onCancel = onLogin,
                             registerViewModel = registerViewModel,
                             user = User(userName, firstName, lastName, email, password)
                         )

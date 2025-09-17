@@ -27,26 +27,27 @@ fun Navigation() {
     ) {
         composable(NavItem.Login) {
             LoginScreen (
-                onHomeClick = navToHome,
-                onRegisterClick = navToRegister
+                onHome = navToHome,
+                onRegister = navToRegister
             )
         }
         composable(NavItem.Register) {
             RegisterScreen(
-                onRegisteredClick = navToLogin,
-                onLoginClick = navToLogin
+                onRegister = navToLogin,
+                onLogin = navToLogin
             )
         }
         composable(NavItem.Home) { backStackEntry ->
             HomeScreen(
-                onLoginClick = navToLogin,
-                onDetailClick = navToDetail,
+                onLogin = navToLogin,
+                onDetail = navToDetail,
                 userName = backStackEntry.findArg(NavArg.UserName)
             )
         }
         composable(NavItem.Detail) { backStackEntry ->
             DetailScreen(
-                onHomeClick = navToHome,
+                onLogin = navToLogin,
+                onHome = navToHome,
                 userName = backStackEntry.findArg(NavArg.UserName),
                 movieId = backStackEntry.findArg(NavArg.MovieId)
             )
