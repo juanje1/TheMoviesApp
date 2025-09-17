@@ -4,6 +4,7 @@ import com.juanje.domain.Movie
 import kotlinx.coroutines.flow.Flow
 
 interface MovieLocalDataSource {
+
     suspend fun getMovies(userName: String): Flow<List<Movie>>
     suspend fun getMovie(userName: String, movieId: Int): Movie
     suspend fun count(userName: String): Int

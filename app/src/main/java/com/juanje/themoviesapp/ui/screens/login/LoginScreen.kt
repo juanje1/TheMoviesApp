@@ -57,7 +57,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.common.showToast
-import com.juanje.themoviesapp.ui.theme.Purple200
+import com.juanje.themoviesapp.ui.theme.Purple40
 
 @Composable
 fun LoginScreen(
@@ -218,7 +218,7 @@ fun LoginScreen(
                             fontSize = dimensionResource(R.dimen.font_size_small).value.sp,
                             fontFamily = FontFamily.Default,
                             textDecoration = TextDecoration.Underline,
-                            color = Purple200
+                            color = Purple40
                         )
                     )
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacer_large)))

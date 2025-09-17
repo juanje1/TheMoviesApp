@@ -14,9 +14,10 @@ import dagger.hilt.android.components.ViewModelComponent
 class ViewModelModule {
 
     @Provides
-    fun loadUserProvider(userRepository: UserRepository) = LoadUser(userRepository)
+    fun loadUserProvider(userRepository: UserRepository) =
+        LoadUser(userRepository)
 
     @Provides
-    fun loadMovieProvider(movieRepository: MovieRepository) = LoadMovie(movieRepository)
-
+    fun loadMovieProvider(movieRepository: MovieRepository) =
+        LoadMovie(movieRepository)
 }

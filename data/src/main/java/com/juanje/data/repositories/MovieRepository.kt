@@ -23,10 +23,10 @@ class MovieRepository(
         return movieLocalDataSource.getMovies(userName)
     }
 
-    suspend fun getMovieDetail(userName: String, movieId: Int): Movie =
+    suspend fun getMovieDetail(userName: String, movieId: Int) =
         movieLocalDataSource.getMovie(userName, movieId)
 
-    suspend fun getCountMovies(userName: String): Int =
+    suspend fun getCountMovies(userName: String) =
         movieLocalDataSource.count(userName)
 
     suspend fun updateMovie(movie: Movie) =
