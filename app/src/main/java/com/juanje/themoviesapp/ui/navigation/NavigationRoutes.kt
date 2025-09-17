@@ -20,7 +20,6 @@ fun navToHome(navController: NavHostController): (String) -> Unit = { userName -
 }
 
 fun navToDetail(navController: NavHostController): (String, Int) -> Unit = { userName, movieId ->
-    navController.popBackStack()
     navController.navigate(NavItem.Detail.createRoute(
         userName = userName,
         movieId = movieId

@@ -46,8 +46,8 @@ fun Navigation() {
         }
         composable(NavItem.Detail) { backStackEntry ->
             DetailScreen(
+                navController = navController,
                 onLogin = navToLogin,
-                onHome = navToHome,
                 userName = backStackEntry.findArg(NavArg.UserName),
                 movieId = backStackEntry.findArg(NavArg.MovieId)
             )

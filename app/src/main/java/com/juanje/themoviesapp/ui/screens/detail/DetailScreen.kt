@@ -11,14 +11,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.ui.screens.common.dialogs.LogoutAlertDialog
 import com.juanje.themoviesapp.ui.screens.common.others.MyTopAppBar
 
 @Composable
 fun DetailScreen(
+    navController: NavHostController,
     onLogin: () -> Unit,
-    onHome: (String) -> Unit,
     userName: String,
     movieId: Int
 ) {
@@ -54,7 +55,7 @@ fun DetailScreen(
                         userName = userName,
                         titleMovie = titleMovie,
                         origin = context.getString(R.string.origin_from_other),
-                        onBack = { onHome(userName) },
+                        onBack = { navController.popBackStack() },
                         onLogout = { showLogoutAlertDialog = true }
                     )
                 }

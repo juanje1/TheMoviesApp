@@ -18,6 +18,9 @@
     <dimen name="font_size_medium">20dp</dimen>
     <dimen name="font_size_large">22dp</dimen>
 
+    <!-- Border Size -->
+    <dimen name="border_medium">2dp</dimen>
+
     <!-- Others -->
     <dimen name="shadow_elevation_topBar">3dp</dimen>
     <dimen name="cell_profile_image_width">50dp</dimen>
