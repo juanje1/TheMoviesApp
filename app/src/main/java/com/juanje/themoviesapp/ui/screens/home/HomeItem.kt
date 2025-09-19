@@ -20,6 +20,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.juanje.domain.Movie
 import com.juanje.themoviesapp.R
@@ -59,13 +61,15 @@ fun HomeItem(
             )
         }
         Text(
-            text = movie.title ?: "",
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.background,
             modifier = Modifier
                 .padding(dimensionResource(R.dimen.padding_xsmall))
                 .height(dimensionResource(R.dimen.cell_title_height))
-                .align(Alignment.CenterHorizontally)
+                .align(Alignment.CenterHorizontally),
+            text = movie.title ?: "",
+            textAlign = TextAlign.Center,
+            fontSize = dimensionResource(R.dimen.font_size_small).value.sp,
+            color = MaterialTheme.colorScheme.background,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

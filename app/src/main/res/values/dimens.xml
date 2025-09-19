@@ -29,6 +29,7 @@
     <dimen name="cell_image_height">600dp</dimen>
     <dimen name="image_height_medium">230dp</dimen>
     <dimen name="image_height_large">300dp</dimen>
+    <dimen name="divider_height">2dp</dimen>
     <dimen name="padding_image_medium">200dp</dimen>
     <dimen name="padding_image_large">270dp</dimen>
     <dimen name="surface_rounded_corner">8dp</dimen>
