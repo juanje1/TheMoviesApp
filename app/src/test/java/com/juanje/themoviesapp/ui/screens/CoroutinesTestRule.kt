@@ -1,4 +1,4 @@
-package com.juanje.themoviesapp.ui.screens.home
+package com.juanje.themoviesapp.ui.screens
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
