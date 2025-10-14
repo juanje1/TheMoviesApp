@@ -2,6 +2,7 @@ package com.juanje.themoviesapp.ui.screens
 
 import com.juanje.data.repositories.MovieRepository
 import com.juanje.data.repositories.UserRepository
+import com.juanje.themoviesapp.common.InternetAvailable
 import com.juanje.usecases.LoadMovie
 import com.juanje.usecases.LoadUser
 import dagger.Module
@@ -20,4 +21,8 @@ class ViewModelModule {
     @Provides
     fun loadMovieProvider(movieRepository: MovieRepository) =
         LoadMovie(movieRepository)
+
+    @Provides
+    fun internetAvailableProvider() =
+        InternetAvailable()
 }

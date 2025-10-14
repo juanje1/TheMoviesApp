@@ -30,18 +30,15 @@ class MovieRepositoryTest {
     private val size = 0
     private val page = 1
 
-    @Mock
-    private lateinit var movieLocalDataSource: MovieLocalDataSource
-    @Mock
-    private lateinit var movieRemoteDataSource: MovieRemoteDataSource
-    @Mock
-    private lateinit var repository: MovieRepository
+    @Mock private lateinit var repository: MovieRepository
+    @Mock private lateinit var movieLocalDataSource: MovieLocalDataSource
+    @Mock private lateinit var movieRemoteDataSource: MovieRemoteDataSource
 
     @Test
     fun `When DB is empty, server is called`() {
         initializeMocks(sizeDatabase, sizeServer+20)
 
-        runBlocking { repository.getMovies(userName, lastVisible, size) }
+        runBlocking { repository.getMovies(userName, lastVisible, size, true) }
 
         verifyBlocking(movieRemoteDataSource) { getMovies(userName, apiKey, page) }
     }
@@ -50,7 +47,7 @@ class MovieRepositoryTest {
     fun `When DB is empty, movies are saved into DB`() {
         initializeMocks(sizeDatabase, sizeServer+20)
 
-        runBlocking { repository.getMovies(userName, lastVisible, size) }
+        runBlocking { repository.getMovies(userName, lastVisible, size, true) }
 
         verifyBlocking(movieLocalDataSource) { insertAll(serverMovies) }
     }
@@ -59,7 +56,7 @@ class MovieRepositoryTest {
     fun `When DB is not empty, server is not called`() {
         initializeMocks(sizeDatabase+20, sizeServer)
 
-        runBlocking { repository.getMovies(userName, lastVisible, size) }
+        runBlocking { repository.getMovies(userName, lastVisible, size, true) }
 
         verifyBlocking(movieRemoteDataSource, times(0)) { getMovies(userName, apiKey, page) }
     }
@@ -68,7 +65,7 @@ class MovieRepositoryTest {
     fun `When DB is not empty, movies are not saved into DB`() {
         initializeMocks(sizeDatabase+20, sizeServer)
 
-        runBlocking { repository.getMovies(userName, lastVisible, size+20) }
+        runBlocking { repository.getMovies(userName, lastVisible, size+20, true) }
 
         verifyBlocking(movieLocalDataSource, times(0)) { insertAll(any()) }
     }
@@ -78,7 +75,7 @@ class MovieRepositoryTest {
         initializeMocks(sizeDatabase+20, sizeServer)
 
         val result = runBlocking {
-            repository.getMovies(userName, lastVisible, size+20).first()
+            repository.getMovies(userName, lastVisible, size+20, true).first()
         }
 
         assertEquals(databaseMovies, result)

@@ -5,7 +5,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanje.domain.Movie
-import com.juanje.themoviesapp.common.isInternetAvailable
+import com.juanje.themoviesapp.common.InternetAvailable
 import com.juanje.usecases.LoadMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -18,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val loadMovie: LoadMovie,
+    private val internetAvailable: InternetAvailable,
     @field:SuppressLint("StaticFieldLeak") @ApplicationContext val context: Context
 ) : ViewModel() {
 
@@ -45,7 +46,7 @@ class HomeViewModel @Inject constructor(
         _state.value = UiState(loading = true)
 
         val size = loadMovie.invokeGetCountMovies(userName)
-        val connectivity = isInternetAvailable(context)
+        val connectivity = internetAvailable.isInternetAvailable(context)
 
         loadMovie.invokeGetMovies(userName, lastVisible.value, size, connectivity).collect {
             _state.value = UiState(
@@ -69,7 +70,7 @@ class HomeViewModel @Inject constructor(
 
     private suspend fun notifyLastVisible(lastVisible: Int) {
         val size = loadMovie.invokeGetCountMovies(_state.value.userName)
-        val connectivity = isInternetAvailable(context)
+        val connectivity = internetAvailable.isInternetAvailable(context)
 
         if (lastVisible+1 >= size - PAGE_THRESHOLD) {
             loadMovie.invokeGetMovies(_state.value.userName, lastVisible+1, size, connectivity)
