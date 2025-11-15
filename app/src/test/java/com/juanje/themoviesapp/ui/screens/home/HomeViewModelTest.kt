@@ -10,6 +10,7 @@ import com.juanje.themoviesapp.ui.screens.fakeMovie
 import com.juanje.themoviesapp.ui.screens.fakeMovies
 import com.juanje.themoviesapp.ui.screens.fakeUserName
 import com.juanje.usecases.LoadMovie
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.test.*
 import org.junit.*
 import org.junit.runner.RunWith
@@ -22,6 +23,7 @@ class HomeViewModelTest {
 
     private val apiKey = "d30e1f350220f9aad6c4110df385d380"
     private val internetAvailable = mock<InternetAvailable>()
+    private val mainDispatcher = mock<CoroutineDispatcher>()
     private val context = mock<Context>()
     private lateinit var homeViewModel: HomeViewModel
 
@@ -34,7 +36,7 @@ class HomeViewModelTest {
         val movieRemoteDataSource = FakeMovieRemoteDataSource(fakeMovies)
         val movieRepository = MovieRepository(movieLocalDataSource, movieRemoteDataSource, apiKey)
         val loadMovie = LoadMovie(movieRepository)
-        homeViewModel = HomeViewModel(loadMovie, internetAvailable, context)
+        homeViewModel = HomeViewModel(loadMovie, internetAvailable, mainDispatcher, context)
     }
 
     @Test

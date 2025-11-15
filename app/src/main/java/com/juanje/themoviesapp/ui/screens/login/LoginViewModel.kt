@@ -3,20 +3,25 @@ package com.juanje.themoviesapp.ui.screens.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanje.domain.User
+import com.juanje.themoviesapp.data.MainDispatcher
 import com.juanje.usecases.LoadUser
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(private val loadUser: LoadUser) : ViewModel() {
+class LoginViewModel @Inject constructor(
+    private val loadUser: LoadUser,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher
+) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state
 
-    fun onLogin(email: String, password: String) = viewModelScope.launch {
+    fun onLogin(email: String, password: String) = viewModelScope.launch(mainDispatcher) {
         val user = loadUser.invokeGetUser(email, password)
 
         _state.value = UiState(

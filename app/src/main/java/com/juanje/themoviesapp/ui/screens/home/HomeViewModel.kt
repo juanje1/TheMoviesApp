@@ -6,9 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanje.domain.Movie
 import com.juanje.themoviesapp.common.InternetAvailable
+import com.juanje.themoviesapp.data.MainDispatcher
 import com.juanje.usecases.LoadMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -19,6 +21,7 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val loadMovie: LoadMovie,
     private val internetAvailable: InternetAvailable,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
     @field:SuppressLint("StaticFieldLeak") @ApplicationContext val context: Context
 ) : ViewModel() {
 
@@ -32,7 +35,7 @@ class HomeViewModel @Inject constructor(
     private val lastVisible = MutableStateFlow(0)
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(mainDispatcher) {
             lastVisible.collect {
                 if (lastVisible.value != 0) {
                     notifyLastVisible(it)
@@ -42,7 +45,7 @@ class HomeViewModel @Inject constructor(
         _state.value = UiState(isInit = true)
     }
 
-    fun getMovies(userName: String) = viewModelScope.launch {
+    fun getMovies(userName: String) = viewModelScope.launch(mainDispatcher) {
         _state.value = UiState(loading = true)
 
         val size = loadMovie.invokeGetCountMovies(userName)
@@ -56,7 +59,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun updateMovie(movie: Movie) = viewModelScope.launch {
+    fun updateMovie(movie: Movie) = viewModelScope.launch(mainDispatcher) {
         loadMovie.invokeUpdateMovie(movie.copy(favourite = !movie.favourite))
     }
 

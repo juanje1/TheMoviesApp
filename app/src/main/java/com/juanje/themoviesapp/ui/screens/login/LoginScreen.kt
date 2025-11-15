@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
@@ -134,7 +135,8 @@ fun LoginScreen(
                                 .padding(
                                     start = dimensionResource(R.dimen.padding_small),
                                     end = dimensionResource(R.dimen.padding_small)
-                                ),
+                                )
+                                .testTag(context.getString(R.string.login_email_test)),
                             value = emailText,
                             onValueChange = { newEmail -> emailText = newEmail },
                             maxLines = context.getString(R.string.max_lines).toInt(),
@@ -155,7 +157,8 @@ fun LoginScreen(
                                 .padding(
                                     start = dimensionResource(R.dimen.padding_small),
                                     end = dimensionResource(R.dimen.padding_small)
-                                ),
+                                )
+                                .testTag(context.getString(R.string.login_password_test)),
                             value = passwordText,
                             onValueChange = { newPassword -> passwordText = newPassword },
                             maxLines = context.getString(R.string.max_lines).toInt(),
@@ -196,7 +199,8 @@ fun LoginScreen(
                         Button(
                             modifier = Modifier
                                 .width(dimensionResource(R.dimen.button_width_medium))
-                                .height(dimensionResource(R.dimen.button_height_medium)),
+                                .height(dimensionResource(R.dimen.button_height_medium))
+                                .testTag(context.getString(R.string.login_login_test)),
                             onClick = {
                                 loginViewModel.onLogin(
                                     email = emailText,
@@ -212,7 +216,9 @@ fun LoginScreen(
                     }
                     Spacer(modifier = Modifier.weight(0.5f))
                     Text(
-                        modifier = Modifier.clickable { onRegister() },
+                        modifier = Modifier
+                            .clickable { onRegister() }
+                            .testTag(context.getString(R.string.login_register_test)),
                         text = AnnotatedString(context.getString(R.string.login_register_text)),
                         style = TextStyle(
                             fontSize = dimensionResource(R.dimen.font_size_small).value.sp,

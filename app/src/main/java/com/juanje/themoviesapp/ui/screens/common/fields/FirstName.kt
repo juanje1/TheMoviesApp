@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -46,7 +47,8 @@ fun firstName(registerViewModel: RegisterViewModel): String {
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = dimensionResource(R.dimen.padding_small))
-            .padding(horizontal = dimensionResource(R.dimen.padding_large)),
+            .padding(horizontal = dimensionResource(R.dimen.padding_large))
+            .testTag(context.getString(R.string.register_first_name_test)),
         value = firstNameText,
         onValueChange = {
             firstNameText = it

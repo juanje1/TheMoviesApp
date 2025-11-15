@@ -8,15 +8,18 @@ import com.juanje.themoviesapp.ui.screens.fakeId
 import com.juanje.themoviesapp.ui.screens.fakeMovies
 import com.juanje.themoviesapp.ui.screens.fakeUserName
 import com.juanje.usecases.LoadMovie
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.test.*
 import org.junit.*
 import org.junit.runner.RunWith
+import org.mockito.Mockito
 import org.mockito.junit.MockitoJUnitRunner
 
 @RunWith(MockitoJUnitRunner::class)
 class DetailViewModelTest {
 
     private val apiKey = "d30e1f350220f9aad6c4110df385d380"
+    private val mainDispatcher = Mockito.mock<CoroutineDispatcher>()
     private lateinit var detailViewModel: DetailViewModel
 
     @get:Rule
@@ -28,7 +31,7 @@ class DetailViewModelTest {
         val movieRemoteDataSource = FakeMovieRemoteDataSource(fakeMovies)
         val movieRepository = MovieRepository(movieLocalDataSource, movieRemoteDataSource, apiKey)
         val loadMovie = LoadMovie(movieRepository)
-        detailViewModel = DetailViewModel(loadMovie)
+        detailViewModel = DetailViewModel(loadMovie, mainDispatcher)
     }
 
     @Test

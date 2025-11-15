@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -52,7 +53,8 @@ fun DetailItem(
                     shape = RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_small)))
                 .clip(RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_small)))
                 .aspectRatio(ImageAspectRatio)
-                .align(Alignment.CenterHorizontally),
+                .align(Alignment.CenterHorizontally)
+                .testTag(context.getString(R.string.detail_movie_image_test)),
             contentScale = ContentScale.Crop
         )
         HorizontalDivider(
@@ -65,44 +67,49 @@ fun DetailItem(
                 .fillMaxWidth()
         ) {
             Text(
+                modifier = Modifier.testTag(context.getString(R.string.detail_movie_title_test)),
                 text = context.getString(R.string.detail_title),
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleLarge
             )
             Text(
+                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_xsmall)),
                 text = movie.title ?: "",
-                textAlign = TextAlign.Justify,
-                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_xsmall))
+                textAlign = TextAlign.Justify
             )
             Text(
+                modifier = Modifier
+                    .padding(top = dimensionResource(R.dimen.padding_medium))
+                    .testTag(context.getString(R.string.detail_movie_overview_test)),
                 text = context.getString(R.string.detail_overview),
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_medium))
+                style = MaterialTheme.typography.titleLarge
             )
             Text(
+                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_xsmall)),
                 text = movie.overview ?: "",
-                textAlign = TextAlign.Justify,
-                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_xsmall))
+                textAlign = TextAlign.Justify
             )
             Text(
+                modifier = Modifier
+                    .padding(top = dimensionResource(R.dimen.padding_medium))
+                    .testTag(context.getString(R.string.detail_movie_favourite_test)),
                 text = context.getString(R.string.detail_favourite_not_favourite),
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_medium))
+                style = MaterialTheme.typography.titleLarge
             )
             Text(
-                text =
-                    if (movie.favourite) context.getString(R.string.detail_favourite)
-                    else context.getString(R.string.detail_not_favourite),
-                textAlign = TextAlign.Justify,
                 modifier = Modifier.padding(
                     top = dimensionResource(R.dimen.padding_xsmall),
                     bottom = dimensionResource(R.dimen.padding_large)
-                )
+                ),
+                text =
+                    if (movie.favourite) context.getString(R.string.detail_favourite)
+                    else context.getString(R.string.detail_not_favourite),
+                textAlign = TextAlign.Justify
             )
         }
     }

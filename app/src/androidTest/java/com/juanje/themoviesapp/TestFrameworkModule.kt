@@ -1,13 +1,13 @@
-package com.juanje.themoviesapp.data
+package com.juanje.themoviesapp
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.juanje.data.datasources.MovieLocalDataSource
 import com.juanje.data.datasources.MovieRemoteDataSource
 import com.juanje.data.datasources.UserLocalDataSource
-import com.juanje.themoviesapp.R
+import com.juanje.themoviesapp.data.FrameworkModule
+import com.juanje.themoviesapp.data.IoDispatcher
+import com.juanje.themoviesapp.data.MainDispatcher
 import com.juanje.themoviesapp.data.database.TheMoviesAppDatabase
 import com.juanje.themoviesapp.data.database.daos.MovieDao
 import com.juanje.themoviesapp.data.database.daos.UserDao
@@ -17,9 +17,9 @@ import com.juanje.themoviesapp.data.server.datasources.MovieServerDataSource
 import com.juanje.themoviesapp.data.server.services.MovieService
 import dagger.Module
 import dagger.Provides
-import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dagger.hilt.testing.TestInstallIn
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import okhttp3.OkHttpClient
@@ -30,8 +30,11 @@ import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
-@InstallIn(SingletonComponent::class)
-object FrameworkModule {
+@TestInstallIn(
+    components = [SingletonComponent::class],
+    replaces = [FrameworkModule::class]
+)
+object TestFrameworkModule {
 
     @Provides
     @Singleton
@@ -76,21 +79,11 @@ object FrameworkModule {
 
     @Provides
     @Singleton
-    fun getMigration4To5(): Migration =
-        object : Migration(4, 5) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("ALTER TABLE MovieDatabaseNew RENAME TO MovieDatabase;")
-            }
-        }
-
-    @Provides
-    @Singleton
-    fun theMoviesAppDatabaseProvider(@ApplicationContext applicationContext: Context)
-    : TheMoviesAppDatabase = Room.databaseBuilder(
-        applicationContext,
-        TheMoviesAppDatabase::class.java,
-        name = applicationContext.getString(R.string.name_database)
-    ).addMigrations(getMigration4To5()).build()
+    fun provideInMemoryDatabase(@ApplicationContext context: Context): TheMoviesAppDatabase {
+        return Room.inMemoryDatabaseBuilder(context, TheMoviesAppDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+    }
 
     @Provides
     @Singleton
@@ -108,8 +101,8 @@ object FrameworkModule {
         retrofit.run { create(MovieService::class.java) }
 
     @Provides
-    fun userDatabaseDataSourceProvider(userDao: UserDao, @IoDispatcher ioDispatcher: CoroutineDispatcher): UserLocalDataSource =
-        UserDatabaseDataSource(userDao, ioDispatcher)
+    fun userDatabaseDataSourceProvider(userDao: UserDao, @IoDispatcher testIoDispatcher: CoroutineDispatcher): UserLocalDataSource =
+        UserDatabaseDataSource(userDao, testIoDispatcher)
 
     @Provides
     fun movieDatabaseDataSourceProvider(movieDao: MovieDao): MovieLocalDataSource =

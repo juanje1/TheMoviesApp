@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.juanje.themoviesapp.R
@@ -79,7 +80,9 @@ fun HomeScreen(
             LazyVerticalGrid(
                 state = listState,
                 columns = GridCells.Adaptive(dimensionResource(R.dimen.column_min_width)),
-                modifier = Modifier.padding(padding),
+                modifier = Modifier
+                    .padding(padding)
+                    .testTag(context.getString(R.string.home_movie_list_test)),
                 horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xsmall)),
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xsmall)),
                 contentPadding = PaddingValues(dimensionResource(R.dimen.padding_xsmall))

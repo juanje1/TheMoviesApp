@@ -14,6 +14,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import com.juanje.domain.User
 import com.juanje.themoviesapp.R
@@ -48,7 +49,8 @@ fun RegisterAction(
         Button(
             modifier = Modifier
                 .width(dimensionResource(R.dimen.button_width_small))
-                .height(dimensionResource(R.dimen.button_height_medium)),
+                .height(dimensionResource(R.dimen.button_height_medium))
+                .testTag(context.getString(R.string.register_register_test)),
             onClick = { registerViewModel.onRegister(user) },
             shape = RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_medium))
         ) {

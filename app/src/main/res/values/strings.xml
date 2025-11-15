@@ -17,23 +17,18 @@
     <!-- Register Screen Strings -->
     <string name="register_image_description">Register Image</string>
     <string name="register_title_text">TheMoviesApp | Register</string>
-
     <string name="register_user_name_label">User Name</string>
     <string name="register_user_name_error_messages">userName</string>
     <string name="register_user_name_error_field_description">error</string>
-
     <string name="register_first_name_label">First Name</string>
     <string name="register_first_name_error_messages">firstName</string>
     <string name="register_first_name_error_field_description">error</string>
-
     <string name="register_last_name_label">Last Name</string>
     <string name="register_last_name_error_messages">lastName</string>
     <string name="register_last_name_error_field_description">error</string>
-
     <string name="register_email_label">Email</string>
     <string name="register_email_error_messages">email</string>
     <string name="register_email_error_field_description">error</string>
-
     <string name="register_password_label">Password</string>
     <string name="register_password_error_messages">password</string>
     <string name="register_password_error_field_description">error</string>
@@ -49,6 +44,29 @@
     <string name="detail_favourite_not_favourite">¿Favourite / Not Favourite?</string>
     <string name="detail_favourite">Favourite</string>
     <string name="detail_not_favourite">Not Favourite</string>
+
+    <!-- Test Tags Strings -->
+    <string name="login_email_test">emailLogin</string>
+    <string name="login_password_test">passwordLogin</string>
+    <string name="login_login_test">loginLogin</string>
+    <string name="login_register_test">registerLogin</string>
+    <string name="register_user_name_test">userNameRegister</string>
+    <string name="register_first_name_test">firstNameRegister</string>
+    <string name="register_last_name_test">lastNameRegister</string>
+    <string name="register_email_test">emailRegister</string>
+    <string name="register_password_test">passwordRegister</string>
+    <string name="register_register_test">registerRegister</string>
+    <string name="register_example_user_name_test">userNameTest</string>
+    <string name="register_example_first_name_test">firstNameTest</string>
+    <string name="register_example_last_name_test">lastNameTest</string>
+    <string name="register_example_email_init_test">emailTest</string>
+    <string name="register_example_email_end_test">test.com</string>
+    <string name="register_example_password_test">passwordTest</string>
+    <string name="home_movie_list_test">movieListHome</string>
+    <string name="detail_movie_image_test">movieImageDetail</string>
+    <string name="detail_movie_title_test">movieTitleDetail</string>
+    <string name="detail_movie_overview_test">movieOverviewDetail</string>
+    <string name="detail_movie_favourite_test">movieFavouriteDetail</string>
 
     <!-- TopAppBar Strings -->
     <string name="profile_default_image_description">Foto de perfil por defecto</string>
