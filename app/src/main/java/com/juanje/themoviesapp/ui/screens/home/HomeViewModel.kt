@@ -7,12 +7,14 @@ import androidx.lifecycle.viewModelScope
 import com.juanje.domain.Movie
 import com.juanje.themoviesapp.common.InternetAvailable
 import com.juanje.themoviesapp.data.MainDispatcher
+import com.juanje.themoviesapp.utils.EspressoIdlingResource
 import com.juanje.usecases.LoadMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.Collections.emptyList
 import javax.inject.Inject
@@ -25,64 +27,51 @@ class HomeViewModel @Inject constructor(
     @field:SuppressLint("StaticFieldLeak") @ApplicationContext val context: Context
 ) : ViewModel() {
 
-    companion object {
-        const val PAGE_THRESHOLD = 10
-    }
-
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state
 
-    private val lastVisible = MutableStateFlow(0)
+    private val _isDataLoading = MutableStateFlow(false)
+    private val isDataLoading: StateFlow<Boolean> = _isDataLoading
 
-    init {
-        viewModelScope.launch(mainDispatcher) {
-            lastVisible.collect {
-                if (lastVisible.value != 0) {
-                    notifyLastVisible(it)
-                }
-            }
-        }
-        _state.value = UiState(isInit = true)
-    }
+    private val _isImageLoading = MutableStateFlow(false)
+    val isImageLoading: StateFlow<Boolean> = _isImageLoading
 
     fun getMovies(userName: String) = viewModelScope.launch(mainDispatcher) {
-        _state.value = UiState(loading = true)
+        if (isDataLoading.value) return@launch
 
-        val size = loadMovie.invokeGetCountMovies(userName)
-        val connectivity = internetAvailable.isInternetAvailable(context)
+        _state.value = _state.value.copy(loading = true)
+        _isDataLoading.value = true
+        EspressoIdlingResource.increment()
 
-        loadMovie.invokeGetMovies(userName, lastVisible.value, size, connectivity).collect {
-            _state.value = UiState(
-                movies = it,
+        try {
+            val connectivity = internetAvailable.isInternetAvailable(context)
+            _state.value = _state.value.copy(
+                loading = false,
+                movies = loadMovie.invokeGetMovies(userName, connectivity).first(),
                 userName = userName
             )
+        } finally {
+            _isDataLoading.value = false
+            EspressoIdlingResource.decrement()
         }
     }
 
     fun updateMovie(movie: Movie) = viewModelScope.launch(mainDispatcher) {
-        loadMovie.invokeUpdateMovie(movie.copy(favourite = !movie.favourite))
-    }
+        EspressoIdlingResource.increment()
 
-    fun updateLastVisible(lastVisiblePosition: Int) {
-        lastVisible.value = lastVisiblePosition
-    }
-
-    fun resetState() {
-        _state.value = UiState()
-    }
-
-    private suspend fun notifyLastVisible(lastVisible: Int) {
-        val size = loadMovie.invokeGetCountMovies(_state.value.userName)
-        val connectivity = internetAvailable.isInternetAvailable(context)
-
-        if (lastVisible+1 >= size - PAGE_THRESHOLD) {
-            loadMovie.invokeGetMovies(_state.value.userName, lastVisible+1, size, connectivity)
+        try {
+            loadMovie.invokeUpdateMovie(movie.copy(favourite = !movie.favourite))
+        } finally {
+            EspressoIdlingResource.decrement()
         }
+    }
+
+    fun setIsImageLoading(isImageLoading: Boolean) {
+        _isImageLoading.value = isImageLoading
     }
 
     data class UiState(
         val loading: Boolean = false,
-        val isInit: Boolean = false,
         val movies: List<Movie> = emptyList(),
         val userName: String = ""
     )

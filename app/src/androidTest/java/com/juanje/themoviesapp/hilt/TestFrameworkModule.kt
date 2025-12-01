@@ -1,10 +1,11 @@
-package com.juanje.themoviesapp
+package com.juanje.themoviesapp.hilt
 
 import android.content.Context
 import androidx.room.Room
 import com.juanje.data.datasources.MovieLocalDataSource
 import com.juanje.data.datasources.MovieRemoteDataSource
 import com.juanje.data.datasources.UserLocalDataSource
+import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.data.FrameworkModule
 import com.juanje.themoviesapp.data.IoDispatcher
 import com.juanje.themoviesapp.data.MainDispatcher
@@ -105,8 +106,8 @@ object TestFrameworkModule {
         UserDatabaseDataSource(userDao, testIoDispatcher)
 
     @Provides
-    fun movieDatabaseDataSourceProvider(movieDao: MovieDao): MovieLocalDataSource =
-        MovieDatabaseDataSource(movieDao)
+    fun movieDatabaseDataSourceProvider(movieDao: MovieDao, @IoDispatcher testIoDispatcher: CoroutineDispatcher): MovieLocalDataSource =
+        MovieDatabaseDataSource(movieDao, testIoDispatcher)
 
     @Provides
     fun movieServerDataSourceProvider(movieService: MovieService): MovieRemoteDataSource =

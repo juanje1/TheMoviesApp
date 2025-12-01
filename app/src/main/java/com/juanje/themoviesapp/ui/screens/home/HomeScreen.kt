@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -14,11 +13,13 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -26,9 +27,14 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.juanje.themoviesapp.R
+import com.juanje.themoviesapp.common.PAGE_THRESHOLD
 import com.juanje.themoviesapp.ui.screens.common.dialogs.LogoutAlertDialog
 import com.juanje.themoviesapp.ui.screens.common.others.MyTopAppBar
+import com.juanje.themoviesapp.utils.EspressoIdlingResource
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
 
+@OptIn(FlowPreview::class)
 @Composable
 fun HomeScreen(
     onLogin: () -> Unit,
@@ -40,11 +46,23 @@ fun HomeScreen(
     val homeViewModel: HomeViewModel = hiltViewModel()
     val homeState by homeViewModel.state.collectAsState()
 
+    val listState = rememberLazyGridState()
     val context = LocalContext.current
 
-    if (homeState.isInit) {
-        homeViewModel.resetState()
+    LaunchedEffect(Unit) {
         homeViewModel.getMovies(userName)
+    }
+
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.firstVisibleItemIndex }
+            .debounce(300L)
+            .collect { index ->
+                val isIdle = EspressoIdlingResource.countingIdlingResource.isIdleNow
+
+                if (index >= listState.layoutInfo.totalItemsCount - PAGE_THRESHOLD && isIdle) {
+                    homeViewModel.getMovies(userName)
+                }
+            }
     }
 
     if (showLogoutAlertDialog) {
@@ -75,8 +93,6 @@ fun HomeScreen(
             }
         }
         if (homeState.movies.isNotEmpty()) {
-            val listState = rememberLazyGridState()
-
             LazyVerticalGrid(
                 state = listState,
                 columns = GridCells.Adaptive(dimensionResource(R.dimen.column_min_width)),
@@ -91,19 +107,11 @@ fun HomeScreen(
                     HomeItem(
                         onDetail = onDetail,
                         onFavourite = { homeViewModel.updateMovie(movie) },
-                        movie = movie
+                        movie = movie,
+                        homeViewModel = homeViewModel
                     )
-                    val lastVisiblePosition = listState.isScrolledToTheEnd()
-
-                    if (lastVisiblePosition != null)
-                        homeViewModel.updateLastVisible(lastVisiblePosition)
-                    else
-                        homeViewModel.updateLastVisible(0)
                 }
             }
         }
     }
 }
-
-fun LazyGridState.isScrolledToTheEnd() =
-    layoutInfo.visibleItemsInfo.lastOrNull()?.index

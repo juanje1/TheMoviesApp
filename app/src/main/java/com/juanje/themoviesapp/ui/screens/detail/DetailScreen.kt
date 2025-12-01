@@ -3,6 +3,7 @@ package com.juanje.themoviesapp.ui.screens.detail
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,8 +31,7 @@ fun DetailScreen(
 
     val context = LocalContext.current
 
-    if (detailState.isInit) {
-        detailViewModel.resetInit()
+    LaunchedEffect(Unit) {
         detailViewModel.getMovieDetail(userName, movieId)
     }
 
@@ -63,7 +63,8 @@ fun DetailScreen(
         ) { padding ->
             DetailItem(
                 padding = padding,
-                movie = it
+                movie = it,
+                detailViewModel = detailViewModel
             )
         }
     }

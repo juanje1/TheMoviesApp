@@ -4,12 +4,21 @@ import androidx.navigation.NavHostController
 
 fun navToLogin(navController: NavHostController): () -> Unit = {
     navController.popBackStack()
-    navController.navigate(NavigationRoutes.Login)
+    navController.navigate(NavItem.Login.createRoute(
+        registered = false
+    ))
+}
+
+fun navToLoginRegistered(navController: NavHostController): () -> Unit = {
+    navController.popBackStack()
+    navController.navigate(NavItem.Login.createRoute(
+        registered = true
+    ))
 }
 
 fun navToRegister(navController: NavHostController): () -> Unit = {
     navController.popBackStack()
-    navController.navigate(NavigationRoutes.Register)
+    navController.navigate(NavItem.Register.route)
 }
 
 fun navToHome(navController: NavHostController): (String) -> Unit = { userName ->

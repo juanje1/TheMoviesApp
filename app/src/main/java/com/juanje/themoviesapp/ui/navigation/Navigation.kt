@@ -17,23 +17,25 @@ import com.juanje.themoviesapp.ui.screens.register.RegisterScreen
 fun Navigation() {
     val navController = rememberNavController()
     val navToLogin = navToLogin(navController)
+    val navToLoginRegistered = navToLoginRegistered(navController)
     val navToRegister = navToRegister(navController)
     val navToHome = navToHome(navController)
     val navToDetail = navToDetail(navController)
 
     NavHost(
         navController = navController,
-        startDestination = NavItem.Login.route
+        startDestination = NavItem.Login.createRoute(false)
     ) {
-        composable(NavItem.Login) {
+        composable(NavItem.Login) { backStackEntry ->
             LoginScreen (
                 onHome = navToHome,
-                onRegister = navToRegister
+                onRegister = navToRegister,
+                registered = backStackEntry.findArg(NavArg.Registered)
             )
         }
         composable(NavItem.Register) {
             RegisterScreen(
-                onRegister = navToLogin,
+                onRegister = navToLoginRegistered,
                 onLogin = navToLogin
             )
         }

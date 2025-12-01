@@ -11,12 +11,11 @@ class MovieRepository(
     private val apiKey: String
 ) {
     companion object {
-        const val PAGE_THRESHOLD = 10
         const val PAGE_SIZE = 20
     }
 
-    suspend fun getMovies(userName: String, lastVisible: Int, size: Int, connectivity: Boolean): Flow<List<Movie>> {
-        if (lastVisible >= size - PAGE_THRESHOLD && connectivity) {
+    suspend fun getMovies(userName: String, connectivity: Boolean): Flow<List<Movie>> {
+        if (connectivity) {
             val page = getCountMovies(userName) / PAGE_SIZE + 1
             movieLocalDataSource.insertAll(movieRemoteDataSource.getMovies(userName, apiKey, page))
         }
@@ -26,7 +25,7 @@ class MovieRepository(
     suspend fun getMovieDetail(userName: String, movieId: Int) =
         movieLocalDataSource.getMovie(userName, movieId)
 
-    suspend fun getCountMovies(userName: String) =
+    private suspend fun getCountMovies(userName: String) =
         movieLocalDataSource.count(userName)
 
     suspend fun updateMovie(movie: Movie) =

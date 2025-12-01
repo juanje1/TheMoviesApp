@@ -9,10 +9,10 @@
     <string name="login_image_description">Login Image</string>
     <string name="login_title_text">TheMoviesApp | Login</string>
     <string name="login_email_text">Email</string>
-    <string name="login_password_text">Contraseña</string>
-    <string name="login_password_text_visibility_description">Visibilidad de Icono de Contraseña</string>
-    <string name="login_login_button">Iniciar Sesión</string>
-    <string name="login_register_text">¿No tienes una cuenta? Regístrate</string>
+    <string name="login_password_text">Password</string>
+    <string name="login_password_text_visibility_description">Password Icon Visibility</string>
+    <string name="login_login_button">Login</string>
+    <string name="login_register_text">Do not have an account? Register here!</string>
 
     <!-- Register Screen Strings -->
     <string name="register_image_description">Register Image</string>
@@ -35,13 +35,10 @@
     <string name="register_password_hide">Hide Password</string>
     <string name="register_password_show">Show Password</string>
 
-    <!-- Home Screen Strings -->
-    <string name="home_movies_title">Movies</string>
-
     <!-- Detail Screen Strings -->
     <string name="detail_title">Title</string>
     <string name="detail_overview">Overview</string>
-    <string name="detail_favourite_not_favourite">¿Favourite / Not Favourite?</string>
+    <string name="detail_favourite_not_favourite">Favourite / Not Favourite?</string>
     <string name="detail_favourite">Favourite</string>
     <string name="detail_not_favourite">Not Favourite</string>
 
@@ -63,27 +60,31 @@
     <string name="register_example_email_end_test">test.com</string>
     <string name="register_example_password_test">passwordTest</string>
     <string name="home_movie_list_test">movieListHome</string>
+    <string name="home_movie_image_test">movieImageHome</string>
+    <string name="home_movie_favourite_test">movieFavouriteHome</string>
+    <string name="home_movie_title_test">movieTitleHome</string>
     <string name="detail_movie_image_test">movieImageDetail</string>
     <string name="detail_movie_title_test">movieTitleDetail</string>
     <string name="detail_movie_overview_test">movieOverviewDetail</string>
     <string name="detail_movie_favourite_test">movieFavouriteDetail</string>
+    <string name="combined_loading_idling_resource">combinedLoadingIdlingResource</string>
 
     <!-- TopAppBar Strings -->
-    <string name="profile_default_image_description">Foto de perfil por defecto</string>
-    <string name="anonymous_username_text">Bienvenidx</string>
+    <string name="profile_default_image_description">Default Profile Picture</string>
+    <string name="anonymous_username_text">Welcome</string>
     <string name="anonymous_title_movie_text">Unknown</string>
     <string name="origin_from_home">home</string>
     <string name="origin_from_other">other</string>
 
     <!-- Common Buttons Strings -->
-    <string name="accept_button_dialog">Aceptar</string>
-    <string name="cancel_button_dialog">Cancelar</string>
+    <string name="accept_button_dialog">Accept</string>
+    <string name="cancel_button_dialog">Cancel</string>
     <string name="register_button">Register</string>
     <string name="cancel_button">Cancel</string>
 
     <!-- Logout Dialog Strings -->
-    <string name="logout_dialog_title">Cerrar Sesión</string>
-    <string name="logout_dialog_message">¿Estás seguro que deseas cerrar sesión?</string>
+    <string name="logout_dialog_title">Logout</string>
+    <string name="logout_dialog_message">Are you sure to logout?</string>
 
     <!-- Info Messages Strings -->
     <string name="info_register_success">Info: User created successfully</string>
@@ -103,6 +104,7 @@
 
     <!-- Others Strings -->
     <string name="arrow_back_content_description">Arrow back</string>
+    <string name="snack_bar_action_label">Hide</string>
     <string name="color_background_login">#E0E0E0</string>
     <string name="color_text_fields">#5E5E5E</string>
     <string name="color_text_register_now">#4D4D4D</string>

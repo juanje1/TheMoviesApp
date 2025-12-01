@@ -10,15 +10,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import com.juanje.domain.User
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.common.showToast
 
 @Composable
 fun RegisterAction(
@@ -27,18 +24,7 @@ fun RegisterAction(
     registerViewModel: RegisterViewModel,
     user: User
 ) {
-    val stateRegister by registerViewModel.state.collectAsState()
     val context = LocalContext.current
-
-    if (stateRegister.timeExecution > 0) {
-        if (stateRegister.userValid) {
-            showToast(context, context.getString(R.string.info_register_success))
-            onRegister()
-        }
-        else
-            showToast(context, context.getString(R.string.error_register))
-        registerViewModel.resetState()
-    }
 
     Row(
         modifier = Modifier

@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanje.domain.Movie
 import com.juanje.themoviesapp.data.MainDispatcher
+import com.juanje.themoviesapp.utils.EspressoIdlingResource
 import com.juanje.usecases.LoadMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -21,18 +22,24 @@ class DetailViewModel @Inject constructor(
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state
 
-    init {
-        _state.value = UiState(isInit = true)
-    }
-
-    fun resetInit() { _state.value = UiState() }
+    private val _isImageLoading = MutableStateFlow(false)
+    val isImageLoading: StateFlow<Boolean> = _isImageLoading
 
     fun getMovieDetail(userName: String, movieId: Int) = viewModelScope.launch(mainDispatcher) {
-        _state.value = UiState(movie = loadMovie.invokeGetMovieDetail(userName, movieId))
+        EspressoIdlingResource.increment()
+
+        try {
+            _state.value = UiState(movie = loadMovie.invokeGetMovieDetail(userName, movieId))
+        } finally {
+            EspressoIdlingResource.decrement()
+        }
+    }
+
+    fun setIsImageLoading(isImageLoading: Boolean) {
+        _isImageLoading.value = isImageLoading
     }
 
     data class UiState(
-        val movie: Movie ?= null,
-        val isInit: Boolean = false
+        val movie: Movie ?= null
     )
 }

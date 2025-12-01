@@ -25,14 +25,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
 import com.juanje.domain.Movie
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.common.ImageAspectRatio
+import com.juanje.themoviesapp.common.IMAGE_ASPECT_RATIO
 
 @Composable
 fun DetailItem(
     padding: PaddingValues,
-    movie: Movie
+    movie: Movie,
+    detailViewModel: DetailViewModel
 ) {
     val context = LocalContext.current
 
@@ -52,9 +54,20 @@ fun DetailItem(
                     color = MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_small)))
                 .clip(RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_small)))
-                .aspectRatio(ImageAspectRatio)
+                .aspectRatio(IMAGE_ASPECT_RATIO)
                 .align(Alignment.CenterHorizontally)
-                .testTag(context.getString(R.string.detail_movie_image_test)),
+                .testTag(context.getString(R.string.detail_movie_image_test)+"_${movie.id}"),
+            onState = { state: AsyncImagePainter.State ->
+                when (state) {
+                    is AsyncImagePainter.State.Loading -> {
+                        detailViewModel.setIsImageLoading(true)
+                    }
+                    is AsyncImagePainter.State.Success, is AsyncImagePainter.State.Error -> {
+                        detailViewModel.setIsImageLoading(false)
+                    }
+                    else -> {}
+                }
+            },
             contentScale = ContentScale.Crop
         )
         HorizontalDivider(
@@ -67,7 +80,7 @@ fun DetailItem(
                 .fillMaxWidth()
         ) {
             Text(
-                modifier = Modifier.testTag(context.getString(R.string.detail_movie_title_test)),
+                modifier = Modifier.testTag(context.getString(R.string.detail_movie_title_test)+"_${movie.id}"),
                 text = context.getString(R.string.detail_title),
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold,
@@ -81,7 +94,7 @@ fun DetailItem(
             Text(
                 modifier = Modifier
                     .padding(top = dimensionResource(R.dimen.padding_medium))
-                    .testTag(context.getString(R.string.detail_movie_overview_test)),
+                    .testTag(context.getString(R.string.detail_movie_overview_test)+"_${movie.id}"),
                 text = context.getString(R.string.detail_overview),
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold,
@@ -95,7 +108,7 @@ fun DetailItem(
             Text(
                 modifier = Modifier
                     .padding(top = dimensionResource(R.dimen.padding_medium))
-                    .testTag(context.getString(R.string.detail_movie_favourite_test)),
+                    .testTag(context.getString(R.string.detail_movie_favourite_test)+"_${movie.id}"),
                 text = context.getString(R.string.detail_favourite_not_favourite),
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold,

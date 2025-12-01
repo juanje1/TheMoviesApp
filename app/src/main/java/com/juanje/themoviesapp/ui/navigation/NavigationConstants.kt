@@ -8,6 +8,7 @@ object NavigationRoutes {
 }
 
 object NavigationArgs {
+    const val Registered = "registered"
     const val UserName = "userName"
     const val MovieId = "movieId"
 }

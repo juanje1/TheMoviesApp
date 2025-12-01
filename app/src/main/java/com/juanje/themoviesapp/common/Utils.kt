@@ -1,9 +1,13 @@
 package com.juanje.themoviesapp.common
 
 import android.content.Context
-import android.widget.Toast
+import androidx.compose.material3.SnackbarHostState
+import com.juanje.themoviesapp.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
-const val ImageAspectRatio = 2/3f
+const val IMAGE_ASPECT_RATIO = 2/3f
+const val PAGE_THRESHOLD = 16
 
 fun initializeErrorMessages() = mutableMapOf(
     "UserName" to "",
@@ -13,6 +17,11 @@ fun initializeErrorMessages() = mutableMapOf(
     "Password" to ""
 )
 
-fun showToast(context: Context, message: String) {
-    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+fun showMessage(coroutineScope: CoroutineScope, snackBarHostState: SnackbarHostState, message: String, context: Context) {
+    coroutineScope.launch {
+        snackBarHostState.showSnackbar(
+            message = message,
+            actionLabel = context.getString(R.string.snack_bar_action_label)
+        )
+    }
 }

@@ -1,4 +1,4 @@
-package com.juanje.themoviesapp
+package com.juanje.themoviesapp.hilt
 
 import android.app.Application
 import android.content.Context

@@ -112,8 +112,8 @@ object FrameworkModule {
         UserDatabaseDataSource(userDao, ioDispatcher)
 
     @Provides
-    fun movieDatabaseDataSourceProvider(movieDao: MovieDao): MovieLocalDataSource =
-        MovieDatabaseDataSource(movieDao)
+    fun movieDatabaseDataSourceProvider(movieDao: MovieDao, @IoDispatcher ioDispatcher: CoroutineDispatcher): MovieLocalDataSource =
+        MovieDatabaseDataSource(movieDao, ioDispatcher)
 
     @Provides
     fun movieServerDataSourceProvider(movieService: MovieService): MovieRemoteDataSource =

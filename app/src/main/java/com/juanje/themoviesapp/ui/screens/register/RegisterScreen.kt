@@ -15,9 +15,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.juanje.domain.User
 import com.juanje.themoviesapp.R
+import com.juanje.themoviesapp.common.showMessage
 import com.juanje.themoviesapp.ui.screens.common.fields.firstName
 import com.juanje.themoviesapp.ui.screens.common.fields.lastName
 import com.juanje.themoviesapp.ui.screens.common.fields.password
@@ -42,10 +49,23 @@ fun RegisterScreen(
     onLogin: () -> Unit
 ) {
     val registerViewModel: RegisterViewModel = hiltViewModel()
+    val stateRegister by registerViewModel.state.collectAsState()
 
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val snackBarHostState = remember { SnackbarHostState() }
 
-    Scaffold {
+    if (stateRegister.timeExecution > 0) {
+        if (stateRegister.userValid)
+            onRegister()
+        else
+            showMessage(coroutineScope, snackBarHostState, context.getString(R.string.error_register), context)
+        registerViewModel.resetState()
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+    ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()

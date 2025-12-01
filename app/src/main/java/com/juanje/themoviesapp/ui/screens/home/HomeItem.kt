@@ -18,35 +18,51 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
 import com.juanje.domain.Movie
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.common.ImageAspectRatio
+import com.juanje.themoviesapp.common.IMAGE_ASPECT_RATIO
 
 @Composable
 fun HomeItem(
     onDetail: (String, Int) -> Unit,
     onFavourite: () -> Unit,
-    movie: Movie
+    movie: Movie,
+    homeViewModel: HomeViewModel
 ) {
     val context = LocalContext.current
 
     Column(
-        modifier = Modifier.background(MaterialTheme.colorScheme.secondary)
+        modifier = Modifier
+            .clickable { onDetail(movie.userName, movie.id) }
+            .background(MaterialTheme.colorScheme.secondary)
+            .testTag(context.getString(R.string.home_movie_list_test)+"_${movie.id}"),
     ) {
-        Box(
-            modifier = Modifier.clickable { onDetail(movie.userName, movie.id) }
-        ) {
+        Box {
             AsyncImage(
                 model = context.getString(R.string.image_url)+movie.posterPath,
                 contentDescription = movie.title,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .aspectRatio(ImageAspectRatio)
+                    .aspectRatio(IMAGE_ASPECT_RATIO)
+                    .testTag(context.getString(R.string.home_movie_image_test)+"_${movie.id}"),
+                onState = { state: AsyncImagePainter.State ->
+                    when (state) {
+                        is AsyncImagePainter.State.Loading -> {
+                            homeViewModel.setIsImageLoading(true)
+                        }
+                        is AsyncImagePainter.State.Success, is AsyncImagePainter.State.Error -> {
+                            homeViewModel.setIsImageLoading(false)
+                        }
+                        else -> {}
+                    }
+                },
             )
             var color: Color = Color.White
             if (movie.favourite) color = Color.Red
@@ -56,7 +72,8 @@ fun HomeItem(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(dimensionResource(R.dimen.padding_xsmall))
-                    .clickable { onFavourite() },
+                    .clickable { onFavourite() }
+                    .testTag(context.getString(R.string.home_movie_favourite_test)+"_${movie.id}"),
                 tint = color
             )
         }
@@ -64,7 +81,8 @@ fun HomeItem(
             modifier = Modifier
                 .padding(dimensionResource(R.dimen.padding_xsmall))
                 .height(dimensionResource(R.dimen.cell_title_height))
-                .align(Alignment.CenterHorizontally),
+                .align(Alignment.CenterHorizontally)
+                .testTag(context.getString(R.string.home_movie_title_test)+"_${movie.id}"),
             text = movie.title ?: "",
             textAlign = TextAlign.Center,
             fontSize = dimensionResource(R.dimen.font_size_small).value.sp,
