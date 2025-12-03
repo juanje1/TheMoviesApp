@@ -5,8 +5,11 @@ import com.juanje.domain.Movie
 
 class LoadMovie(private val movieRepository: MovieRepository) {
 
-    suspend fun invokeGetMovies(userName: String, connectivity: Boolean) =
-        movieRepository.getMovies(userName, connectivity)
+    suspend fun invokeGetMovies(userName: String) =
+        movieRepository.getMovies(userName)
+
+    suspend fun invokeGetMoviesFromDatabase(userName: String) =
+        movieRepository.getMoviesFromDatabase(userName)
 
     suspend fun invokeGetMovieDetail(userName: String, movieId: Int) =
         movieRepository.getMovieDetail(userName, movieId)

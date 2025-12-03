@@ -14,13 +14,15 @@ class MovieRepository(
         const val PAGE_SIZE = 20
     }
 
-    suspend fun getMovies(userName: String, connectivity: Boolean): Flow<List<Movie>> {
-        if (connectivity) {
-            val page = getCountMovies(userName) / PAGE_SIZE + 1
-            movieLocalDataSource.insertAll(movieRemoteDataSource.getMovies(userName, apiKey, page))
-        }
-        return movieLocalDataSource.getMovies(userName)
+    suspend fun getMovies(userName: String) {
+        val page = getCountMovies(userName) / PAGE_SIZE + 1
+        val movies = movieRemoteDataSource.getMovies(userName, apiKey, page)
+
+        movieLocalDataSource.insertAll(movies)
     }
+
+    suspend fun getMoviesFromDatabase(userName: String): Flow<List<Movie>> =
+        movieLocalDataSource.getMovies(userName)
 
     suspend fun getMovieDetail(userName: String, movieId: Int) =
         movieLocalDataSource.getMovie(userName, movieId)

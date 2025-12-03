@@ -11,12 +11,16 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -28,13 +32,13 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.common.PAGE_THRESHOLD
+import com.juanje.themoviesapp.common.showMessage
 import com.juanje.themoviesapp.ui.screens.common.dialogs.LogoutAlertDialog
 import com.juanje.themoviesapp.ui.screens.common.others.MyTopAppBar
-import com.juanje.themoviesapp.utils.EspressoIdlingResource
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 
-@OptIn(FlowPreview::class)
 @Composable
 fun HomeScreen(
     onLogin: () -> Unit,
@@ -48,21 +52,22 @@ fun HomeScreen(
 
     val listState = rememberLazyGridState()
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
-        homeViewModel.getMovies(userName)
+        homeViewModel.setUserNameFlow(userName)
     }
 
-    LaunchedEffect(listState) {
+    LaunchedEffect(listState, homeState.isGettingMovies) {
         snapshotFlow { listState.firstVisibleItemIndex }
-            .debounce(300L)
-            .collect { index ->
-                val isIdle = EspressoIdlingResource.countingIdlingResource.isIdleNow
-
-                if (index >= listState.layoutInfo.totalItemsCount - PAGE_THRESHOLD && isIdle) {
-                    homeViewModel.getMovies(userName)
-                }
-            }
+            .map { index ->
+                val totalItemsCount = listState.layoutInfo.totalItemsCount
+                val threshold = totalItemsCount - PAGE_THRESHOLD
+                totalItemsCount > 0 && index >= threshold && !homeState.isGettingMovies
+            }.distinctUntilChanged()
+            .filter { shouldLoad -> shouldLoad }
+            .collect { homeViewModel.getMovies(userName) }
     }
 
     if (showLogoutAlertDialog) {
@@ -82,17 +87,17 @@ fun HomeScreen(
                     onLogout = { showLogoutAlertDialog = true }
                 )
             }
-        }
+        },
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
     ) { padding ->
-        if (homeState.loading) {
+        if (homeState.isInitialLoading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator()
             }
-        }
-        if (homeState.movies.isNotEmpty()) {
+        } else {
             LazyVerticalGrid(
                 state = listState,
                 columns = GridCells.Adaptive(dimensionResource(R.dimen.column_min_width)),
@@ -111,6 +116,12 @@ fun HomeScreen(
                         homeViewModel = homeViewModel
                     )
                 }
+            }
+        }
+
+        if (homeState.error != null) {
+            LaunchedEffect(homeState.error) {
+                showMessage(coroutineScope, snackBarHostState, homeState.error!!, context)
             }
         }
     }

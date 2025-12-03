@@ -2,7 +2,7 @@ package com.juanje.themoviesapp.ui.screens.home
 
 import android.content.Context
 import com.juanje.data.repositories.MovieRepository
-import com.juanje.themoviesapp.common.InternetAvailable
+import com.juanje.themoviesapp.common.NetworkConnectivityObserver
 import com.juanje.themoviesapp.ui.screens.CoroutinesTestRule
 import com.juanje.themoviesapp.ui.screens.FakeMovieLocalDataSource
 import com.juanje.themoviesapp.ui.screens.FakeMovieRemoteDataSource
@@ -22,7 +22,7 @@ import org.mockito.junit.MockitoJUnitRunner
 class HomeViewModelTest {
 
     private val apiKey = "d30e1f350220f9aad6c4110df385d380"
-    private val internetAvailable = mock<InternetAvailable>()
+    private val networkConnectivityObserver = mock<NetworkConnectivityObserver>()
     private val mainDispatcher = mock<CoroutineDispatcher>()
     private val context = mock<Context>()
     private lateinit var homeViewModel: HomeViewModel
@@ -36,12 +36,12 @@ class HomeViewModelTest {
         val movieRemoteDataSource = FakeMovieRemoteDataSource(fakeMovies)
         val movieRepository = MovieRepository(movieLocalDataSource, movieRemoteDataSource, apiKey)
         val loadMovie = LoadMovie(movieRepository)
-        homeViewModel = HomeViewModel(loadMovie, internetAvailable, mainDispatcher, context)
+        homeViewModel = HomeViewModel(loadMovie, networkConnectivityObserver, mainDispatcher, context)
     }
 
     @Test
     fun `Listening to movies flow emits the list of movies from the server`() = runTest {
-        `when`(internetAvailable.isInternetAvailable(context)).thenReturn(true)
+        `when`(networkConnectivityObserver.isInternetAvailable(context)).thenReturn(true)
 
         homeViewModel.getMovies(fakeUserName)
         val movies = homeViewModel.state.value.movies
@@ -51,7 +51,7 @@ class HomeViewModelTest {
 
     @Test
     fun `Updating a movie in the local database`() = runTest {
-        `when`(internetAvailable.isInternetAvailable(context)).thenReturn(true)
+        `when`(networkConnectivityObserver.isInternetAvailable(context)).thenReturn(true)
 
         homeViewModel.getMovies(fakeUserName)
         homeViewModel.updateMovie(fakeMovie)

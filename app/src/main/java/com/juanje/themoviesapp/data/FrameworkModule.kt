@@ -2,8 +2,6 @@ package com.juanje.themoviesapp.data
 
 import android.content.Context
 import androidx.room.Room
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.juanje.data.datasources.MovieLocalDataSource
 import com.juanje.data.datasources.MovieRemoteDataSource
 import com.juanje.data.datasources.UserLocalDataSource
@@ -76,21 +74,12 @@ object FrameworkModule {
 
     @Provides
     @Singleton
-    fun getMigration4To5(): Migration =
-        object : Migration(4, 5) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("ALTER TABLE MovieDatabaseNew RENAME TO MovieDatabase;")
-            }
-        }
-
-    @Provides
-    @Singleton
     fun theMoviesAppDatabaseProvider(@ApplicationContext applicationContext: Context)
     : TheMoviesAppDatabase = Room.databaseBuilder(
         applicationContext,
         TheMoviesAppDatabase::class.java,
         name = applicationContext.getString(R.string.name_database)
-    ).addMigrations(getMigration4To5()).build()
+    ).build()
 
     @Provides
     @Singleton

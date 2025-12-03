@@ -96,6 +96,8 @@
     <string name="error_username_exists">Error: The UserName already exists</string>
     <string name="error_email_exists">Error: The Email already exists</string>
     <string name="error_password_length">Error: The Password must have at least 8 characters</string>
+    <string name="error_internet">There is no Internet connection</string>
+    <string name="error_unknown">Unknown error</string>
 
     <!-- Float Values -->
     <string name="bias_small">0f</string>
