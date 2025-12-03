@@ -48,11 +48,7 @@ class HomeViewModel @Inject constructor(
         connectivityObserver
             .observe()
             .onEach { isAvailable ->
-                _state.update {
-                    it.copy(
-                        isInternetAvailable = isAvailable
-                    )
-                }
+                _state.update { it.copy(isInternetAvailable = isAvailable) }
             }.launchIn(viewModelScope)
 
         _userNameFlow
@@ -64,20 +60,10 @@ class HomeViewModel @Inject constructor(
                             getMovies(userName)
                     }.map { movieList -> userName to movieList }
             }.onEach { (userName, movieList) ->
-                _state.update {
-                    it.copy(
-                        movies = movieList,
-                        userName = userName,
-                        isInitialLoading = false
-                    )
-                }
+                val uniqueMoviesList = filterDuplicatesInList(movieList)
+                _state.update { it.copy(movies = uniqueMoviesList, userName = userName, isInitialLoading = false) }
             }.catch { e ->
-                _state.update {
-                    it.copy(
-                        error = e.message ?: context.getString(R.string.error_internet),
-                        isInitialLoading = false
-                    )
-                }
+                _state.update { it.copy(error = e.message ?: context.getString(R.string.error_internet), isInitialLoading = false) }
             }.launchIn(viewModelScope)
     }
 
@@ -115,6 +101,14 @@ class HomeViewModel @Inject constructor(
         } finally {
             _state.update { it.copy(isUpdatingMovies = false) }
             EspressoIdlingResource.decrement()
+        }
+    }
+
+    private fun filterDuplicatesInList(list: List<Movie>): List<Movie> {
+        val seenKeys = mutableSetOf<String>()
+        return list.filter { item ->
+            val key = "${item.title}|${item.releaseDate}"
+            seenKeys.add(key)
         }
     }
 
