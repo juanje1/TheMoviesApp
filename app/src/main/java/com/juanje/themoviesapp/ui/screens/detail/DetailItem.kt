@@ -26,14 +26,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
-import com.juanje.domain.Movie
+import com.juanje.domain.MovieFavorite
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.common.IMAGE_ASPECT_RATIO
 
 @Composable
 fun DetailItem(
     padding: PaddingValues,
-    movie: Movie,
+    movieFavorite: MovieFavorite,
     detailViewModel: DetailViewModel
 ) {
     val context = LocalContext.current
@@ -44,8 +44,8 @@ fun DetailItem(
             .verticalScroll(rememberScrollState())
     ) {
         AsyncImage(
-            model = context.getString(R.string.image_url)+movie.posterPath,
-            contentDescription = movie.title,
+            model = context.getString(R.string.image_url)+movieFavorite.movie.posterPath,
+            contentDescription = movieFavorite.movie.title,
             modifier = Modifier
                 .padding(top = dimensionResource(R.dimen.padding_medium))
                 .height(dimensionResource(R.dimen.cell_image_medium))
@@ -56,7 +56,7 @@ fun DetailItem(
                 .clip(RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_small)))
                 .aspectRatio(IMAGE_ASPECT_RATIO)
                 .align(Alignment.CenterHorizontally)
-                .testTag(context.getString(R.string.detail_movie_image_test)+"_${movie.id}"),
+                .testTag(context.getString(R.string.detail_movie_image_test)+"_${movieFavorite.movie.id}"),
             onState = { state: AsyncImagePainter.State ->
                 when (state) {
                     is AsyncImagePainter.State.Loading -> {
@@ -80,7 +80,7 @@ fun DetailItem(
                 .fillMaxWidth()
         ) {
             Text(
-                modifier = Modifier.testTag(context.getString(R.string.detail_movie_title_test)+"_${movie.id}"),
+                modifier = Modifier.testTag(context.getString(R.string.detail_movie_title_test)+"_${movieFavorite.movie.id}"),
                 text = context.getString(R.string.detail_title),
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold,
@@ -88,13 +88,13 @@ fun DetailItem(
             )
             Text(
                 modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_xsmall)),
-                text = movie.title ?: "",
+                text = movieFavorite.movie.title ?: "",
                 textAlign = TextAlign.Justify
             )
             Text(
                 modifier = Modifier
                     .padding(top = dimensionResource(R.dimen.padding_medium))
-                    .testTag(context.getString(R.string.detail_movie_overview_test)+"_${movie.id}"),
+                    .testTag(context.getString(R.string.detail_movie_overview_test)+"_${movieFavorite.movie.id}"),
                 text = context.getString(R.string.detail_overview),
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold,
@@ -102,13 +102,13 @@ fun DetailItem(
             )
             Text(
                 modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_xsmall)),
-                text = movie.overview ?: "",
+                text = movieFavorite.movie.overview ?: "",
                 textAlign = TextAlign.Justify
             )
             Text(
                 modifier = Modifier
                     .padding(top = dimensionResource(R.dimen.padding_medium))
-                    .testTag(context.getString(R.string.detail_movie_favourite_test)+"_${movie.id}"),
+                    .testTag(context.getString(R.string.detail_movie_favourite_test)+"_${movieFavorite.movie.id}"),
                 text = context.getString(R.string.detail_favourite_not_favourite),
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold,
@@ -120,7 +120,7 @@ fun DetailItem(
                     bottom = dimensionResource(R.dimen.padding_large)
                 ),
                 text =
-                    if (movie.favourite) context.getString(R.string.detail_favourite)
+                    if (movieFavorite.isFavorite) context.getString(R.string.detail_favourite)
                     else context.getString(R.string.detail_not_favourite),
                 textAlign = TextAlign.Justify
             )

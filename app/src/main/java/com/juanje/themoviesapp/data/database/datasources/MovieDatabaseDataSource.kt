@@ -16,19 +16,20 @@ class MovieDatabaseDataSource(
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ): MovieLocalDataSource {
 
-    override suspend fun getMovies(userName: String): Flow<List<Movie>> =
-        withContext(ioDispatcher) {
-            movieDao.getMovies(userName).map { movies -> movies.map { it.toMovie() } }
-        }
+    override fun getMovies(userName: String): Flow<List<Movie>> =
+        movieDao.getMovies(userName).map { movies -> movies.map { it.toMovie() } }
 
-    override suspend fun getMovie(userName: String, movieId: Int): Movie =
-        withContext(ioDispatcher) {
-            movieDao.getMovie(userName, movieId).toMovie()
-        }
+    override fun getMovie(userName: String, movieId: Int): Flow<Movie> =
+        movieDao.getMovie(userName, movieId).map { it.toMovie() }
 
     override suspend fun count(userName: String): Int =
         withContext(ioDispatcher) {
             movieDao.count(userName)
+        }
+
+    override suspend fun deleteAll(userName: String) =
+        withContext(ioDispatcher) {
+            movieDao.deleteAll(userName)
         }
 
     override suspend fun insertAll(movies: List<Movie>) =
@@ -36,8 +37,8 @@ class MovieDatabaseDataSource(
             movieDao.insertAll(movies.map { it.toMovieDatabase() })
         }
 
-    override suspend fun updateMovie(movie: Movie) =
+    override suspend fun refreshMoviesTx(userName: String, movies: List<Movie>) =
         withContext(ioDispatcher) {
-            movieDao.updateMovie(movie.toMovieDatabase())
+            movieDao.refreshMoviesTx(userName, movies.map { it.toMovieDatabase() })
         }
 }

@@ -2,13 +2,18 @@ package com.juanje.themoviesapp.data
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
+import com.juanje.data.datasources.FavoriteLocalDataSource
 import com.juanje.data.datasources.MovieLocalDataSource
 import com.juanje.data.datasources.MovieRemoteDataSource
 import com.juanje.data.datasources.UserLocalDataSource
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.data.database.TheMoviesAppDatabase
+import com.juanje.themoviesapp.data.database.daos.FavoriteDao
 import com.juanje.themoviesapp.data.database.daos.MovieDao
 import com.juanje.themoviesapp.data.database.daos.UserDao
+import com.juanje.themoviesapp.data.database.datasources.FavoriteDatabaseDataSource
 import com.juanje.themoviesapp.data.database.datasources.MovieDatabaseDataSource
 import com.juanje.themoviesapp.data.database.datasources.UserDatabaseDataSource
 import com.juanje.themoviesapp.data.server.datasources.MovieServerDataSource
@@ -93,6 +98,11 @@ object FrameworkModule {
 
     @Provides
     @Singleton
+    fun favoriteDaoProvider(theMoviesAppDatabase: TheMoviesAppDatabase): FavoriteDao =
+        theMoviesAppDatabase.favoriteDao()
+
+    @Provides
+    @Singleton
     fun movieServiceProvider(retrofit: Retrofit): MovieService =
         retrofit.run { create(MovieService::class.java) }
 
@@ -107,4 +117,8 @@ object FrameworkModule {
     @Provides
     fun movieServerDataSourceProvider(movieService: MovieService): MovieRemoteDataSource =
         MovieServerDataSource(movieService)
+
+    @Provides
+    fun favoriteDatabaseDataSourceProvider(favoriteDao: FavoriteDao, @IoDispatcher ioDispatcher: CoroutineDispatcher): FavoriteLocalDataSource =
+        FavoriteDatabaseDataSource(favoriteDao, ioDispatcher)
 }

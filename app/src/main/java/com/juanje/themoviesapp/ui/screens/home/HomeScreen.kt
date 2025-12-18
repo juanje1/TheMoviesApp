@@ -10,10 +10,12 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,6 +41,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onLogin: () -> Unit,
@@ -67,7 +70,7 @@ fun HomeScreen(
                 totalItemsCount > 0 && index >= threshold && !homeState.isGettingMovies
             }.distinctUntilChanged()
             .filter { shouldLoad -> shouldLoad }
-            .collect { homeViewModel.getMovies(userName) }
+            .collect { homeViewModel.getAndInsertMovies(userName) }
     }
 
     if (showLogoutAlertDialog) {
@@ -90,31 +93,35 @@ fun HomeScreen(
         },
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
     ) { padding ->
-        if (homeState.isInitialLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else {
-            LazyVerticalGrid(
-                state = listState,
-                columns = GridCells.Adaptive(dimensionResource(R.dimen.column_min_width)),
-                modifier = Modifier
-                    .padding(padding)
-                    .testTag(context.getString(R.string.home_movie_list_test)),
-                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xsmall)),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xsmall)),
-                contentPadding = PaddingValues(dimensionResource(R.dimen.padding_xsmall))
-            ) {
-                items(homeState.movies) { movie ->
-                    HomeItem(
-                        onDetail = onDetail,
-                        onFavourite = { homeViewModel.updateMovie(movie) },
-                        movie = movie,
-                        homeViewModel = homeViewModel
-                    )
+        PullToRefreshBox(
+            isRefreshing = homeState.isRefreshingMovies,
+            onRefresh = { homeViewModel.getAndInsertMovies(userName, true) },
+            modifier = Modifier.padding(padding)
+        ) {
+            if (homeState.isInitialLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else {
+                LazyVerticalGrid(
+                    state = listState,
+                    columns = GridCells.Adaptive(dimensionResource(R.dimen.column_min_width)),
+                    modifier = Modifier.testTag(context.getString(R.string.home_movie_list_test)),
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xsmall)),
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xsmall)),
+                    contentPadding = PaddingValues(dimensionResource(R.dimen.padding_xsmall))
+                ) {
+                    items(homeState.movies) { movieFavorite ->
+                        HomeItem(
+                            onDetail = onDetail,
+                            onFavourite = { homeViewModel.updateMovie(movieFavorite.movie) },
+                            movieFavorite = movieFavorite,
+                            homeViewModel = homeViewModel
+                        )
+                    }
                 }
             }
         }

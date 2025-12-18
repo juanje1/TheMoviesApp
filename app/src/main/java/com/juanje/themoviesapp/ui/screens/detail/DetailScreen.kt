@@ -32,7 +32,7 @@ fun DetailScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        detailViewModel.getMovieDetail(userName, movieId)
+        detailViewModel.setArgsFlow(userName, movieId)
     }
 
     if (showLogoutAlertDialog) {
@@ -43,12 +43,12 @@ fun DetailScreen(
         )
     }
 
-    detailState.movie?.let {
+    detailState.movieFavorite?.let { movieFavorite ->
         Scaffold(
             topBar = {
                 val titleMovie: String =
-                    if (it.title == null) context.getString(R.string.anonymous_title_movie_text)
-                    else it.title!!.ifEmpty { context.getString(R.string.anonymous_title_movie_text) }
+                    if (movieFavorite.movie.title == null) context.getString(R.string.anonymous_title_movie_text)
+                    else movieFavorite.movie.title!!.ifEmpty { context.getString(R.string.anonymous_title_movie_text) }
 
                 Surface(shadowElevation = dimensionResource(R.dimen.shadow_elevation_topBar)) {
                     MyTopAppBar(
@@ -63,7 +63,7 @@ fun DetailScreen(
         ) { padding ->
             DetailItem(
                 padding = padding,
-                movie = it,
+                movieFavorite = movieFavorite,
                 detailViewModel = detailViewModel
             )
         }

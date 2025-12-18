@@ -25,7 +25,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
-import com.juanje.domain.Movie
+import com.juanje.domain.MovieFavorite
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.common.IMAGE_ASPECT_RATIO
 
@@ -33,25 +33,25 @@ import com.juanje.themoviesapp.common.IMAGE_ASPECT_RATIO
 fun HomeItem(
     onDetail: (String, Int) -> Unit,
     onFavourite: () -> Unit,
-    movie: Movie,
+    movieFavorite: MovieFavorite,
     homeViewModel: HomeViewModel
 ) {
     val context = LocalContext.current
 
     Column(
         modifier = Modifier
-            .clickable { onDetail(movie.userName, movie.id) }
+            .clickable { onDetail(movieFavorite.movie.userName, movieFavorite.movie.id) }
             .background(MaterialTheme.colorScheme.secondary)
-            .testTag(context.getString(R.string.home_movie_list_test)+"_${movie.id}"),
+            .testTag(context.getString(R.string.home_movie_list_test)+"_${movieFavorite.movie.id}"),
     ) {
         Box {
             AsyncImage(
-                model = context.getString(R.string.image_url)+movie.posterPath,
-                contentDescription = movie.title,
+                model = context.getString(R.string.image_url)+movieFavorite.movie.posterPath,
+                contentDescription = movieFavorite.movie.title,
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(IMAGE_ASPECT_RATIO)
-                    .testTag(context.getString(R.string.home_movie_image_test)+"_${movie.id}"),
+                    .testTag(context.getString(R.string.home_movie_image_test)+"_${movieFavorite.movie.id}"),
                 onState = { state: AsyncImagePainter.State ->
                     when (state) {
                         is AsyncImagePainter.State.Loading -> {
@@ -65,15 +65,15 @@ fun HomeItem(
                 },
             )
             var color: Color = Color.White
-            if (movie.favourite) color = Color.Red
+            if (movieFavorite.isFavorite) color = Color.Red
             Icon(
                 imageVector = Icons.TwoTone.Favorite,
-                contentDescription = movie.title,
+                contentDescription = movieFavorite.movie.title,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(dimensionResource(R.dimen.padding_xsmall))
                     .clickable { onFavourite() }
-                    .testTag(context.getString(R.string.home_movie_favourite_test)+"_${movie.id}"),
+                    .testTag(context.getString(R.string.home_movie_favourite_test)+"_${movieFavorite.movie.id}"),
                 tint = color
             )
         }
@@ -82,8 +82,8 @@ fun HomeItem(
                 .padding(dimensionResource(R.dimen.padding_xsmall))
                 .height(dimensionResource(R.dimen.cell_title_height))
                 .align(Alignment.CenterHorizontally)
-                .testTag(context.getString(R.string.home_movie_title_test)+"_${movie.id}"),
-            text = movie.title ?: "",
+                .testTag(context.getString(R.string.home_movie_title_test)+"_${movieFavorite.movie.id}"),
+            text = movieFavorite.movie.title ?: "",
             textAlign = TextAlign.Center,
             fontSize = dimensionResource(R.dimen.font_size_small).value.sp,
             color = MaterialTheme.colorScheme.background,

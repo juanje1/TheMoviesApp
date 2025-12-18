@@ -1,5 +1,6 @@
 package com.juanje.themoviesapp.data
 
+import com.juanje.data.datasources.FavoriteLocalDataSource
 import com.juanje.data.datasources.MovieLocalDataSource
 import com.juanje.data.datasources.MovieRemoteDataSource
 import com.juanje.data.datasources.UserLocalDataSource
@@ -23,6 +24,7 @@ class DataModule {
     fun movieRepositoryProvider(
         movieLocalDataSource: MovieLocalDataSource,
         movieRemoteDataSource: MovieRemoteDataSource,
+        favoriteLocalDataSource: FavoriteLocalDataSource,
         @Named("apiKey") apiKey: String
-    ) = MovieRepository(movieLocalDataSource, movieRemoteDataSource, apiKey)
+    ) = MovieRepository(movieLocalDataSource, movieRemoteDataSource, favoriteLocalDataSource, apiKey)
 }

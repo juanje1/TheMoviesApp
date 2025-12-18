@@ -6,6 +6,6 @@ data class Movie (
     val overview: String ?= null,
     val posterPath: String ?= null,
     val releaseDate: String ?= null,
-    val favourite: Boolean = false,
-    val userName: String
+    val userName: String,
+    val displayOrder: Int
 )

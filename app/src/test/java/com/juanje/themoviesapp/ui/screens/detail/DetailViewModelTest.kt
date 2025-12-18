@@ -37,7 +37,7 @@ class DetailViewModelTest {
     @Test
     fun `Listening to movie detail from the database`() = runTest {
         detailViewModel.getMovieDetail(fakeUserName, fakeId)
-        val movie = detailViewModel.state.value.movie
+        val movie = detailViewModel.state.value.movieFavorite
 
         Assert.assertEquals(fakeUserName, movie?.userName)
         Assert.assertEquals(fakeId, movie?.id)

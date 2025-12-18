@@ -26,6 +26,6 @@ fun MovieResultServer.toMovie(userName: String) = Movie(
     overview = overview,
     posterPath = poster_path,
     releaseDate = release_date,
-    favourite = favourite,
-    userName = userName
+    userName = userName,
+    displayOrder = 0
 )

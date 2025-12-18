@@ -5,9 +5,10 @@ import kotlinx.coroutines.flow.Flow
 
 interface MovieLocalDataSource {
 
-    suspend fun getMovies(userName: String): Flow<List<Movie>>
-    suspend fun getMovie(userName: String, movieId: Int): Movie
+    fun getMovies(userName: String): Flow<List<Movie>>
+    fun getMovie(userName: String, movieId: Int): Flow<Movie>
     suspend fun count(userName: String): Int
+    suspend fun deleteAll(userName: String)
     suspend fun insertAll(movies: List<Movie>)
-    suspend fun updateMovie(movie: Movie)
+    suspend fun refreshMoviesTx(userName: String, movies: List<Movie>)
 }

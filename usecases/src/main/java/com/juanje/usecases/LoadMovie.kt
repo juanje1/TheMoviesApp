@@ -5,15 +5,18 @@ import com.juanje.domain.Movie
 
 class LoadMovie(private val movieRepository: MovieRepository) {
 
-    suspend fun invokeGetMovies(userName: String) =
-        movieRepository.getMovies(userName)
+    fun invokeGetMovieFavorites(userName: String) =
+        movieRepository.getMovieFavorites(userName)
 
-    suspend fun invokeGetMoviesFromDatabase(userName: String) =
-        movieRepository.getMoviesFromDatabase(userName)
+    fun invokeGetMovieFavorite(userName: String, movieId: Int) =
+        movieRepository.getMovieFavorite(userName, movieId)
 
-    suspend fun invokeGetMovieDetail(userName: String, movieId: Int) =
-        movieRepository.getMovieDetail(userName, movieId)
+    suspend fun invokeCount(userName: String) =
+        movieRepository.count(userName)
 
-    suspend fun invokeUpdateMovie(movie: Movie) =
-        movieRepository.updateMovie(movie)
+    suspend fun invokeGetAndInsertMovies(userName: String, refresh: Boolean) =
+        movieRepository.getAndInsertMovies(userName, refresh)
+
+    suspend fun invokeUpdateMovie(userName: String, movie: Movie, isFavorite: Boolean) =
+        movieRepository.updateMovie(userName, movie, isFavorite)
 }

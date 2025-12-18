@@ -43,7 +43,7 @@ class HomeViewModelTest {
     fun `Listening to movies flow emits the list of movies from the server`() = runTest {
         `when`(networkConnectivityObserver.isInternetAvailable(context)).thenReturn(true)
 
-        homeViewModel.getMovies(fakeUserName)
+        homeViewModel.getAndInsertMovies(fakeUserName)
         val movies = homeViewModel.state.value.movies
 
         Assert.assertEquals(fakeMovies, movies)
@@ -53,9 +53,9 @@ class HomeViewModelTest {
     fun `Updating a movie in the local database`() = runTest {
         `when`(networkConnectivityObserver.isInternetAvailable(context)).thenReturn(true)
 
-        homeViewModel.getMovies(fakeUserName)
+        homeViewModel.getAndInsertMovies(fakeUserName)
         homeViewModel.updateMovie(fakeMovie)
-        homeViewModel.getMovies(fakeUserName)
+        homeViewModel.getAndInsertMovies(fakeUserName)
         val movies = homeViewModel.state.value.movies
 
         Assert.assertEquals(true, movies.find { it.id == fakeMovie.id }?.favourite)

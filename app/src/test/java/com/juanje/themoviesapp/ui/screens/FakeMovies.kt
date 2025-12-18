@@ -21,7 +21,7 @@ class FakeMovieLocalDataSource : MovieLocalDataSource {
     private var movies = mutableListOf<Movie>()
     private var movie = fakeMovie
 
-    override suspend fun getMovies(userName: String) = flowOf(movies)
+    override suspend fun getMoviesForUserFlow(userName: String) = flowOf(movies)
 
     override suspend fun getMovie(userName: String, movieId: Int): Movie = movie
 
@@ -31,7 +31,7 @@ class FakeMovieLocalDataSource : MovieLocalDataSource {
         this.movies += movies
     }
 
-    override suspend fun updateMovie(movie: Movie) {
+    override suspend fun upsertAll(movie: Movie) {
         this.movies = this.movies.map { if (it.id == movie.id) movie else it }.toMutableList()
     }
 }
