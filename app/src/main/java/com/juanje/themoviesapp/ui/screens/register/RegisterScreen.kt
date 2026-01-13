@@ -20,6 +20,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -49,18 +50,28 @@ fun RegisterScreen(
     onLogin: () -> Unit
 ) {
     val registerViewModel: RegisterViewModel = hiltViewModel()
-    val stateRegister by registerViewModel.state.collectAsState()
+    val registerState by registerViewModel.state.collectAsState()
 
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    if (stateRegister.timeExecution > 0) {
-        if (stateRegister.userValid)
-            onRegister()
-        else
-            showMessage(coroutineScope, snackBarHostState, context.getString(R.string.error_register), context)
-        registerViewModel.resetState()
+    LaunchedEffect(registerState.actionFinished) {
+        if (registerState.actionFinished) {
+            if (registerState.userValid) {
+                onRegister()
+            } else {
+                showMessage(coroutineScope, snackBarHostState, context.getString(R.string.error_register), context)
+            }
+        }
+        registerViewModel.resetActionFinished()
+    }
+
+    LaunchedEffect(registerState.error) {
+        registerState.error?.let { resId ->
+            showMessage(coroutineScope, snackBarHostState, context.getString(resId), context)
+            registerViewModel.resetError()
+        }
     }
 
     Scaffold(

@@ -17,7 +17,7 @@ import com.juanje.themoviesapp.idling.CombinedLoadingIdlingResource
 import com.juanje.themoviesapp.ui.MainActivity
 import com.juanje.themoviesapp.ui.screens.detail.DetailViewModel
 import com.juanje.themoviesapp.ui.screens.home.HomeViewModel
-import com.juanje.themoviesapp.utils.EspressoIdlingResource
+import com.juanje.themoviesapp.utils.IdlingResourceProvider
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.After
@@ -56,13 +56,13 @@ class InstrumentedTest {
         )
 
         composeTestRule.registerIdlingResource(combinedLoadingIdlingResource)
-        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
+        IdlingRegistry.getInstance().register(IdlingResourceProvider.countingIdlingResource)
     }
 
     @After
     fun tearDown() {
         composeTestRule.unregisterIdlingResource(combinedLoadingIdlingResource)
-        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
+        IdlingRegistry.getInstance().unregister(IdlingResourceProvider.countingIdlingResource)
     }
 
     @Test

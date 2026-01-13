@@ -24,8 +24,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import com.juanje.domain.RegistrationField
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.ui.screens.register.RegisterViewModel
 import kotlinx.coroutines.launch
@@ -50,7 +52,7 @@ fun userName(registerViewModel: RegisterViewModel): String {
         onValueChange = {
             userNameText = it
             scope.launch {
-                registerViewModel.checkUserNameValid(userNameText)
+                registerViewModel.onFieldChanged(RegistrationField.USER_NAME, userNameText)
             }
         },
         label = { Text(text = context.getString(R.string.register_user_name_label)) },
@@ -63,18 +65,18 @@ fun userName(registerViewModel: RegisterViewModel): String {
             onNext = { focusManager.moveFocus(FocusDirection.Down) }
         ),
         trailingIcon = {
-            if (stateRegister.errorMessages[context.getString(R.string.register_user_name_error_messages)]?.isNotEmpty() == true)
+            if (stateRegister.errorMessages.containsKey(RegistrationField.USER_NAME))
                 Icon(
                     imageVector = Icons.Filled.Error,
-                    contentDescription = context.getString(R.string.register_user_name_error_field_description),
+                    contentDescription = context.getString(R.string.register_error_field_description),
                     tint = MaterialTheme.colorScheme.error
                 )
         },
-        isError = stateRegister.errorMessages[context.getString(R.string.register_user_name_error_messages)]?.isNotEmpty() == true
+        isError = stateRegister.errorMessages.containsKey(RegistrationField.USER_NAME)
     )
-    if (stateRegister.errorMessages[context.getString(R.string.register_user_name_error_messages)]?.isNotEmpty() == true) {
+    if (stateRegister.errorMessages.containsKey(RegistrationField.USER_NAME)) {
         Text(
-            text = stateRegister.errorMessages[context.getString(R.string.register_user_name_error_messages)] ?: "",
+            text = stateRegister.errorMessages[RegistrationField.USER_NAME]?.let { stringResource(it) } ?: "",
             color = MaterialTheme.colorScheme.error,
             modifier = Modifier.padding(start = dimensionResource(R.dimen.padding_medium))
         )

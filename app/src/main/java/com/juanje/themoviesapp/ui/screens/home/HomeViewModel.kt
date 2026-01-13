@@ -1,18 +1,17 @@
 package com.juanje.themoviesapp.ui.screens.home
 
-import android.annotation.SuppressLint
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanje.domain.Movie
 import com.juanje.domain.MovieFavorite
 import com.juanje.themoviesapp.R
+import com.juanje.themoviesapp.common.AppIdlingResource
 import com.juanje.themoviesapp.common.ConnectivityObserver
+import com.juanje.themoviesapp.common.toErrorRes
+import com.juanje.themoviesapp.common.trackLoading
 import com.juanje.themoviesapp.data.MainDispatcher
-import com.juanje.themoviesapp.utils.EspressoIdlingResource
 import com.juanje.usecases.LoadMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +20,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -31,9 +31,9 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val loadMovie: LoadMovie,
-    connectivityObserver: ConnectivityObserver,
+    private val idlingResource: AppIdlingResource,
+    private val connectivityObserver: ConnectivityObserver,
     @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
-    @field:SuppressLint("StaticFieldLeak") @ApplicationContext val context: Context
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
@@ -45,65 +45,81 @@ class HomeViewModel @Inject constructor(
     private val _userNameFlow = MutableStateFlow<String?>(null)
 
     init {
+        observeConnectivity()
+        observeMovieFavorites()
+        syncMoviesIfNecessary()
+    }
+
+    private fun observeConnectivity() {
         connectivityObserver
             .observe()
             .onEach { isAvailable ->
                 _state.update { it.copy(isInternetAvailable = isAvailable) }
             }.launchIn(viewModelScope)
+    }
 
-        _userNameFlow.filterNotNull().flatMapLatest { userName ->
-            loadMovie.invokeGetMovieFavorites(userName).onEach { movieList ->
+    private fun observeMovieFavorites() {
+        _userNameFlow
+            .filterNotNull()
+            .flatMapLatest { userName ->
+                loadMovie.invokeGetMovieFavorites(userName)
+                    .trackLoading(idlingResource)
+                    .map { movieList -> userName to movieList }
+            }.onEach { (userName, movieList) ->
                 _state.update { it.copy(movies = movieList, userName = userName, isInitialLoading = false) }
-            }
-        }.catch { e ->
-            _state.update { it.copy(error = e.message ?: context.getString(R.string.error_internet), isInitialLoading = false) }
-        }.launchIn(viewModelScope)
+            }.catch { e ->
+                _state.update { it.copy(error = e.toErrorRes(), isInitialLoading = false) }
+            }.launchIn(viewModelScope)
+    }
 
-        _userNameFlow.filterNotNull().onEach { userName ->
-            val count = loadMovie.invokeCount(userName)
-            if (count == 0) getAndInsertMovies(userName, refresh = true)
-        }.launchIn(viewModelScope)
+    private fun syncMoviesIfNecessary() {
+        _userNameFlow
+            .filterNotNull()
+            .onEach { userName ->
+                trackLoading(
+                    idlingResource = idlingResource,
+                    onError = { e -> _state.update { it.copy(error = e.toErrorRes()) } }
+                ) {
+                    if (loadMovie.invokeCount(userName) == 0)
+                        loadMovie.invokeGetAndInsertMovies(userName, refresh = true)
+                }
+            }.launchIn(viewModelScope)
     }
 
     fun getAndInsertMovies(userName: String, refresh: Boolean = false) = viewModelScope.launch(mainDispatcher) {
         if (_state.value.isGettingMovies || _state.value.isRefreshingMovies) return@launch
 
         if (!_state.value.isInternetAvailable) {
-            _state.update { it.copy(error = context.getString(R.string.error_internet)) }
+            _state.update { it.copy(error = R.string.error_internet) }
             return@launch
         }
 
         if (refresh) _state.update { it.copy(isGettingMovies = false, isRefreshingMovies = true, error = null) }
         else _state.update { it.copy(isGettingMovies = true, isRefreshingMovies = false, error = null) }
 
-        EspressoIdlingResource.increment()
-
-        try {
+        trackLoading(
+            idlingResource = idlingResource,
+            onError = { e -> _state.update { it.copy(error = e.toErrorRes()) } },
+            onFinally = { _state.update { it.copy(isGettingMovies = false, isRefreshingMovies = false) } }
+        ) {
             loadMovie.invokeGetAndInsertMovies(userName, refresh)
-        } catch (e: Exception) {
-            _state.update { it.copy(error = e.message ?: context.getString(R.string.error_unknown)) }
-        } finally {
-            _state.update { it.copy(isGettingMovies = false, isRefreshingMovies = false) }
-            EspressoIdlingResource.decrement()
         }
     }
 
     fun updateMovie(movie: Movie) = viewModelScope.launch(mainDispatcher) {
         val userName = _userNameFlow.value ?: return@launch
-
         if (_state.value.isUpdatingMovies) return@launch
 
-        _state.value = _state.value.copy(isUpdatingMovies = true, error = null)
-        EspressoIdlingResource.increment()
+        val favorite = _state.value.movies.find { it.movie.id == movie.id }?.isFavorite ?: return@launch
 
-        try {
-            val favorite = _state.value.movies.find { it.movie.id == movie.id }?.isFavorite ?: return@launch
-            loadMovie.invokeUpdateMovie(userName, movie, !favorite)
-        } catch (e: Exception) {
-            _state.update { it.copy(error = e.message ?: context.getString(R.string.error_unknown)) }
-        } finally {
-            _state.update { it.copy(isUpdatingMovies = false) }
-            EspressoIdlingResource.decrement()
+        _state.update { it.copy(isUpdatingMovies = true, error = null) }
+
+        trackLoading(
+            idlingResource = idlingResource,
+            onError = { e -> _state.update { it.copy(error = e.toErrorRes()) } },
+            onFinally = { _state.update { it.copy(isUpdatingMovies = false) } }
+        ) {
+            loadMovie.invokeUpdateMovieFavorite(userName, movie, !favorite)
         }
     }
 
@@ -112,9 +128,11 @@ class HomeViewModel @Inject constructor(
     }
 
     fun setUserNameFlow(userName: String) {
-        if (_userNameFlow.value != userName) {
-            _userNameFlow.value = userName
-        }
+        _userNameFlow.value = userName
+    }
+
+    fun resetError() {
+        _state.update { it.copy(error = null) }
     }
 
     data class UiState(
@@ -125,6 +143,6 @@ class HomeViewModel @Inject constructor(
         val isGettingMovies: Boolean = false,
         val isUpdatingMovies: Boolean = false,
         val isRefreshingMovies: Boolean = false,
-        val error: String? = null
+        val error: Int? = null,
     )
 }

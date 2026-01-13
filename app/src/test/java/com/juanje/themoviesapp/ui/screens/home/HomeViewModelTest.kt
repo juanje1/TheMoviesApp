@@ -1,63 +1,88 @@
 package com.juanje.themoviesapp.ui.screens.home
 
-import android.content.Context
 import com.juanje.data.repositories.MovieRepository
 import com.juanje.themoviesapp.common.NetworkConnectivityObserver
-import com.juanje.themoviesapp.ui.screens.CoroutinesTestRule
-import com.juanje.themoviesapp.ui.screens.FakeMovieLocalDataSource
-import com.juanje.themoviesapp.ui.screens.FakeMovieRemoteDataSource
-import com.juanje.themoviesapp.ui.screens.fakeMovie
-import com.juanje.themoviesapp.ui.screens.fakeMovies
-import com.juanje.themoviesapp.ui.screens.fakeUserName
+import com.juanje.themoviesapp.ui.screens.common.CoroutinesTestRule
+import com.juanje.themoviesapp.ui.screens.common.FakeAppIdlingResource
+import com.juanje.themoviesapp.ui.screens.common.FakeFavoriteLocalDataSource
+import com.juanje.themoviesapp.ui.screens.common.FakeMovieLocalDataSource
+import com.juanje.themoviesapp.ui.screens.common.FakeMovieRemoteDataSource
+import com.juanje.themoviesapp.ui.screens.common.createFakeMovie
+import com.juanje.themoviesapp.ui.screens.common.fakeFavorites
+import com.juanje.themoviesapp.ui.screens.common.fakeFavoritesId
+import com.juanje.themoviesapp.ui.screens.common.fakeMovieFavorite
+import com.juanje.themoviesapp.ui.screens.common.fakeMovieFavoriteNoFavorite
+import com.juanje.themoviesapp.ui.screens.common.fakeUserName
 import com.juanje.usecases.LoadMovie
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.*
 import org.junit.*
+import org.junit.Assert.assertTrue
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.`when`
+import org.mockito.Mock
 import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.kotlin.whenever
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(MockitoJUnitRunner::class)
 class HomeViewModelTest {
-
     private val apiKey = "d30e1f350220f9aad6c4110df385d380"
-    private val networkConnectivityObserver = mock<NetworkConnectivityObserver>()
-    private val mainDispatcher = mock<CoroutineDispatcher>()
-    private val context = mock<Context>()
+    private lateinit var favoriteLocalDataSource: FakeFavoriteLocalDataSource
+    private lateinit var movieRepository: MovieRepository
+    private lateinit var loadMovie: LoadMovie
     private lateinit var homeViewModel: HomeViewModel
 
     @get:Rule
     val coroutinesTestRule = CoroutinesTestRule()
 
+    @Mock
+    private lateinit var networkConnectivityObserver: NetworkConnectivityObserver
+
     @Before
     fun setUp() {
-        val movieLocalDataSource = FakeMovieLocalDataSource()
-        val movieRemoteDataSource = FakeMovieRemoteDataSource(fakeMovies)
-        val movieRepository = MovieRepository(movieLocalDataSource, movieRemoteDataSource, apiKey)
-        val loadMovie = LoadMovie(movieRepository)
-        homeViewModel = HomeViewModel(loadMovie, networkConnectivityObserver, mainDispatcher, context)
+        whenever(networkConnectivityObserver.observe()).thenReturn(flowOf(true))
+        favoriteLocalDataSource = FakeFavoriteLocalDataSource()
+
+        movieRepository = MovieRepository(
+            movieLocalDataSource = FakeMovieLocalDataSource(),
+            movieRemoteDataSource = FakeMovieRemoteDataSource(),
+            favoriteLocalDataSource = favoriteLocalDataSource,
+            apiKey = apiKey
+        )
+        loadMovie = LoadMovie(movieRepository)
+        homeViewModel = HomeViewModel(
+            loadMovie = loadMovie,
+            idlingResource = FakeAppIdlingResource(),
+            connectivityObserver = networkConnectivityObserver,
+            mainDispatcher = coroutinesTestRule.testDispatcher
+        )
     }
 
     @Test
-    fun `Listening to movies flow emits the list of movies from the server`() = runTest {
-        `when`(networkConnectivityObserver.isInternetAvailable(context)).thenReturn(true)
+    fun `Listening to movies flow emits the list of movies from the server without favorites`() = runTest {
+        // When
+        homeViewModel.setUserNameFlow(fakeUserName)
+        advanceUntilIdle()
 
-        homeViewModel.getAndInsertMovies(fakeUserName)
-        val movies = homeViewModel.state.value.movies
-
-        Assert.assertEquals(fakeMovies, movies)
+        // Then
+        Assert.assertEquals(fakeMovieFavoriteNoFavorite, homeViewModel.state.value.movies)
     }
 
     @Test
     fun `Updating a movie in the local database`() = runTest {
-        `when`(networkConnectivityObserver.isInternetAvailable(context)).thenReturn(true)
+        // Given
+        val movieFavoriteList = fakeFavoritesId.map { createFakeMovie(it, it) }
 
-        homeViewModel.getAndInsertMovies(fakeUserName)
-        homeViewModel.updateMovie(fakeMovie)
-        homeViewModel.getAndInsertMovies(fakeUserName)
-        val movies = homeViewModel.state.value.movies
+        // When
+        homeViewModel.setUserNameFlow(fakeUserName)
+        advanceUntilIdle()
 
-        Assert.assertEquals(true, movies.find { it.id == fakeMovie.id }?.favourite)
+        movieFavoriteList.map { homeViewModel.updateMovie(it) }
+        advanceUntilIdle()
+
+        // Then
+        Assert.assertEquals(fakeMovieFavorite, homeViewModel.state.value.movies)
+        fakeFavorites.map { assertTrue(favoriteLocalDataSource.isFavorite(it.businessId)) }
     }
 }

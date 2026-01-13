@@ -76,7 +76,7 @@ fun LoginScreen(
     var passwordTextVisibility by rememberSaveable { mutableStateOf(false) }
 
     val loginViewModel: LoginViewModel = hiltViewModel()
-    val stateLogin by loginViewModel.state.collectAsState()
+    val loginState by loginViewModel.state.collectAsState()
 
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
@@ -88,9 +88,16 @@ fun LoginScreen(
             showMessage(coroutineScope, snackBarHostState, context.getString(R.string.info_register_success), context)
     }
 
-    if (stateLogin.timeExecution > 0) {
-        if (stateLogin.isUserValid)
-            onHome(stateLogin.user?.userName!!)
+    LaunchedEffect(loginState.error) {
+        loginState.error?.let { resId ->
+            showMessage(coroutineScope, snackBarHostState, context.getString(resId), context)
+            loginViewModel.resetError()
+        }
+    }
+
+    if (loginState.timeExecution > 0) {
+        if (loginState.isUserValid)
+            onHome(loginState.user?.userName!!)
         else
             showMessage(coroutineScope, snackBarHostState, context.getString(R.string.error_login_incorrect), context)
         loginViewModel.resetState()

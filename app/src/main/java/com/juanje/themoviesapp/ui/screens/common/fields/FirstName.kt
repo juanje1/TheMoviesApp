@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -23,25 +24,23 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import com.juanje.domain.RegistrationField
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.ui.screens.register.RegisterViewModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun firstName(registerViewModel: RegisterViewModel): String {
     var firstNameText by rememberSaveable { mutableStateOf("") }
-    var isEdited by rememberSaveable { mutableStateOf(false) }
 
     val stateRegister by registerViewModel.state.collectAsState()
 
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-
-    if (isEdited) {
-        isEdited = false
-        registerViewModel.checkEmptyField(context.getString(R.string.register_first_name_error_messages), firstNameText)
-    }
+    val scope = rememberCoroutineScope()
 
     OutlinedTextField(
         modifier = Modifier
@@ -52,7 +51,9 @@ fun firstName(registerViewModel: RegisterViewModel): String {
         value = firstNameText,
         onValueChange = {
             firstNameText = it
-            isEdited = true
+            scope.launch {
+                registerViewModel.onFieldChanged(RegistrationField.FIRST_NAME, firstNameText)
+            }
         },
         label = { Text(text = context.getString(R.string.register_first_name_label)) },
         shape = RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_small)),
@@ -64,18 +65,18 @@ fun firstName(registerViewModel: RegisterViewModel): String {
             onNext = { focusManager.moveFocus(FocusDirection.Down) }
         ),
         trailingIcon = {
-            if (stateRegister.errorMessages[context.getString(R.string.register_first_name_error_messages)]?.isNotEmpty() == true)
+            if (stateRegister.errorMessages.containsKey(RegistrationField.FIRST_NAME))
                 Icon(
                     imageVector = Icons.Filled.Error,
-                    contentDescription = context.getString(R.string.register_first_name_error_field_description),
+                    contentDescription = context.getString(R.string.register_error_field_description),
                     tint = MaterialTheme.colorScheme.error
                 )
         },
-        isError = stateRegister.errorMessages[context.getString(R.string.register_first_name_error_messages)]?.isNotEmpty() == true
+        isError = stateRegister.errorMessages.containsKey(RegistrationField.FIRST_NAME)
     )
-    if (stateRegister.errorMessages[context.getString(R.string.register_first_name_error_messages)]?.isNotEmpty() == true) {
+    if (stateRegister.errorMessages.containsKey(RegistrationField.FIRST_NAME)) {
         Text(
-            text = stateRegister.errorMessages[context.getString(R.string.register_first_name_error_messages)] ?: "",
+            text = stateRegister.errorMessages[RegistrationField.FIRST_NAME]?.let { stringResource(it) } ?: "",
             color = MaterialTheme.colorScheme.error,
             modifier = Modifier.padding(start = dimensionResource(R.dimen.padding_medium))
         )

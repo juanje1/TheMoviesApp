@@ -3,6 +3,8 @@ package com.juanje.data.repositories
 import com.juanje.data.datasources.FavoriteLocalDataSource
 import com.juanje.data.datasources.MovieLocalDataSource
 import com.juanje.data.datasources.MovieRemoteDataSource
+import com.juanje.data.utilities.asAppError
+import com.juanje.data.utilities.safeCall
 import com.juanje.domain.Favorite
 import com.juanje.domain.Movie
 import com.juanje.domain.MovieFavorite
@@ -36,44 +38,51 @@ class MovieRepository(
                 val businessId = generateBusinessId(userName, movie)
                 MovieFavorite(movie = movie, isFavorite = businessId in favoriteIdsSet)
             }
-        }
+        }.asAppError()
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getMovieFavorite(userName: String, movieId: Int): Flow<MovieFavorite> {
-        return movieLocalDataSource.getMovie(userName, movieId)
-            .flatMapLatest { movie ->
-                val businessId = generateBusinessId(userName, movie)
-                val favoriteFlow = favoriteLocalDataSource.getFavorite(businessId)
+        return movieLocalDataSource.getMovie(userName, movieId).flatMapLatest { movie ->
+            val businessId = generateBusinessId(userName, movie)
+            val favoriteFlow = favoriteLocalDataSource.getFavorite(businessId)
 
-                favoriteFlow.map { isFav ->
-                    MovieFavorite(movie = movie, isFavorite = isFav)
-                }
-            }.filterNotNull()
+            favoriteFlow.map { isFav ->
+                MovieFavorite(movie = movie, isFavorite = isFav)
+            }
+        }.filterNotNull().asAppError()
     }
 
-    suspend fun count(userName: String): Int =
-        movieLocalDataSource.count(userName)
+    suspend fun count(userName: String): Int {
+        return safeCall {
+            movieLocalDataSource.count(userName)
+        }
+    }
 
     suspend fun getAndInsertMovies(userName: String, refresh: Boolean = false) {
-        val count = if (refresh) 0 else count(userName)
-        val nextPage = (count / PAGE_SIZE) + 1
+        return safeCall {
+            val count = if (refresh) 0 else count(userName)
+            val nextPage = (count / PAGE_SIZE) + 1
 
-        val remoteMovies = movieRemoteDataSource.getMovies(userName, apiKey, nextPage)
-        val moviesToUpsert = remoteMovies.mapIndexed { index, remoteMovie ->
-            remoteMovie.copy(id = 0, displayOrder = count + index)
+            val remoteMovies = movieRemoteDataSource.getMovies(userName, apiKey, nextPage)
+            val moviesToUpsert = remoteMovies.mapIndexed { index, remoteMovie ->
+                remoteMovie.copy(id = 0, displayOrder = count + index + 1)
+            }
+
+            if (refresh) movieLocalDataSource.refreshMoviesTx(userName, moviesToUpsert)
+            else movieLocalDataSource.insertAll(moviesToUpsert)
         }
-
-        if (refresh) movieLocalDataSource.refreshMoviesTx(userName, moviesToUpsert)
-        else movieLocalDataSource.insertAll(moviesToUpsert)
     }
 
-    suspend fun updateMovie(userName: String, movie: Movie, isFavorite: Boolean) {
-        val businessId = generateBusinessId(userName, movie)
-        if (isFavorite) {
-            val favorite = Favorite(businessId)
-            favoriteLocalDataSource.insertFavorite(favorite)
-        } else
-            favoriteLocalDataSource.deleteFavorite(businessId)
+    suspend fun updateMovieFavorite(userName: String, movie: Movie, isFavorite: Boolean) {
+        return safeCall {
+            val businessId = generateBusinessId(userName, movie)
+
+            if (isFavorite) {
+                val favorite = Favorite(businessId)
+                favoriteLocalDataSource.insertFavorite(favorite)
+            } else
+                favoriteLocalDataSource.deleteFavorite(businessId)
+        }
     }
 }

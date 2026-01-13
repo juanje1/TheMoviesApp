@@ -17,6 +17,6 @@ class LoadMovie(private val movieRepository: MovieRepository) {
     suspend fun invokeGetAndInsertMovies(userName: String, refresh: Boolean) =
         movieRepository.getAndInsertMovies(userName, refresh)
 
-    suspend fun invokeUpdateMovie(userName: String, movie: Movie, isFavorite: Boolean) =
-        movieRepository.updateMovie(userName, movie, isFavorite)
+    suspend fun invokeUpdateMovieFavorite(userName: String, movie: Movie, isFavorite: Boolean) =
+        movieRepository.updateMovieFavorite(userName, movie, isFavorite)
 }

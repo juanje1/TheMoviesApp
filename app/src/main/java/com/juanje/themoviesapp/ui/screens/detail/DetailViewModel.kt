@@ -1,15 +1,13 @@
 package com.juanje.themoviesapp.ui.screens.detail
 
-import android.annotation.SuppressLint
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanje.domain.MovieFavorite
-import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.utils.EspressoIdlingResource
+import com.juanje.themoviesapp.common.AppIdlingResource
+import com.juanje.themoviesapp.common.toErrorRes
+import com.juanje.themoviesapp.common.trackLoading
 import com.juanje.usecases.LoadMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,7 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailViewModel @Inject constructor(
     private val loadMovie: LoadMovie,
-    @field:SuppressLint("StaticFieldLeak") @ApplicationContext val context: Context
+    private val idlingResource: AppIdlingResource
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
@@ -38,16 +36,19 @@ class DetailViewModel @Inject constructor(
     private val _argsFlow = MutableStateFlow<DetailArgs?>(null)
 
     init {
+        observeMovieFavorite()
+    }
+
+    private fun observeMovieFavorite() {
         _argsFlow
-            .onEach { EspressoIdlingResource.increment() }
             .filterNotNull()
-            .flatMapLatest { args -> loadMovie.invokeGetMovieFavorite(args.userName, args.movieId) }
-            .onEach { movieFavorite ->
-                _state.update { it.copy(movieFavorite = movieFavorite) }
-                EspressoIdlingResource.decrement()
+            .flatMapLatest { args ->
+                loadMovie.invokeGetMovieFavorite(args.userName, args.movieId)
+                    .trackLoading(idlingResource)
+            }.onEach { movieFavorite ->
+                _state.update { it.copy(movie = movieFavorite) }
             }.catch { e ->
-                _state.update { it.copy(error = e.message ?: context.getString(R.string.error_internet)) }
-                EspressoIdlingResource.decrement()
+                _state.update { it.copy(error = e.toErrorRes()) }
             }.launchIn(viewModelScope)
     }
 
@@ -59,8 +60,12 @@ class DetailViewModel @Inject constructor(
         _argsFlow.value = DetailArgs(userName, movieId)
     }
 
+    fun resetError() {
+        _state.update { it.copy(error = null) }
+    }
+
     data class UiState(
-        val movieFavorite: MovieFavorite ?= null,
-        val error: String? = null
+        val movie: MovieFavorite ?= null,
+        val error: Int? = null
     )
 }

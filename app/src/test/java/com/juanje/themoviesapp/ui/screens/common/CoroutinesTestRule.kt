@@ -1,4 +1,4 @@
-package com.juanje.themoviesapp.ui.screens
+package com.juanje.themoviesapp.ui.screens.common
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -11,7 +11,7 @@ import org.junit.runner.Description
 @OptIn(ExperimentalCoroutinesApi::class)
 class CoroutinesTestRule : TestWatcher() {
 
-    private val testDispatcher = StandardTestDispatcher()
+    val testDispatcher = StandardTestDispatcher()
 
     override fun starting(description: Description) {
         super.starting(description)

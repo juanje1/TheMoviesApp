@@ -73,6 +73,13 @@ fun HomeScreen(
             .collect { homeViewModel.getAndInsertMovies(userName) }
     }
 
+    LaunchedEffect(homeState.error) {
+        homeState.error?.let { resId ->
+            showMessage(coroutineScope, snackBarHostState, context.getString(resId), context)
+            homeViewModel.resetError()
+        }
+    }
+
     if (showLogoutAlertDialog) {
         LogoutAlertDialog(
             onAccept = { onLogin() },
@@ -123,12 +130,6 @@ fun HomeScreen(
                         )
                     }
                 }
-            }
-        }
-
-        if (homeState.error != null) {
-            LaunchedEffect(homeState.error) {
-                showMessage(coroutineScope, snackBarHostState, homeState.error!!, context)
             }
         }
     }

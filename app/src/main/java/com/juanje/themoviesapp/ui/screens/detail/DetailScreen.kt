@@ -1,12 +1,15 @@
 package com.juanje.themoviesapp.ui.screens.detail
 
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
@@ -14,6 +17,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.juanje.themoviesapp.R
+import com.juanje.themoviesapp.common.showMessage
 import com.juanje.themoviesapp.ui.screens.common.dialogs.LogoutAlertDialog
 import com.juanje.themoviesapp.ui.screens.common.others.MyTopAppBar
 
@@ -30,9 +34,18 @@ fun DetailScreen(
     val detailState by detailViewModel.state.collectAsState()
 
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+    val snackBarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
         detailViewModel.setArgsFlow(userName, movieId)
+    }
+
+    LaunchedEffect(detailState.error) {
+        detailState.error?.let { resId ->
+            showMessage(coroutineScope, snackBarHostState, context.getString(resId), context)
+            detailViewModel.resetError()
+        }
     }
 
     if (showLogoutAlertDialog) {
@@ -43,7 +56,7 @@ fun DetailScreen(
         )
     }
 
-    detailState.movieFavorite?.let { movieFavorite ->
+    detailState.movie?.let { movieFavorite ->
         Scaffold(
             topBar = {
                 val titleMovie: String =

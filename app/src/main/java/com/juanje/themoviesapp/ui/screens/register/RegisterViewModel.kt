@@ -1,28 +1,28 @@
 package com.juanje.themoviesapp.ui.screens.register
 
-import android.annotation.SuppressLint
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.juanje.domain.RegistrationField
 import com.juanje.domain.User
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.common.initializeErrorMessages
+import com.juanje.themoviesapp.common.AppIdlingResource
+import com.juanje.themoviesapp.common.toErrorRes
+import com.juanje.themoviesapp.common.trackLoading
 import com.juanje.themoviesapp.data.MainDispatcher
-import com.juanje.themoviesapp.utils.EspressoIdlingResource
 import com.juanje.usecases.LoadUser
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
     private val loadUser: LoadUser,
-    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
-    @field:SuppressLint("StaticFieldLeak") @ApplicationContext val context: Context
+    private val idlingResource: AppIdlingResource,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher
 ) : ViewModel(){
 
     private val _state = MutableStateFlow(UiState())
@@ -30,84 +30,126 @@ class RegisterViewModel @Inject constructor(
 
     fun onRegister(user: User) = viewModelScope.launch(mainDispatcher) {
         _state.value = UiState(userValid = true)
-        EspressoIdlingResource.increment()
+        val localErrors = validateLocalErrors(user)
+        _state.update { it.copy(errorMessages = localErrors, userValid = localErrors.isEmpty()) }
 
-        try {
-            checkUserNameValid(user.userName)
-            checkEmptyField(context.getString(R.string.register_first_name_error_messages), user.firstName)
-            checkEmptyField(context.getString(R.string.register_last_name_error_messages), user.lastName)
-            checkEmailValid(user.email)
-            checkPasswordValid(user.password)
+        if (_state.value.userValid) {
+            trackLoading(
+                idlingResource = idlingResource,
+                onError = { e -> _state.update { it.copy(error = e.toErrorRes()) } }
+            ) {
+                val remoteErrors = validateRemoteErrors(user)
+                _state.update { it.copy(errorMessages = remoteErrors, userValid = remoteErrors.isEmpty()) }
 
-            if (_state.value.userValid) {
-                loadUser.invokeInsertUser(user)
+                if (_state.value.userValid)
+                    loadUser.invokeInsertUser(user)
             }
-        } finally {
-            EspressoIdlingResource.decrement()
+        }
+        _state.update { it.copy(actionFinished = true) }
+    }
+
+    fun onFieldChanged(field: RegistrationField, text: String) = viewModelScope.launch(mainDispatcher) {
+        val localError = when (field) {
+            RegistrationField.PASSWORD -> if (text.length < 8) R.string.error_password_length else null
+            else -> if (text.isEmpty()) R.string.error_field_not_empty else null
         }
 
-        _state.value = _state.value.copy(timeExecution = 1)
-    }
-
-    fun checkEmptyField(field: String, text: String) {
-        if (text.isEmpty()) {
-            _state.value.errorMessages[field] = context.getString(R.string.error_field_not_empty)
-            _state.value = UiState(errorMessages = _state.value.errorMessages)
-        } else resetErrorMessageState(field)
-    }
-
-    suspend fun checkUserNameValid(userName: String) {
-        checkEmptyField(context.getString(R.string.register_user_name_error_messages), userName)
-        EspressoIdlingResource.increment()
-
-        try {
-            if (_state.value.errorMessages[context.getString(R.string.register_user_name_error_messages)]?.isEmpty() == true) {
-                val existsUserName = loadUser.invokeExistsUserName(userName)
-
-                if (existsUserName) {
-                    _state.value.errorMessages[context.getString(R.string.register_user_name_error_messages)] = context.getString(R.string.error_username_exists)
-                    _state.value = UiState(errorMessages = _state.value.errorMessages)
-                } else resetErrorMessageState(context.getString(R.string.register_user_name_error_messages))
+        if (localError != null) {
+            updateError(field, localError)
+        } else {
+            when (field) {
+                RegistrationField.USER_NAME -> existsUserName(field, text)
+                RegistrationField.EMAIL -> existsEmail(field, text)
+                else -> { clearFieldError(field) }
             }
-        } finally {
-            EspressoIdlingResource.decrement()
         }
     }
 
-    suspend fun checkEmailValid(email: String) {
-        checkEmptyField(context.getString(R.string.register_email_error_messages), email)
-        EspressoIdlingResource.increment()
+    private fun validateLocalErrors(user: User): MutableMap<RegistrationField, Int> =
+        mutableMapOf<RegistrationField, Int>().apply {
+            if (user.userName.isEmpty()) put(RegistrationField.USER_NAME, R.string.error_field_not_empty)
+            if (user.firstName.isEmpty()) put(RegistrationField.FIRST_NAME, R.string.error_field_not_empty)
+            if (user.lastName.isEmpty()) put(RegistrationField.LAST_NAME, R.string.error_field_not_empty)
+            if (user.email.isEmpty()) put(RegistrationField.EMAIL, R.string.error_field_not_empty)
+            if (user.password.length < 8) put(RegistrationField.PASSWORD, R.string.error_password_length)
+        }
 
-        try {
-            if (_state.value.errorMessages[context.getString(R.string.register_email_error_messages)]?.isEmpty() == true) {
-                val existsEmail = loadUser.invokeExistsEmail(email)
+    private suspend fun validateRemoteErrors(user: User): MutableMap<RegistrationField, Int> {
+        val remoteErrors = _state.value.errorMessages.toMutableMap()
 
-                if (existsEmail) {
-                    _state.value.errorMessages[context.getString(R.string.register_email_error_messages)] = context.getString(R.string.error_email_exists)
-                    _state.value = UiState(errorMessages = _state.value.errorMessages)
-                } else resetErrorMessageState(context.getString(R.string.register_email_error_messages))
-            }
-        } finally {
-            EspressoIdlingResource.decrement()
+        if (loadUser.invokeExistsUserName(user.userName))
+            remoteErrors[RegistrationField.USER_NAME] = R.string.error_username_exists
+
+        if (loadUser.invokeExistsEmail(user.email))
+            remoteErrors[RegistrationField.EMAIL] = R.string.error_email_exists
+
+        return remoteErrors
+    }
+
+    private fun updateError(field: RegistrationField, errorRes: Int) {
+        _state.update { currentState ->
+            if (currentState.errorMessages[field] == errorRes) return@update currentState
+
+            val newErrors = currentState.errorMessages.toMutableMap()
+            newErrors[field] = errorRes
+
+            currentState.copy(errorMessages = newErrors, userValid = false)
         }
     }
 
-    fun checkPasswordValid(password: String) =
-        if (password.length < 8) {
-            _state.value.errorMessages[context.getString(R.string.register_password_error_messages)] = context.getString(R.string.error_password_length)
-            _state.value = UiState(errorMessages = _state.value.errorMessages)
-        } else resetErrorMessageState(context.getString(R.string.register_password_error_messages))
+    private fun clearFieldError(field: RegistrationField) {
+        _state.update { currentState ->
+            if (!currentState.errorMessages.containsKey(field)) return@update currentState
 
-    private fun resetErrorMessageState(field: String) {
-        _state.value.errorMessages[field] = ""
-        _state.value = _state.value.copy(errorMessages = _state.value.errorMessages)
+            val newErrors = currentState.errorMessages.toMutableMap()
+            newErrors.remove(field)
+
+            currentState.copy(errorMessages = newErrors, userValid = newErrors.isEmpty())
+        }
     }
 
-    fun resetState() { _state.value = UiState(errorMessages = _state.value.errorMessages) }
+    private suspend fun existsUserName(field: RegistrationField, text: String) {
+        trackLoading(
+            idlingResource = idlingResource,
+            onError = { e -> _state.update { it.copy(error = e.toErrorRes()) } }
+        ) {
+            val exists = loadUser.invokeExistsUserName(text)
+
+            if (exists) {
+                updateError(field, R.string.error_username_exists)
+            } else {
+                clearFieldError(field)
+            }
+        }
+    }
+
+    private suspend fun existsEmail(field: RegistrationField, text: String) {
+        trackLoading(
+            idlingResource = idlingResource,
+            onError = { e -> _state.update { it.copy(error = e.toErrorRes()) } }
+        ) {
+            val exists = loadUser.invokeExistsEmail(text)
+
+            if (exists) {
+                updateError(field, R.string.error_email_exists)
+            } else {
+                clearFieldError(field)
+            }
+        }
+    }
+
+    fun resetActionFinished() {
+        _state.update { it.copy(actionFinished = false) }
+    }
+
+    fun resetError() {
+        _state.update { it.copy(error = null) }
+    }
 
     data class UiState(
+        val actionFinished: Boolean = false,
         val userValid: Boolean = false,
-        val timeExecution: Int = 0,
-        val errorMessages: MutableMap<String, String> = initializeErrorMessages()
+        val errorMessages: Map<RegistrationField, Int> = emptyMap(),
+        val error: Int? = null
     )
 }

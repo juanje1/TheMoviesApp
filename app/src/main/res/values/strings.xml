@@ -18,20 +18,11 @@
     <string name="register_image_description">Register Image</string>
     <string name="register_title_text">TheMoviesApp | Register</string>
     <string name="register_user_name_label">User Name</string>
-    <string name="register_user_name_error_messages">userName</string>
-    <string name="register_user_name_error_field_description">error</string>
     <string name="register_first_name_label">First Name</string>
-    <string name="register_first_name_error_messages">firstName</string>
-    <string name="register_first_name_error_field_description">error</string>
     <string name="register_last_name_label">Last Name</string>
-    <string name="register_last_name_error_messages">lastName</string>
-    <string name="register_last_name_error_field_description">error</string>
     <string name="register_email_label">Email</string>
-    <string name="register_email_error_messages">email</string>
-    <string name="register_email_error_field_description">error</string>
     <string name="register_password_label">Password</string>
-    <string name="register_password_error_messages">password</string>
-    <string name="register_password_error_field_description">error</string>
+    <string name="register_error_field_description">error</string>
     <string name="register_password_hide">Hide Password</string>
     <string name="register_password_show">Show Password</string>
 
@@ -97,6 +88,7 @@
     <string name="error_email_exists">Error: The Email already exists</string>
     <string name="error_password_length">Error: The Password must have at least 8 characters</string>
     <string name="error_internet">There is no Internet connection</string>
+    <string name="error_database">There is a problem with the database</string>
     <string name="error_unknown">Unknown error</string>
 
     <!-- Float Values -->
