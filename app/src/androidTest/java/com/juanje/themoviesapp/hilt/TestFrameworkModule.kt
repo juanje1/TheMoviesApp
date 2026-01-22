@@ -2,6 +2,7 @@ package com.juanje.themoviesapp.hilt
 
 import android.content.Context
 import androidx.room.Room
+import com.juanje.data.datasources.FavoriteLocalDataSource
 import com.juanje.data.datasources.MovieLocalDataSource
 import com.juanje.data.datasources.MovieRemoteDataSource
 import com.juanje.data.datasources.UserLocalDataSource
@@ -10,8 +11,10 @@ import com.juanje.themoviesapp.data.FrameworkModule
 import com.juanje.themoviesapp.data.IoDispatcher
 import com.juanje.themoviesapp.data.MainDispatcher
 import com.juanje.themoviesapp.data.database.TheMoviesAppDatabase
+import com.juanje.themoviesapp.data.database.daos.FavoriteDao
 import com.juanje.themoviesapp.data.database.daos.MovieDao
 import com.juanje.themoviesapp.data.database.daos.UserDao
+import com.juanje.themoviesapp.data.database.datasources.FavoriteDatabaseDataSource
 import com.juanje.themoviesapp.data.database.datasources.MovieDatabaseDataSource
 import com.juanje.themoviesapp.data.database.datasources.UserDatabaseDataSource
 import com.juanje.themoviesapp.data.server.datasources.MovieServerDataSource
@@ -98,6 +101,11 @@ object TestFrameworkModule {
 
     @Provides
     @Singleton
+    fun favoriteDaoProvider(theMoviesAppDatabase: TheMoviesAppDatabase): FavoriteDao =
+        theMoviesAppDatabase.favoriteDao()
+
+    @Provides
+    @Singleton
     fun movieServiceProvider(retrofit: Retrofit): MovieService =
         retrofit.run { create(MovieService::class.java) }
 
@@ -112,4 +120,8 @@ object TestFrameworkModule {
     @Provides
     fun movieServerDataSourceProvider(movieService: MovieService): MovieRemoteDataSource =
         MovieServerDataSource(movieService)
+
+    @Provides
+    fun favoriteDatabaseDataSourceProvider(favoriteDao: FavoriteDao, @IoDispatcher testIoDispatcher: CoroutineDispatcher): FavoriteLocalDataSource =
+        FavoriteDatabaseDataSource(favoriteDao, testIoDispatcher)
 }

@@ -33,19 +33,20 @@ class RegisterViewModel @Inject constructor(
         val localErrors = validateLocalErrors(user)
         _state.update { it.copy(errorMessages = localErrors, userValid = localErrors.isEmpty()) }
 
-        if (_state.value.userValid) {
-            trackLoading(
-                idlingResource = idlingResource,
-                onError = { e -> _state.update { it.copy(error = e.toErrorRes()) } }
-            ) {
+        trackLoading(
+            idlingResource = idlingResource,
+            onError = { e -> _state.update { it.copy(error = e.toErrorRes()) } },
+            onFinally = { _state.update { it.copy(actionFinished = true) } }
+        ) {
+            if (_state.value.userValid) {
                 val remoteErrors = validateRemoteErrors(user)
                 _state.update { it.copy(errorMessages = remoteErrors, userValid = remoteErrors.isEmpty()) }
 
-                if (_state.value.userValid)
+                if (_state.value.userValid) {
                     loadUser.invokeInsertUser(user)
+                }
             }
         }
-        _state.update { it.copy(actionFinished = true) }
     }
 
     fun onFieldChanged(field: RegistrationField, text: String) = viewModelScope.launch(mainDispatcher) {

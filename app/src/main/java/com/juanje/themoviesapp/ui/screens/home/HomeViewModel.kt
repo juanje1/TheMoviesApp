@@ -13,34 +13,29 @@ import com.juanje.themoviesapp.data.MainDispatcher
 import com.juanje.usecases.LoadMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.Collections.emptyList
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val loadMovie: LoadMovie,
     private val idlingResource: AppIdlingResource,
     private val connectivityObserver: ConnectivityObserver,
-    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state
-
-    private val _isImageLoading = MutableStateFlow(false)
-    val isImageLoading: StateFlow<Boolean> = _isImageLoading
 
     private val _userNameFlow = MutableStateFlow<String?>(null)
 
@@ -58,30 +53,37 @@ class HomeViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    private fun observeMovieFavorites() {
-        _userNameFlow
-            .filterNotNull()
-            .flatMapLatest { userName ->
-                loadMovie.invokeGetMovieFavorites(userName)
-                    .trackLoading(idlingResource)
-                    .map { movieList -> userName to movieList }
-            }.onEach { (userName, movieList) ->
-                _state.update { it.copy(movies = movieList, userName = userName, isInitialLoading = false) }
+    private fun observeMovieFavorites() = viewModelScope.launch(mainDispatcher) {
+        val userName = _userNameFlow.filterNotNull().first()
+
+        trackLoading(
+            idlingResource = idlingResource,
+            onError = { e -> _state.update { it.copy(error = e.toErrorRes()) } }
+        ) {
+            val initialMovies = loadMovie.invokeGetMovieFavorites(userName).first()
+            _state.update { it.copy(movies = initialMovies, userName = userName, isInitialLoading = false) }
+        }
+
+        loadMovie.invokeGetMovieFavorites(userName)
+            .onEach { movieList ->
+                _state.update { it.copy(movies = movieList) }
             }.catch { e ->
-                _state.update { it.copy(error = e.toErrorRes(), isInitialLoading = false) }
+                _state.update { it.copy(error = e.toErrorRes()) }
             }.launchIn(viewModelScope)
     }
 
     private fun syncMoviesIfNecessary() {
         _userNameFlow
             .filterNotNull()
+            .distinctUntilChanged()
             .onEach { userName ->
                 trackLoading(
                     idlingResource = idlingResource,
                     onError = { e -> _state.update { it.copy(error = e.toErrorRes()) } }
                 ) {
-                    if (loadMovie.invokeCount(userName) == 0)
+                    if (loadMovie.invokeCount(userName) == 0) {
                         loadMovie.invokeGetAndInsertMovies(userName, refresh = true)
+                    }
                 }
             }.launchIn(viewModelScope)
     }
@@ -121,10 +123,6 @@ class HomeViewModel @Inject constructor(
         ) {
             loadMovie.invokeUpdateMovieFavorite(userName, movie, !favorite)
         }
-    }
-
-    fun setIsImageLoading(isImageLoading: Boolean) {
-        _isImageLoading.value = isImageLoading
     }
 
     fun setUserNameFlow(userName: String) {

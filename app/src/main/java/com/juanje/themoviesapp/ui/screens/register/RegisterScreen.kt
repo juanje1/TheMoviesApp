@@ -6,9 +6,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -38,11 +40,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.juanje.domain.User
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.common.showMessage
+import com.juanje.themoviesapp.ui.screens.common.fields.email
 import com.juanje.themoviesapp.ui.screens.common.fields.firstName
 import com.juanje.themoviesapp.ui.screens.common.fields.lastName
 import com.juanje.themoviesapp.ui.screens.common.fields.password
 import com.juanje.themoviesapp.ui.screens.common.fields.userName
-import com.juanje.themoviesapp.ui.screens.common.fields.email
 
 @Composable
 fun RegisterScreen(
@@ -61,27 +63,27 @@ fun RegisterScreen(
             if (registerState.userValid) {
                 onRegister()
             } else {
-                showMessage(coroutineScope, snackBarHostState, context.getString(R.string.error_register), context)
+                showMessage(coroutineScope, snackBarHostState, context.getString(R.string.error_register))
             }
+            registerViewModel.resetActionFinished()
         }
-        registerViewModel.resetActionFinished()
     }
 
     LaunchedEffect(registerState.error) {
         registerState.error?.let { resId ->
-            showMessage(coroutineScope, snackBarHostState, context.getString(resId), context)
+            showMessage(coroutineScope, snackBarHostState, context.getString(resId))
             registerViewModel.resetError()
         }
     }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
-    ) {
+    ) { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
-                .padding(it)
+                .consumeWindowInsets(innerPadding)
         ) {
             Image(
                 painter = painterResource(id = R.drawable.register),
@@ -104,8 +106,10 @@ fun RegisterScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
+                        .imePadding()
                         .verticalScroll(rememberScrollState()),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spaced_by))
                 ) {
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacer_large)))
                     Text(
@@ -117,24 +121,19 @@ fun RegisterScreen(
                         )
                     )
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacer_medium)))
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spaced_by))
-                    ) {
-                        val userName = userName(registerViewModel)
-                        val firstName = firstName(registerViewModel)
-                        val lastName = lastName(registerViewModel)
-                        val email = email(registerViewModel)
-                        val password = password(registerViewModel)
 
-                        RegisterAction(
-                            onRegister = onRegister,
-                            onCancel = onLogin,
-                            registerViewModel = registerViewModel,
-                            user = User(userName, firstName, lastName, email, password)
-                        )
-                    }
+                    val userName = userName(registerViewModel)
+                    val firstName = firstName(registerViewModel)
+                    val lastName = lastName(registerViewModel)
+                    val email = email(registerViewModel)
+                    val password = password(registerViewModel)
+
+                    RegisterAction(
+                        onRegister = onRegister,
+                        onCancel = onLogin,
+                        registerViewModel = registerViewModel,
+                        user = User(userName, firstName, lastName, email, password)
+                    )
                 }
             }
         }

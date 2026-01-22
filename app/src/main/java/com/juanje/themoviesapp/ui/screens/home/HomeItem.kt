@@ -24,7 +24,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import coil.compose.AsyncImagePainter
 import com.juanje.domain.MovieFavorite
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.common.IMAGE_ASPECT_RATIO
@@ -51,18 +50,7 @@ fun HomeItem(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(IMAGE_ASPECT_RATIO)
-                    .testTag(context.getString(R.string.home_movie_image_test)+"_${movieFavorite.movie.id}"),
-                onState = { state: AsyncImagePainter.State ->
-                    when (state) {
-                        is AsyncImagePainter.State.Loading -> {
-                            homeViewModel.setIsImageLoading(true)
-                        }
-                        is AsyncImagePainter.State.Success, is AsyncImagePainter.State.Error -> {
-                            homeViewModel.setIsImageLoading(false)
-                        }
-                        else -> {}
-                    }
-                },
+                    .testTag(context.getString(R.string.home_movie_image_test)+"_${movieFavorite.movie.id}")
             )
             var color: Color = Color.White
             if (movieFavorite.isFavorite) color = Color.Red

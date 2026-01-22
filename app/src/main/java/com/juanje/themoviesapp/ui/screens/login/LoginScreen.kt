@@ -85,12 +85,12 @@ fun LoginScreen(
 
     LaunchedEffect(Unit) {
         if (registered)
-            showMessage(coroutineScope, snackBarHostState, context.getString(R.string.info_register_success), context)
+            showMessage(coroutineScope, snackBarHostState, context.getString(R.string.info_register_success))
     }
 
     LaunchedEffect(loginState.error) {
         loginState.error?.let { resId ->
-            showMessage(coroutineScope, snackBarHostState, context.getString(resId), context)
+            showMessage(coroutineScope, snackBarHostState, context.getString(resId))
             loginViewModel.resetError()
         }
     }
@@ -99,7 +99,7 @@ fun LoginScreen(
         if (loginState.isUserValid)
             onHome(loginState.user?.userName!!)
         else
-            showMessage(coroutineScope, snackBarHostState, context.getString(R.string.error_login_incorrect), context)
+            showMessage(coroutineScope, snackBarHostState, context.getString(R.string.error_login_incorrect))
         loginViewModel.resetState()
     }
 

@@ -50,6 +50,7 @@
     <string name="register_example_email_init_test">emailTest</string>
     <string name="register_example_email_end_test">test.com</string>
     <string name="register_example_password_test">passwordTest</string>
+    <string name="home_loading_spinner_text">loading_spinner</string>
     <string name="home_movie_list_test">movieListHome</string>
     <string name="home_movie_image_test">movieImageHome</string>
     <string name="home_movie_favourite_test">movieFavouriteHome</string>
@@ -98,7 +99,6 @@
 
     <!-- Others Strings -->
     <string name="arrow_back_content_description">Arrow back</string>
-    <string name="snack_bar_action_label">Hide</string>
     <string name="color_background_login">#E0E0E0</string>
     <string name="color_text_fields">#5E5E5E</string>
     <string name="color_text_register_now">#4D4D4D</string>

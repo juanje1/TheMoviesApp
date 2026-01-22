@@ -25,7 +25,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import coil.compose.AsyncImage
-import coil.compose.AsyncImagePainter
 import com.juanje.domain.MovieFavorite
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.common.IMAGE_ASPECT_RATIO
@@ -57,17 +56,6 @@ fun DetailItem(
                 .aspectRatio(IMAGE_ASPECT_RATIO)
                 .align(Alignment.CenterHorizontally)
                 .testTag(context.getString(R.string.detail_movie_image_test)+"_${movieFavorite.movie.id}"),
-            onState = { state: AsyncImagePainter.State ->
-                when (state) {
-                    is AsyncImagePainter.State.Loading -> {
-                        detailViewModel.setIsImageLoading(true)
-                    }
-                    is AsyncImagePainter.State.Success, is AsyncImagePainter.State.Error -> {
-                        detailViewModel.setIsImageLoading(false)
-                    }
-                    else -> {}
-                }
-            },
             contentScale = ContentScale.Crop
         )
         HorizontalDivider(

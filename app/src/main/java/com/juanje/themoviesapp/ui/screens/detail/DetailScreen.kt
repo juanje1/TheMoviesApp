@@ -43,7 +43,7 @@ fun DetailScreen(
 
     LaunchedEffect(detailState.error) {
         detailState.error?.let { resId ->
-            showMessage(coroutineScope, snackBarHostState, context.getString(resId), context)
+            showMessage(coroutineScope, snackBarHostState, context.getString(resId))
             detailViewModel.resetError()
         }
     }

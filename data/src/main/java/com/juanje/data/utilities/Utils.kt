@@ -7,11 +7,14 @@ import kotlinx.coroutines.flow.catch
 import java.io.IOException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
+import kotlin.coroutines.cancellation.CancellationException
 
 suspend fun <T> safeCall(call: suspend () -> T): T {
     return try {
         call()
     } catch (e: Exception) {
+        if (e is CancellationException) throw e
+
         throw when (e) {
             is UnknownHostException -> AppError.Network
             is SocketTimeoutException -> AppError.Network

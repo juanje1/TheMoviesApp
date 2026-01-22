@@ -93,10 +93,10 @@ dependencies {
     ksp "com.google.dagger:hilt-compiler:2.49"
     ksp "androidx.room:room-compiler:2.5.2"
 
+    testImplementation "org.jetbrains.kotlin:kotlin-test"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1"
-    testImplementation "junit:junit:4.13.2"
     testImplementation "org.mockito.kotlin:mockito-kotlin:5.1.0"
-    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
+    testImplementation "junit:junit:4.13.2"
 
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:1.7.8"
     androidTestImplementation "androidx.test.espresso:espresso-core:3.7.0"

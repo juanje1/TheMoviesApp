@@ -75,7 +75,7 @@ fun HomeScreen(
 
     LaunchedEffect(homeState.error) {
         homeState.error?.let { resId ->
-            showMessage(coroutineScope, snackBarHostState, context.getString(resId), context)
+            showMessage(coroutineScope, snackBarHostState, context.getString(resId))
             homeViewModel.resetError()
         }
     }
@@ -107,7 +107,9 @@ fun HomeScreen(
         ) {
             if (homeState.isInitialLoading) {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .testTag(context.getString(R.string.home_loading_spinner_text)),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
