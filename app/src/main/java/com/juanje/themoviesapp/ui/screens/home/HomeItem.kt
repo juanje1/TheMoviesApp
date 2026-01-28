@@ -24,7 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.juanje.domain.MovieFavorite
+import com.juanje.domain.dataclasses.MovieFavorite
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.common.IMAGE_ASPECT_RATIO
 
@@ -32,8 +32,7 @@ import com.juanje.themoviesapp.common.IMAGE_ASPECT_RATIO
 fun HomeItem(
     onDetail: (String, Int) -> Unit,
     onFavourite: () -> Unit,
-    movieFavorite: MovieFavorite,
-    homeViewModel: HomeViewModel
+    movieFavorite: MovieFavorite
 ) {
     val context = LocalContext.current
 

@@ -1,6 +1,6 @@
 package com.juanje.themoviesapp.ui.screens.detail
 
-import com.juanje.data.repositories.MovieRepository
+import com.juanje.data.repositories.MovieRepositoryImpl
 import com.juanje.themoviesapp.ui.screens.common.CoroutinesTestRule
 import com.juanje.themoviesapp.ui.screens.common.FakeAppIdlingResource
 import com.juanje.themoviesapp.ui.screens.common.FakeFavoriteLocalDataSource
@@ -9,10 +9,13 @@ import com.juanje.themoviesapp.ui.screens.common.FakeMovieRemoteDataSource
 import com.juanje.themoviesapp.ui.screens.common.fakeId
 import com.juanje.themoviesapp.ui.screens.common.fakeUserName
 import com.juanje.usecases.LoadMovie
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.*
-import org.junit.*
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.junit.MockitoJUnitRunner
 
@@ -21,8 +24,7 @@ import org.mockito.junit.MockitoJUnitRunner
 class DetailViewModelTest {
     private val apiKey = "d30e1f350220f9aad6c4110df385d380"
 
-    private lateinit var testDispatcher: CoroutineDispatcher
-    private lateinit var movieRepository: MovieRepository
+    private lateinit var movieRepository: MovieRepositoryImpl
     private lateinit var loadMovie: LoadMovie
     private lateinit var detailViewModel: DetailViewModel
 
@@ -31,9 +33,7 @@ class DetailViewModelTest {
 
     @Before
     fun setUp() {
-        testDispatcher = coroutinesTestRule.testDispatcher
-
-        movieRepository = MovieRepository(
+        movieRepository = MovieRepositoryImpl(
             movieLocalDataSource = FakeMovieLocalDataSource(),
             movieRemoteDataSource = FakeMovieRemoteDataSource(),
             favoriteLocalDataSource = FakeFavoriteLocalDataSource(),
@@ -42,7 +42,8 @@ class DetailViewModelTest {
         loadMovie = LoadMovie(movieRepository)
         detailViewModel = DetailViewModel(
             loadMovie = loadMovie,
-            idlingResource = FakeAppIdlingResource()
+            idlingResource = FakeAppIdlingResource(),
+            mainDispatcher = coroutinesTestRule.testDispatcher
         )
     }
 

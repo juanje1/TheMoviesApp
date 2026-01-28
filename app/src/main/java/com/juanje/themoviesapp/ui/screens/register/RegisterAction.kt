@@ -14,12 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
-import com.juanje.domain.User
+import com.juanje.domain.dataclasses.User
 import com.juanje.themoviesapp.R
 
 @Composable
 fun RegisterAction(
-    onRegister: () -> Unit,
     onCancel: () -> Unit,
     registerViewModel: RegisterViewModel,
     user: User

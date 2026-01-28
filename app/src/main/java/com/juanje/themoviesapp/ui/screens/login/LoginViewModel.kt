@@ -2,11 +2,11 @@ package com.juanje.themoviesapp.ui.screens.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.juanje.domain.User
+import com.juanje.domain.dataclasses.User
 import com.juanje.themoviesapp.common.AppIdlingResource
 import com.juanje.themoviesapp.common.toErrorRes
 import com.juanje.themoviesapp.common.trackLoading
-import com.juanje.themoviesapp.data.MainDispatcher
+import com.juanje.domain.MainDispatcher
 import com.juanje.usecases.LoadUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -53,7 +53,7 @@ class LoginViewModel @Inject constructor(
     }
 
     data class UiState(
-        val user: User ?= null,
+        val user: User?= null,
         val timeExecution: Int = 0,
         val isUserValid: Boolean = false,
         val error: Int? = null

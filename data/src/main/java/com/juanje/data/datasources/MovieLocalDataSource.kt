@@ -1,10 +1,9 @@
 package com.juanje.data.datasources
 
-import com.juanje.domain.Movie
+import com.juanje.domain.dataclasses.Movie
 import kotlinx.coroutines.flow.Flow
 
 interface MovieLocalDataSource {
-
     fun getMovies(userName: String): Flow<List<Movie>>
     fun getMovie(userName: String, movieId: Int): Flow<Movie>
     suspend fun count(userName: String): Int

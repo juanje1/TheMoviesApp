@@ -37,7 +37,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.juanje.domain.User
+import com.juanje.domain.dataclasses.User
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.common.showMessage
 import com.juanje.themoviesapp.ui.screens.common.fields.email
@@ -129,7 +129,6 @@ fun RegisterScreen(
                     val password = password(registerViewModel)
 
                     RegisterAction(
-                        onRegister = onRegister,
                         onCancel = onLogin,
                         registerViewModel = registerViewModel,
                         user = User(userName, firstName, lastName, email, password)

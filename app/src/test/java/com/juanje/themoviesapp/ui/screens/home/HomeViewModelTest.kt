@@ -1,6 +1,6 @@
 package com.juanje.themoviesapp.ui.screens.home
 
-import com.juanje.data.repositories.MovieRepository
+import com.juanje.data.repositories.MovieRepositoryImpl
 import com.juanje.themoviesapp.common.NetworkConnectivityObserver
 import com.juanje.themoviesapp.ui.screens.common.CoroutinesTestRule
 import com.juanje.themoviesapp.ui.screens.common.FakeAppIdlingResource
@@ -29,7 +29,7 @@ import org.mockito.kotlin.whenever
 class HomeViewModelTest {
     private val apiKey = "d30e1f350220f9aad6c4110df385d380"
     private lateinit var favoriteLocalDataSource: FakeFavoriteLocalDataSource
-    private lateinit var movieRepository: MovieRepository
+    private lateinit var movieRepository: MovieRepositoryImpl
     private lateinit var loadMovie: LoadMovie
     private lateinit var homeViewModel: HomeViewModel
 
@@ -44,7 +44,7 @@ class HomeViewModelTest {
         whenever(networkConnectivityObserver.observe()).thenReturn(flowOf(true))
         favoriteLocalDataSource = FakeFavoriteLocalDataSource()
 
-        movieRepository = MovieRepository(
+        movieRepository = MovieRepositoryImpl(
             movieLocalDataSource = FakeMovieLocalDataSource(),
             movieRemoteDataSource = FakeMovieRemoteDataSource(),
             favoriteLocalDataSource = favoriteLocalDataSource,

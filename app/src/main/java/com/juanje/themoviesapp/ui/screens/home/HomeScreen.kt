@@ -127,8 +127,7 @@ fun HomeScreen(
                         HomeItem(
                             onDetail = onDetail,
                             onFavourite = { homeViewModel.updateMovie(movieFavorite.movie) },
-                            movieFavorite = movieFavorite,
-                            homeViewModel = homeViewModel
+                            movieFavorite = movieFavorite
                         )
                     }
                 }

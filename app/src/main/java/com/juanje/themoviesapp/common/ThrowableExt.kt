@@ -1,6 +1,6 @@
 package com.juanje.themoviesapp.common
 
-import com.juanje.domain.AppError
+import com.juanje.domain.common.AppError
 import com.juanje.themoviesapp.R
 
 fun Throwable.toErrorRes(): Int = when (this) {

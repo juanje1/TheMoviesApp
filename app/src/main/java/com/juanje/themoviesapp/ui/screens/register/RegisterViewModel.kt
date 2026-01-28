@@ -2,13 +2,13 @@ package com.juanje.themoviesapp.ui.screens.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.juanje.domain.RegistrationField
-import com.juanje.domain.User
+import com.juanje.domain.common.RegistrationField
+import com.juanje.domain.dataclasses.User
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.common.AppIdlingResource
 import com.juanje.themoviesapp.common.toErrorRes
 import com.juanje.themoviesapp.common.trackLoading
-import com.juanje.themoviesapp.data.MainDispatcher
+import com.juanje.domain.MainDispatcher
 import com.juanje.usecases.LoadUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher

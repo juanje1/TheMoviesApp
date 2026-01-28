@@ -4,9 +4,9 @@ import android.database.sqlite.SQLiteException
 import com.juanje.data.datasources.FavoriteLocalDataSource
 import com.juanje.data.datasources.MovieLocalDataSource
 import com.juanje.data.datasources.MovieRemoteDataSource
-import com.juanje.domain.AppError
-import com.juanje.domain.Favorite
-import com.juanje.domain.Movie
+import com.juanje.domain.common.AppError
+import com.juanje.domain.dataclasses.Favorite
+import com.juanje.domain.dataclasses.Movie
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -33,7 +33,7 @@ class MovieRepositoryTest {
 
     private val apiKey = "d30e1f350220f9aad6c4110df385d380"
 
-    private lateinit var movieRepository: MovieRepository
+    private lateinit var movieRepository: MovieRepositoryImpl
 
     @Mock
     private lateinit var movieLocalDataSource: MovieLocalDataSource
@@ -46,7 +46,7 @@ class MovieRepositoryTest {
 
     @Before
     fun setup() {
-        movieRepository = MovieRepository(
+        movieRepository = MovieRepositoryImpl(
             movieLocalDataSource = movieLocalDataSource,
             movieRemoteDataSource = movieRemoteDataSource,
             favoriteLocalDataSource = favoriteLocalDataSource,

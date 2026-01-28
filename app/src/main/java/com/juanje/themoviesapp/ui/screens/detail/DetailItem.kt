@@ -25,15 +25,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import coil.compose.AsyncImage
-import com.juanje.domain.MovieFavorite
+import com.juanje.domain.dataclasses.MovieFavorite
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.common.IMAGE_ASPECT_RATIO
 
 @Composable
 fun DetailItem(
     padding: PaddingValues,
-    movieFavorite: MovieFavorite,
-    detailViewModel: DetailViewModel
+    movieFavorite: MovieFavorite
 ) {
     val context = LocalContext.current
 

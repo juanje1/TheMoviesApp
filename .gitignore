@@ -7,3 +7,4 @@
 /captures
 .externalNativeBuild
 1.json
+*.json

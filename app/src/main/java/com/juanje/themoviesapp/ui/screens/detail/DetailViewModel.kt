@@ -2,11 +2,11 @@ package com.juanje.themoviesapp.ui.screens.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.juanje.domain.MovieFavorite
+import com.juanje.domain.dataclasses.MovieFavorite
 import com.juanje.themoviesapp.common.AppIdlingResource
 import com.juanje.themoviesapp.common.toErrorRes
 import com.juanje.themoviesapp.common.trackLoading
-import com.juanje.themoviesapp.data.MainDispatcher
+import com.juanje.domain.MainDispatcher
 import com.juanje.usecases.LoadMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -64,7 +64,7 @@ class DetailViewModel @Inject constructor(
     }
 
     data class UiState(
-        val movie: MovieFavorite ?= null,
+        val movie: MovieFavorite?= null,
         val error: Int? = null
     )
 }

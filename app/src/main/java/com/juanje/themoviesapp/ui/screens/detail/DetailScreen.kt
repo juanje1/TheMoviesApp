@@ -76,8 +76,7 @@ fun DetailScreen(
         ) { padding ->
             DetailItem(
                 padding = padding,
-                movieFavorite = movieFavorite,
-                detailViewModel = detailViewModel
+                movieFavorite = movieFavorite
             )
         }
     }

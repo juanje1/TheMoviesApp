@@ -2,8 +2,8 @@ package com.juanje.data.repositories
 
 import android.database.sqlite.SQLiteException
 import com.juanje.data.datasources.UserLocalDataSource
-import com.juanje.domain.AppError
-import com.juanje.domain.User
+import com.juanje.domain.common.AppError
+import com.juanje.domain.dataclasses.User
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -28,14 +28,14 @@ class UserRepositoryTest {
         private const val wrongPassword: String = "1234"
     }
 
-    private lateinit var userRepository: UserRepository
+    private lateinit var userRepository: UserRepositoryImpl
 
     @Mock
     private lateinit var userLocalDataSource: UserLocalDataSource
 
     @Before
     fun setup() {
-        userRepository = UserRepository(userLocalDataSource)
+        userRepository = UserRepositoryImpl(userLocalDataSource)
     }
 
     @Test

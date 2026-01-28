@@ -3,9 +3,9 @@ package com.juanje.themoviesapp.ui.screens.common
 import com.juanje.data.datasources.FavoriteLocalDataSource
 import com.juanje.data.datasources.MovieLocalDataSource
 import com.juanje.data.datasources.MovieRemoteDataSource
-import com.juanje.domain.Favorite
-import com.juanje.domain.Movie
-import com.juanje.domain.MovieFavorite
+import com.juanje.domain.dataclasses.Favorite
+import com.juanje.domain.dataclasses.Movie
+import com.juanje.domain.dataclasses.MovieFavorite
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map

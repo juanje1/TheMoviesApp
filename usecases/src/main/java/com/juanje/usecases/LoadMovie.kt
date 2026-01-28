@@ -1,9 +1,12 @@
 package com.juanje.usecases
 
-import com.juanje.data.repositories.MovieRepository
-import com.juanje.domain.Movie
+import com.juanje.domain.dataclasses.Movie
+import com.juanje.domain.repositories.MovieRepository
+import javax.inject.Inject
 
-class LoadMovie(private val movieRepository: MovieRepository) {
+class LoadMovie @Inject constructor(
+    private val movieRepository: MovieRepository
+) {
 
     fun invokeGetMovieFavorites(userName: String) =
         movieRepository.getMovieFavorites(userName)

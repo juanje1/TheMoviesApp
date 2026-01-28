@@ -31,7 +31,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import com.juanje.domain.RegistrationField
+import com.juanje.domain.common.RegistrationField
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.ui.screens.register.RegisterViewModel
 import kotlinx.coroutines.launch

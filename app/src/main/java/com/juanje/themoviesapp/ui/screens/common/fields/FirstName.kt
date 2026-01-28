@@ -27,7 +27,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import com.juanje.domain.RegistrationField
+import com.juanje.domain.common.RegistrationField
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.ui.screens.register.RegisterViewModel
 import kotlinx.coroutines.launch

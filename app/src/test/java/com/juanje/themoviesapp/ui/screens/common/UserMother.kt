@@ -1,6 +1,6 @@
 package com.juanje.themoviesapp.ui.screens.common
 
-import com.juanje.domain.User
+import com.juanje.domain.dataclasses.User
 
 object UserMother {
 

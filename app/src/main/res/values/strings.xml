@@ -1,7 +1,7 @@
 <resources>
     <!-- General Strings -->
     <string name="app_name">TheMoviesApp</string>
-    <string name="name_database">TheMoviesApp-db</string>
+    <string name="database_name">TheMoviesApp-db</string>
     <string name="base_url">https://api.themoviedb.org/3/</string>
     <string name="image_url">https://image.tmdb.org/t/p/w185</string>
 
