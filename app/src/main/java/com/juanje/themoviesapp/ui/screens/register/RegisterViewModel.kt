@@ -12,6 +12,9 @@ import com.juanje.domain.MainDispatcher
 import com.juanje.usecases.LoadUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -28,16 +31,24 @@ class RegisterViewModel @Inject constructor(
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state
 
-    fun onRegister(user: User) = viewModelScope.launch(mainDispatcher) {
-        _state.value = UiState(userValid = true)
+    private var searchJob: Job? = null
+
+    private fun registerHandler(onCleanup: () -> Unit = {}) = CoroutineExceptionHandler { _, e ->
+        _state.update { it.copy(error = e.toErrorRes()) }
+        onCleanup()
+    }
+
+    fun onRegister(user: User) = viewModelScope.launch(mainDispatcher + registerHandler {
+        _state.update { it.copy(isRegistering = false) }
+    }) {
+        if (_state.value.isRegistering) return@launch
+
+        _state.update { it.copy(isRegistering = true, actionFinished = false) }
+
         val localErrors = validateLocalErrors(user)
         _state.update { it.copy(errorMessages = localErrors, userValid = localErrors.isEmpty()) }
 
-        trackLoading(
-            idlingResource = idlingResource,
-            onError = { e -> _state.update { it.copy(error = e.toErrorRes()) } },
-            onFinally = { _state.update { it.copy(actionFinished = true) } }
-        ) {
+        trackLoading(idlingResource = idlingResource) {
             if (_state.value.userValid) {
                 val remoteErrors = validateRemoteErrors(user)
                 _state.update { it.copy(errorMessages = remoteErrors, userValid = remoteErrors.isEmpty()) }
@@ -47,9 +58,12 @@ class RegisterViewModel @Inject constructor(
                 }
             }
         }
+        _state.update { it.copy(isRegistering = false, actionFinished = true) }
     }
 
-    fun onFieldChanged(field: RegistrationField, text: String) = viewModelScope.launch(mainDispatcher) {
+    fun onFieldChanged(field: RegistrationField, text: String) {
+        searchJob?.cancel()
+
         val localError = when (field) {
             RegistrationField.PASSWORD -> if (text.length < 8) R.string.error_password_length else null
             else -> if (text.isEmpty()) R.string.error_field_not_empty else null
@@ -57,7 +71,12 @@ class RegisterViewModel @Inject constructor(
 
         if (localError != null) {
             updateError(field, localError)
-        } else {
+            return
+        }
+
+        searchJob = viewModelScope.launch(mainDispatcher + registerHandler()) {
+            delay(200)
+
             when (field) {
                 RegistrationField.USER_NAME -> existsUserName(field, text)
                 RegistrationField.EMAIL -> existsEmail(field, text)
@@ -110,10 +129,7 @@ class RegisterViewModel @Inject constructor(
     }
 
     private suspend fun existsUserName(field: RegistrationField, text: String) {
-        trackLoading(
-            idlingResource = idlingResource,
-            onError = { e -> _state.update { it.copy(error = e.toErrorRes()) } }
-        ) {
+        trackLoading(idlingResource = idlingResource) {
             val exists = loadUser.invokeExistsUserName(text)
 
             if (exists) {
@@ -125,10 +141,7 @@ class RegisterViewModel @Inject constructor(
     }
 
     private suspend fun existsEmail(field: RegistrationField, text: String) {
-        trackLoading(
-            idlingResource = idlingResource,
-            onError = { e -> _state.update { it.copy(error = e.toErrorRes()) } }
-        ) {
+        trackLoading(idlingResource = idlingResource) {
             val exists = loadUser.invokeExistsEmail(text)
 
             if (exists) {
@@ -150,6 +163,7 @@ class RegisterViewModel @Inject constructor(
     data class UiState(
         val actionFinished: Boolean = false,
         val userValid: Boolean = false,
+        val isRegistering: Boolean = false,
         val errorMessages: Map<RegistrationField, Int> = emptyMap(),
         val error: Int? = null
     )

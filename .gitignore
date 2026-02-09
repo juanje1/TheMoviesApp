@@ -6,5 +6,5 @@
 /build
 /captures
 .externalNativeBuild
-1.json
 *.json
+*.log

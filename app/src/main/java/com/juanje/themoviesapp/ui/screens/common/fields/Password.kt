@@ -15,12 +15,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -34,18 +35,26 @@ import androidx.compose.ui.text.input.VisualTransformation
 import com.juanje.domain.common.RegistrationField
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.ui.screens.register.RegisterViewModel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.filter
 
 @Composable
 fun password(registerViewModel: RegisterViewModel): String {
     var passwordText by rememberSaveable { mutableStateOf("") }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
+    var isDirty by rememberSaveable { mutableStateOf(false) }
 
     val stateRegister by registerViewModel.state.collectAsState()
 
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        snapshotFlow { passwordText }
+            .filter { isDirty }
+            .collect { text ->
+                registerViewModel.onFieldChanged(RegistrationField.PASSWORD, text)
+            }
+    }
 
     OutlinedTextField(
         modifier = Modifier
@@ -56,9 +65,7 @@ fun password(registerViewModel: RegisterViewModel): String {
         value = passwordText,
         onValueChange = {
             passwordText = it
-            scope.launch {
-                registerViewModel.onFieldChanged(RegistrationField.PASSWORD, passwordText)
-            }
+            isDirty = true
         },
         label = { Text(text = context.getString(R.string.register_password_label)) },
         shape = RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_small)),

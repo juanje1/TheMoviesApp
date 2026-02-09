@@ -104,7 +104,12 @@ fun LoginScreen(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackBarHostState,
+                modifier = Modifier.testTag(context.getString(R.string.snack_bar_host_test))
+            )
+       }
     ) {
         Box(
             modifier = Modifier
@@ -232,6 +237,7 @@ fun LoginScreen(
                                 )
                             },
                             shape = RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_medium).value.toInt()),
+                            enabled = !loginState.isLogging,
                         ) {
                             Text(
                                 text = context.getString(R.string.login_login_button).uppercase()

@@ -10,6 +10,7 @@ import com.juanje.domain.MainDispatcher
 import com.juanje.usecases.LoadUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -26,17 +27,27 @@ class LoginViewModel @Inject constructor(
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state
 
-    fun onLogin(email: String, password: String) = viewModelScope.launch(mainDispatcher) {
-        trackLoading(
-            idlingResource = idlingResource,
-            onError = { e -> _state.update { it.copy(error = e.toErrorRes()) } }
-        ) {
+    private fun loginHandler(onCleanup: () -> Unit = {}) = CoroutineExceptionHandler { _, e ->
+        _state.update { it.copy(error = e.toErrorRes()) }
+        onCleanup()
+    }
+
+    fun onLogin(email: String, password: String) = viewModelScope.launch(mainDispatcher + loginHandler {
+        _state.update { it.copy(isLogging = false) }
+    }) {
+
+        if (_state.value.isLogging) return@launch
+
+        _state.update { it.copy(isLogging = true, error = null) }
+
+        trackLoading(idlingResource = idlingResource) {
             val user = loadUser.invokeGetUser(email, password)
 
             _state.value = UiState(
                 user = user,
                 timeExecution = state.value.timeExecution + 1,
-                isUserValid = user.getIsUserValid(email, password)
+                isUserValid = user.getIsUserValid(email, password),
+                isLogging = false
             )
         }
     }
@@ -56,6 +67,7 @@ class LoginViewModel @Inject constructor(
         val user: User?= null,
         val timeExecution: Int = 0,
         val isUserValid: Boolean = false,
+        val isLogging: Boolean = false,
         val error: Int? = null
     )
 }

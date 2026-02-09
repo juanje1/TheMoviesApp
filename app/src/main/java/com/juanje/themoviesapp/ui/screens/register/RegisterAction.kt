@@ -10,6 +10,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -23,6 +25,8 @@ fun RegisterAction(
     registerViewModel: RegisterViewModel,
     user: User
 ) {
+    val registerState by registerViewModel.state.collectAsState()
+
     val context = LocalContext.current
 
     Row(
@@ -37,7 +41,8 @@ fun RegisterAction(
                 .height(dimensionResource(R.dimen.button_height_medium))
                 .testTag(context.getString(R.string.register_register_test)),
             onClick = { registerViewModel.onRegister(user) },
-            shape = RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_medium))
+            shape = RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_medium)),
+            enabled = !registerState.isRegistering,
         ) {
             Text(
                 text = context.getString(R.string.register_button).uppercase()

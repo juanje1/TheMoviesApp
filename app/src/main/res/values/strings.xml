@@ -59,6 +59,7 @@
     <string name="detail_movie_title_test">movieTitleDetail</string>
     <string name="detail_movie_overview_test">movieOverviewDetail</string>
     <string name="detail_movie_favourite_test">movieFavouriteDetail</string>
+    <string name="snack_bar_host_test">snackBarHost</string>
     <string name="combined_loading_idling_resource">combinedLoadingIdlingResource</string>
 
     <!-- TopAppBar Strings -->

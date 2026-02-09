@@ -57,10 +57,9 @@ abstract class FrameworkModule {
         fun theMoviesAppDatabaseProvider(
             @ApplicationContext applicationContext: Context,
             @Named("databaseName") databaseName: String
-        )
-                : TheMoviesAppDatabase = Room.databaseBuilder(
-            applicationContext,
-            TheMoviesAppDatabase::class.java,
+        ): TheMoviesAppDatabase = Room.databaseBuilder(
+            context = applicationContext,
+            klass = TheMoviesAppDatabase::class.java,
             name = databaseName
         ).build()
 

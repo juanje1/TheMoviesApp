@@ -22,6 +22,7 @@ interface MovieDao {
     @Query("DELETE FROM MovieDatabase WHERE userName = :userName")
     suspend fun deleteAll(userName: String)
 
+    @Transaction
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAll(movies: List<MovieDatabase>)
 

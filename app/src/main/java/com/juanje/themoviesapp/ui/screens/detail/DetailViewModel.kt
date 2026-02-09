@@ -2,14 +2,15 @@ package com.juanje.themoviesapp.ui.screens.detail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.juanje.domain.MainDispatcher
 import com.juanje.domain.dataclasses.MovieFavorite
 import com.juanje.themoviesapp.common.AppIdlingResource
 import com.juanje.themoviesapp.common.toErrorRes
-import com.juanje.themoviesapp.common.trackLoading
-import com.juanje.domain.MainDispatcher
+import com.juanje.themoviesapp.common.trackFlow
 import com.juanje.usecases.LoadMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -34,22 +35,20 @@ class DetailViewModel @Inject constructor(
     private data class DetailArgs(val userName: String, val movieId: Int)
     private val _argsFlow = MutableStateFlow<DetailArgs?>(null)
 
+    private fun detailHandler(onCleanup: () -> Unit = {}) = CoroutineExceptionHandler { _, e ->
+        _state.update { it.copy(error = e.toErrorRes()) }
+        onCleanup()
+    }
+
     init {
         observeMovieFavorite()
     }
 
-    private fun observeMovieFavorite() = viewModelScope.launch(mainDispatcher) {
+    private fun observeMovieFavorite() = viewModelScope.launch(mainDispatcher + detailHandler()) {
         val args = _argsFlow.filterNotNull().first()
 
-        trackLoading(
-            idlingResource = idlingResource,
-            onError = { e -> _state.update { it.copy(error = e.toErrorRes()) } }
-        ) {
-            val initialFavorite = loadMovie.invokeGetMovieFavorite(args.userName, args.movieId).first()
-            _state.update { it.copy(movie = initialFavorite) }
-        }
-
         loadMovie.invokeGetMovieFavorite(args.userName, args.movieId)
+            .trackFlow(idlingResource)
             .onEach { movieFavorite -> _state.update { it.copy(movie = movieFavorite) } }
             .catch { e -> _state.update { it.copy(error = e.toErrorRes()) } }
             .launchIn(viewModelScope)

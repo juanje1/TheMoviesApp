@@ -37,11 +37,13 @@ import com.juanje.themoviesapp.common.PAGE_THRESHOLD
 import com.juanje.themoviesapp.common.showMessage
 import com.juanje.themoviesapp.ui.screens.common.dialogs.LogoutAlertDialog
 import com.juanje.themoviesapp.ui.screens.common.others.MyTopAppBar
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
 @Composable
 fun HomeScreen(
     onLogin: () -> Unit,
@@ -64,6 +66,7 @@ fun HomeScreen(
 
     LaunchedEffect(listState, homeState.isGettingMovies) {
         snapshotFlow { listState.firstVisibleItemIndex }
+            .debounce(300)
             .map { index ->
                 val totalItemsCount = listState.layoutInfo.totalItemsCount
                 val threshold = totalItemsCount - PAGE_THRESHOLD
@@ -98,7 +101,12 @@ fun HomeScreen(
                 )
             }
         },
-        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackBarHostState,
+                modifier = Modifier.testTag(context.getString(R.string.snack_bar_host_test))
+            )
+        }
     ) { padding ->
         PullToRefreshBox(
             isRefreshing = homeState.isRefreshingMovies,

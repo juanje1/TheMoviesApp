@@ -12,12 +12,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
@@ -30,17 +31,25 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.juanje.domain.common.RegistrationField
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.ui.screens.register.RegisterViewModel
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.filter
 
 @Composable
 fun firstName(registerViewModel: RegisterViewModel): String {
     var firstNameText by rememberSaveable { mutableStateOf("") }
+    var isDirty by rememberSaveable { mutableStateOf(false) }
 
     val stateRegister by registerViewModel.state.collectAsState()
 
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        snapshotFlow { firstNameText }
+            .filter { isDirty }
+            .collect { text ->
+                registerViewModel.onFieldChanged(RegistrationField.FIRST_NAME, text)
+            }
+    }
 
     OutlinedTextField(
         modifier = Modifier
@@ -51,9 +60,7 @@ fun firstName(registerViewModel: RegisterViewModel): String {
         value = firstNameText,
         onValueChange = {
             firstNameText = it
-            scope.launch {
-                registerViewModel.onFieldChanged(RegistrationField.FIRST_NAME, firstNameText)
-            }
+            isDirty = true
         },
         label = { Text(text = context.getString(R.string.register_first_name_label)) },
         shape = RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_small)),

@@ -2,10 +2,12 @@ package com.juanje.themoviesapp
 
 import android.content.Context
 import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
+import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
@@ -71,36 +73,30 @@ class InstrumentedTest {
     fun navigationToMovieDetail() {
         // 1. Login -> Register
         checkLoginFields()
-        composeTestRule.onNodeWithTag(context.getString(R.string.login_register_test), useUnmergedTree = true)
-            .performClick()
+        composeTestRule.onTag(context.getString(R.string.login_register_test)).performClick()
         composeTestRule.waitForIdle()
 
         // 2. Register
         checkRegisterFields()
         fillRegisterFields()
-        composeTestRule.onNodeWithTag(context.getString(R.string.register_register_test), useUnmergedTree = true)
-            .performScrollTo()
+        composeTestRule.onTag(context.getString(R.string.register_register_test)).performScrollTo()
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithTag(context.getString(R.string.register_register_test), useUnmergedTree = true)
-            .performClick()
+        composeTestRule.onTag(context.getString(R.string.register_register_test)).performClick()
         composeTestRule.waitForIdle()
 
         // 3. Login
         checkLoginFields()
         fillLoginFields()
-        composeTestRule.onNodeWithTag(context.getString(R.string.login_login_test), useUnmergedTree = true)
-            .performClick()
+        composeTestRule.onTag(context.getString(R.string.login_login_test)).performClick()
         composeTestRule.waitForIdle()
 
         // 4. Home
-        checkHomeFields(movieId)
+        if (!checkHomeFields(movieId)) return
 
         // 5. Home -> Detail
-        composeTestRule.onNodeWithTag(context.getString(R.string.home_movie_list_test)+"_$movieId")
-            .performScrollTo()
+        composeTestRule.onTag(context.getString(R.string.home_movie_list_test)+"_$movieId").performScrollTo()
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithTag(context.getString(R.string.home_movie_list_test)+"_$movieId")
-            .performClick()
+        composeTestRule.onTag(context.getString(R.string.home_movie_list_test)+"_$movieId").performClick()
         composeTestRule.waitForIdle()
 
         // 6. Detail
@@ -111,16 +107,12 @@ class InstrumentedTest {
         val tags = CheckLoginRobot.getFields(context)
 
         composeTestRule.waitUntil(timeoutMillis) {
-            composeTestRule.onAllNodesWithTag(tags.first(), useUnmergedTree = true)
-                .fetchSemanticsNodes()
-                .isNotEmpty()
+            composeTestRule.onAllTags(tags.first()).fetchSemanticsNodes().isNotEmpty()
         }
-
         composeTestRule.waitForIdle()
 
         tags.forEach { tag ->
-            composeTestRule.onNodeWithTag(tag, useUnmergedTree = true)
-                .scrollToAndAssertDisplayed(composeTestRule)
+            composeTestRule.onTag(tag).scrollToAndAssertDisplayed(composeTestRule)
         }
     }
 
@@ -128,16 +120,12 @@ class InstrumentedTest {
         val tags = CheckRegisterRobot.getFields(context)
 
         composeTestRule.waitUntil(timeoutMillis) {
-            composeTestRule.onAllNodesWithTag(tags.first(), useUnmergedTree = true)
-                .fetchSemanticsNodes()
-                .isNotEmpty()
+            composeTestRule.onAllTags(tags.first()).fetchSemanticsNodes().isNotEmpty()
         }
-
         composeTestRule.waitForIdle()
 
         tags.forEach { tag ->
-            composeTestRule.onNodeWithTag(tag, useUnmergedTree = true)
-                .scrollToAndAssertDisplayed(composeTestRule)
+            composeTestRule.onTag(tag).scrollToAndAssertDisplayed(composeTestRule)
         }
     }
 
@@ -145,12 +133,10 @@ class InstrumentedTest {
         val tags = FillLoginRobot.getFields(context, id)
 
         tags.forEach { (tag, value) ->
-            composeTestRule.onNodeWithTag(tag, useUnmergedTree = true)
-                .scrollToAndType(composeTestRule, value)
+            composeTestRule.onTag(tag).scrollToAndType(composeTestRule, value)
         }
 
-        composeTestRule.onNodeWithTag(context.getString(R.string.login_password_test), useUnmergedTree = true)
-            .performImeAction()
+        composeTestRule.onTag(context.getString(R.string.login_password_test)).performImeAction()
         composeTestRule.waitForIdle()
     }
 
@@ -158,57 +144,69 @@ class InstrumentedTest {
         val tags = FillRegisterRobot.getFields(context, id)
 
         tags.forEach { (tag, value) ->
-            composeTestRule.onNodeWithTag(tag, useUnmergedTree = true)
-                .scrollToAndType(composeTestRule, value)
+            composeTestRule.onTag(tag).scrollToAndType(composeTestRule, value)
         }
 
-        composeTestRule.onNodeWithTag(context.getString(R.string.register_password_test), useUnmergedTree = true)
-            .performImeAction()
+        composeTestRule.onTag(context.getString(R.string.register_password_test)).performImeAction()
         composeTestRule.waitForIdle()
     }
 
-    private fun checkHomeFields(movieId: Int) {
+    private fun checkHomeFields(movieId: Int): Boolean {
         val loadingSpinner = context.getString(R.string.home_loading_spinner_text)
         val movieListHome = context.getString(R.string.home_movie_list_test)
+        val snackBarHost = context.getString(R.string.snack_bar_host_test)
         val tags = CheckHomeRobot.getFields(context, movieId)
 
-        composeTestRule.waitUntil(timeoutMillis) {
-            composeTestRule.onAllNodesWithTag(loadingSpinner, useUnmergedTree = true)
-                .fetchSemanticsNodes()
-                .isEmpty()
-        }
-
-        composeTestRule.waitForIdle()
+        var hasErrorEncountered = false
 
         composeTestRule.waitUntil(timeoutMillis) {
-            composeTestRule.onAllNodesWithTag(movieListHome, useUnmergedTree = true)
-                .fetchSemanticsNodes()
-                .isNotEmpty()
+            composeTestRule.onAllTags(loadingSpinner).fetchSemanticsNodes().isEmpty()
         }
-
-        composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithTag(movieListHome, useUnmergedTree = true).assertIsDisplayed()
         composeTestRule.waitForIdle()
 
-        tags.forEach { tag ->
-            waitAndAssertItem(tag)
+        composeTestRule.waitUntil(timeoutMillis) {
+            val homeLoaded = composeTestRule.onAllTags(movieListHome).fetchSemanticsNodes().isNotEmpty()
+            val hasError = composeTestRule.onTag(snackBarHost).onChildren().fetchSemanticsNodes().isNotEmpty()
+
+            hasErrorEncountered = hasError
+            homeLoaded || hasError
         }
+        composeTestRule.waitForIdle()
+
+        if (hasErrorEncountered) {
+            composeTestRule.onTag(snackBarHost).assertIsDisplayed()
+            return false
+        }
+
+        composeTestRule.onTag(movieListHome).assertIsDisplayed()
+        composeTestRule.waitForIdle()
+
+        tags.forEach { tag -> waitAndAssertItem(tag) }
+        return true
     }
 
     private fun checkDetailFields(movieId: Int) {
+        val snackBarHost = context.getString(R.string.snack_bar_host_test)
         val tags = CheckDetailRobot.getFields(context, movieId)
 
-        composeTestRule.waitUntil(timeoutMillis) {
-            composeTestRule.onAllNodesWithTag(tags.first(), useUnmergedTree = true)
-                .fetchSemanticsNodes()
-                .isNotEmpty()
-        }
+        var hasErrorEncountered = false
 
+        composeTestRule.waitUntil(timeoutMillis) {
+            val detailLoaded = composeTestRule.onAllTags(tags.first()).fetchSemanticsNodes().isNotEmpty()
+            val hasError = composeTestRule.onTag(snackBarHost).onChildren().fetchSemanticsNodes().isNotEmpty()
+
+            hasErrorEncountered = hasError
+            detailLoaded || hasError
+        }
         composeTestRule.waitForIdle()
 
+        if (hasErrorEncountered) {
+            composeTestRule.onTag(snackBarHost).assertIsDisplayed()
+            return
+        }
+
         tags.forEach { tag ->
-            composeTestRule.onNodeWithTag(tag, useUnmergedTree = true)
-                .scrollToAndAssertDisplayed(composeTestRule)
+            composeTestRule.onTag(tag).scrollToAndAssertDisplayed(composeTestRule)
         }
     }
 
@@ -237,13 +235,17 @@ class InstrumentedTest {
 
     private fun waitAndAssertItem(tag: String) {
         composeTestRule.waitUntil(timeoutMillis) {
-            composeTestRule.onAllNodesWithTag(tag, useUnmergedTree = true)
-                .fetchSemanticsNodes()
-                .isNotEmpty()
+            composeTestRule.onAllTags(tag).fetchSemanticsNodes().isNotEmpty()
         }
-
         composeTestRule.waitForIdle()
-        composeTestRule.onNodeWithTag(tag, useUnmergedTree = true).assertIsDisplayed()
+
+        composeTestRule.onTag(tag).assertIsDisplayed()
         composeTestRule.waitForIdle()
     }
 }
+
+fun SemanticsNodeInteractionsProvider.onTag(tag: String) =
+    onNodeWithTag(tag, useUnmergedTree = true)
+
+fun SemanticsNodeInteractionsProvider.onAllTags(tag: String) =
+    onAllNodesWithTag(tag, useUnmergedTree = true)

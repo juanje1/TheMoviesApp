@@ -16,27 +16,22 @@ class NetworkConnectivityObserver @Inject constructor(
     @ApplicationContext private val context: Context
 ): ConnectivityObserver {
 
-    private val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    private val connectivityManager =
+        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
     override fun observe(): Flow<Boolean> = callbackFlow {
         val callback = object : ConnectivityManager.NetworkCallback() {
 
             override fun onAvailable(network: Network) {
-                val capabilities = connectivityManager.getNetworkCapabilities(network)
-                if (capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)) {
-                    trySend(true)
-                }
+                trySend(true)
             }
 
             override fun onLost(network: Network) {
-                val isAnyInternetAvailable = connectivityManager.activeNetwork != null &&
-                        connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
-                            ?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
-                if (!isAnyInternetAvailable) {
-                    trySend(false)
-                }
+                trySend(isConnected())
             }
         }
+
+        trySend(isConnected())
 
         val request = NetworkRequest.Builder()
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
@@ -48,4 +43,10 @@ class NetworkConnectivityObserver @Inject constructor(
             connectivityManager.unregisterNetworkCallback(callback)
         }
     }.distinctUntilChanged()
+
+    override fun isConnected(): Boolean {
+        val network = connectivityManager.activeNetwork
+        val capabilities = connectivityManager.getNetworkCapabilities(network)
+        return capabilities?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true
+    }
 }
