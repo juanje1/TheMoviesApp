@@ -28,7 +28,7 @@ import kotlin.test.assertFailsWith
 @RunWith(MockitoJUnitRunner::class)
 class MovieRepositoryTest {
     companion object {
-        private const val USERNAME: String = "User 1"
+        private const val USER_NAME: String = "User 1"
     }
 
     private val apiKey = "d30e1f350220f9aad6c4110df385d380"
@@ -57,42 +57,42 @@ class MovieRepositoryTest {
     @Test
     fun `When DB is empty, request the page 1`() = runTest {
         // Given
-        whenever(movieLocalDataSource.count(USERNAME)).thenReturn(0)
-        whenever(movieRemoteDataSource.getMovies(USERNAME, apiKey, 1)).thenReturn(createMovies())
+        whenever(movieLocalDataSource.count(USER_NAME)).thenReturn(0)
+        whenever(movieRemoteDataSource.getMovies(USER_NAME, apiKey, 1)).thenReturn(createMovies())
         whenever(movieLocalDataSource.insertAll(any())).thenReturn(Unit)
 
         // When
-        movieRepository.getAndInsertMovies(USERNAME)
+        movieRepository.getAndInsertMovies(USER_NAME)
 
         // Then
-        verify(movieRemoteDataSource).getMovies(USERNAME, apiKey, 1)
+        verify(movieRemoteDataSource).getMovies(USER_NAME, apiKey, 1)
     }
 
     @Test
     fun `When DB is not empty with 20 movies, request the page 2`() = runTest {
         // Given
-        whenever(movieLocalDataSource.count(USERNAME)).thenReturn(20)
-        whenever(movieRemoteDataSource.getMovies(USERNAME, apiKey, 2)).thenReturn(createMovies(init = 20))
+        whenever(movieLocalDataSource.count(USER_NAME)).thenReturn(20)
+        whenever(movieRemoteDataSource.getMovies(USER_NAME, apiKey, 2)).thenReturn(createMovies(init = 20))
         whenever(movieLocalDataSource.insertAll(any())).thenReturn(Unit)
 
         // When
-        movieRepository.getAndInsertMovies(USERNAME)
+        movieRepository.getAndInsertMovies(USER_NAME)
 
         // Then
-        verify(movieRemoteDataSource).getMovies(USERNAME, apiKey, 2)
+        verify(movieRemoteDataSource).getMovies(USER_NAME, apiKey, 2)
     }
 
     @Test
     fun `When refresh is true, call to refreshMoviesTx and request page 1`() = runTest {
         // Given
-        whenever(movieRemoteDataSource.getMovies(USERNAME, apiKey, 1)).thenReturn(createMovies())
-        whenever(movieLocalDataSource.refreshMoviesTx(eq(USERNAME), any())).thenReturn(Unit)
+        whenever(movieRemoteDataSource.getMovies(USER_NAME, apiKey, 1)).thenReturn(createMovies())
+        whenever(movieLocalDataSource.refreshMoviesTx(eq(USER_NAME), any())).thenReturn(Unit)
 
         // When
-        movieRepository.getAndInsertMovies(USERNAME, true)
+        movieRepository.getAndInsertMovies(USER_NAME, true)
 
         // Then
-        verify(movieLocalDataSource).refreshMoviesTx(eq(USERNAME), any())
+        verify(movieLocalDataSource).refreshMoviesTx(eq(USER_NAME), any())
         verify(movieLocalDataSource, times(0)).count(any())
         verify(movieLocalDataSource, times(0)).insertAll(any())
     }
@@ -100,16 +100,16 @@ class MovieRepositoryTest {
     @Test
     fun `When refresh is false, call to insertAll`() = runTest {
         // Given
-        whenever(movieLocalDataSource.count(USERNAME)).thenReturn(0)
+        whenever(movieLocalDataSource.count(USER_NAME)).thenReturn(0)
         whenever(movieRemoteDataSource.getMovies(any(), any(), any())).thenReturn(createMovies())
         whenever(movieLocalDataSource.insertAll(any())).thenReturn(Unit)
 
         // When
-        movieRepository.getAndInsertMovies(USERNAME)
+        movieRepository.getAndInsertMovies(USER_NAME)
 
         // Then
         verify(movieLocalDataSource).insertAll(any())
-        verify(movieLocalDataSource, times(0)).refreshMoviesTx(eq(USERNAME), any())
+        verify(movieLocalDataSource, times(0)).refreshMoviesTx(eq(USER_NAME), any())
     }
 
     @Test
@@ -118,11 +118,11 @@ class MovieRepositoryTest {
         val count = 40
         val newMovies = createMovies(init = 40)
 
-        whenever(movieLocalDataSource.count(USERNAME)).thenReturn(count)
+        whenever(movieLocalDataSource.count(USER_NAME)).thenReturn(count)
         whenever(movieRemoteDataSource.getMovies(any(), any(), any())).thenReturn(newMovies)
 
         // When
-        movieRepository.getAndInsertMovies(USERNAME)
+        movieRepository.getAndInsertMovies(USER_NAME)
 
         // Then
         val captorList = argumentCaptor<List<Movie>>()
@@ -135,13 +135,13 @@ class MovieRepositoryTest {
     @Test
     fun `When UnknownHostException is thrown, getAndInsertMoves evolve with AppError Network`() = runTest {
         // Given
-        whenever(movieLocalDataSource.count(USERNAME)).thenReturn(0)
+        whenever(movieLocalDataSource.count(USER_NAME)).thenReturn(0)
         doAnswer { throw UnknownHostException() }
             .whenever(movieRemoteDataSource).getMovies(any(), any(), any())
 
         // When & Then
         assertFailsWith<AppError.Network> {
-            movieRepository.getAndInsertMovies(USERNAME)
+            movieRepository.getAndInsertMovies(USER_NAME)
         }
 
         verify(movieLocalDataSource, never()).insertAll(any())
@@ -151,11 +151,11 @@ class MovieRepositoryTest {
     fun `When SQLiteException is thrown, getAndInsertMoves evolve with AppError Database`() = runTest {
         // Given
         doAnswer { throw SQLiteException() }
-            .whenever(movieLocalDataSource).count(USERNAME)
+            .whenever(movieLocalDataSource).count(USER_NAME)
 
         // When & Then
         assertFailsWith<AppError.Database> {
-            movieRepository.getAndInsertMovies(USERNAME)
+            movieRepository.getAndInsertMovies(USER_NAME)
         }
     }
 
@@ -167,7 +167,7 @@ class MovieRepositoryTest {
         val businessId = createFavorite(movieToFavorite).businessId
 
         // When
-        movieRepository.updateMovieFavorite(USERNAME, movieToFavorite, true)
+        movieRepository.updateMovieFavorite(USER_NAME, movieToFavorite, true)
 
         // Then
         val captor = argumentCaptor<Favorite>()
@@ -185,7 +185,7 @@ class MovieRepositoryTest {
         val businessId = createFavorite(movieToFavorite).businessId
 
         // When
-        movieRepository.updateMovieFavorite(USERNAME, movieToFavorite, false)
+        movieRepository.updateMovieFavorite(USER_NAME, movieToFavorite, false)
 
         // Then
         verify(favoriteLocalDataSource).deleteFavorite(businessId)
@@ -203,7 +203,7 @@ class MovieRepositoryTest {
 
         // When & Then
         assertFailsWith<AppError.Database> {
-            movieRepository.updateMovieFavorite(USERNAME, movieToFavorite, false)
+            movieRepository.updateMovieFavorite(USER_NAME, movieToFavorite, false)
         }
     }
 
@@ -218,7 +218,7 @@ class MovieRepositoryTest {
                     overview = "Overview $i",
                     posterPath = "Poster Path $i",
                     releaseDate = "Release Date $i",
-                    userName = USERNAME,
+                    userName = USER_NAME,
                     displayOrder = i
                 )
             )
@@ -228,5 +228,5 @@ class MovieRepositoryTest {
     }
 
     private fun createFavorite(movie: Movie) =
-        Favorite(businessId = "$USERNAME|${movie.title}|${movie.releaseDate}")
+        Favorite(businessId = "$USER_NAME|${movie.title}|${movie.releaseDate}")
 }

@@ -24,8 +24,8 @@ import kotlin.test.assertFailsWith
 @RunWith(MockitoJUnitRunner::class)
 class UserRepositoryTest {
     companion object {
-        private const val wrongEmail: String = "wrong@email.com"
-        private const val wrongPassword: String = "1234"
+        private const val WRONG_EMAIL: String = "wrong@email.com"
+        private const val WRONG_PASSWORD: String = "1234"
     }
 
     private lateinit var userRepository: UserRepositoryImpl
@@ -41,13 +41,13 @@ class UserRepositoryTest {
     @Test
     fun `When the user does not exist in the database, getUser returns null`() = runTest {
         // Given
-        whenever(userLocalDataSource.getUser(wrongEmail, wrongPassword)).thenReturn(null)
+        whenever(userLocalDataSource.getUser(WRONG_EMAIL, WRONG_PASSWORD)).thenReturn(null)
 
         // When
-        val result = userRepository.getUser(wrongEmail, wrongPassword)
+        val result = userRepository.getUser(WRONG_EMAIL, WRONG_PASSWORD)
 
         // Then
-        verify(userLocalDataSource).getUser(wrongEmail, wrongPassword)
+        verify(userLocalDataSource).getUser(WRONG_EMAIL, WRONG_PASSWORD)
         assertNull(result)
     }
 
