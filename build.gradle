@@ -1,27 +1,28 @@
-plugins {
-    // Gradle
-    id 'com.android.application' version '8.8.2' apply false
-    id 'com.android.library' version '8.8.2' apply false
+    plugins {
+        // Gradle
+        alias(libs.plugins.android.application) apply false
+        alias(libs.plugins.android.library) apply false
 
-    // Kotlin
-    id 'org.jetbrains.kotlin.android' version '2.1.0' apply false
-    id 'org.jetbrains.kotlin.jvm' version '2.1.0' apply false
+        // Kotlin
+        alias(libs.plugins.kotlin.android) apply false
+        alias(libs.plugins.kotlin.jvm) apply false
+        alias(libs.plugins.kotlin.serialization) apply false
 
-    // KSP
-    id 'com.google.devtools.ksp' version '2.1.0-1.0.29' apply false
+        // KSP
+        alias(libs.plugins.ksp) apply false
 
-    // Hilt
-    id 'com.google.dagger.hilt.android' version '2.54' apply false
+        // Hilt
+        alias(libs.plugins.hilt) apply false
 
-    // Compose
-    id 'org.jetbrains.kotlin.plugin.compose' version '2.1.0' apply false
-}
+        // Compose
+        alias(libs.plugins.kotlin.compose) apply false
+    }
 
-subprojects {
-    configurations.configureEach {
-        resolutionStrategy {
-            force 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1'
-            force 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1'
+    subprojects {
+        configurations.configureEach {
+            resolutionStrategy {
+                force libs.kotlinx.coroutines.core.get().toString()
+                force libs.kotlinx.coroutines.android.get().toString()
+            }
         }
     }
-}

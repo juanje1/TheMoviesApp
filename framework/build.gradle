@@ -39,20 +39,22 @@ dependencies {
     implementation project(":data")
     implementation project(":domain")
 
-    implementation "androidx.core:core-ktx:1.12.0"
-    api "androidx.room:room-ktx:2.6.1"
+    implementation libs.androidx.core.ktx
 
-    implementation "com.google.dagger:hilt-android:2.54"
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3"
-    api "com.squareup.okhttp3:logging-interceptor:4.9.0"
-    api "com.squareup.retrofit2:retrofit:2.9.0"
-    api "com.squareup.retrofit2:converter-gson:2.9.0"
+    api libs.androidx.room.ktx
+    ksp libs.androidx.room.compiler
 
-    ksp "androidx.room:room-compiler:2.6.1"
-    ksp "com.google.dagger:hilt-compiler:2.54"
+    implementation libs.hilt.android
+    ksp libs.hilt.compiler
 
-    testImplementation 'junit:junit:4.13.2'
+    implementation libs.kotlinx.serialization.json
 
-    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.7.0'
+    api libs.okhttp.logging
+    api libs.retrofit
+    api libs.retrofit.converter.gson
+
+    testImplementation libs.junit
+
+    androidTestImplementation libs.androidx.test.ext.junit
+    androidTestImplementation libs.androidx.espresso.core
 }
