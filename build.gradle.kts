@@ -1,0 +1,28 @@
+plugins {
+    // Gradle
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+
+    // Kotlin
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+
+    // KSP
+    alias(libs.plugins.ksp) apply false
+
+    // Hilt
+    alias(libs.plugins.hilt) apply false
+
+    // Compose
+    alias(libs.plugins.kotlin.compose) apply false
+}
+
+subprojects {
+    configurations.configureEach {
+        resolutionStrategy {
+            force(libs.kotlinx.coroutines.core.get().toString())
+            force(libs.kotlinx.coroutines.android.get().toString())
+        }
+    }
+}
