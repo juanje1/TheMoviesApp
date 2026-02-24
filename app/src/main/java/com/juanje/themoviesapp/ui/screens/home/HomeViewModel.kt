@@ -1,52 +1,65 @@
 package com.juanje.themoviesapp.ui.screens.home
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
 import com.juanje.domain.MainDispatcher
 import com.juanje.domain.dataclasses.Movie
 import com.juanje.domain.dataclasses.MovieFavorite
 import com.juanje.themoviesapp.common.AppIdlingResource
 import com.juanje.themoviesapp.common.ConnectivityObserver
-import com.juanje.themoviesapp.common.toErrorRes
+import com.juanje.themoviesapp.common.createHandler
 import com.juanje.themoviesapp.common.trackFlow
 import com.juanje.themoviesapp.common.trackLoading
+import com.juanje.themoviesapp.ui.navigation.Screen
 import com.juanje.usecases.LoadMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import java.util.Collections.emptyList
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val loadMovie: LoadMovie,
     private val idlingResource: AppIdlingResource,
     private val connectivityObserver: ConnectivityObserver,
-    @MainDispatcher private val mainDispatcher: CoroutineDispatcher
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(UiState())
+    private val homeArgs = savedStateHandle.toRoute<Screen.Home>()
+
+    private val _state = MutableStateFlow(UiState(userName = homeArgs.userName))
     val state: StateFlow<UiState> = _state
 
-    private val _userNameFlow = MutableStateFlow<String?>(null)
+    private val _userNameFlow = savedStateHandle.getStateFlow<String?>(
+        key = Screen.Home::userName.name,
+        initialValue = homeArgs.userName
+    )
 
-    private fun homeHandler(onCleanup: () -> Unit = {}) = CoroutineExceptionHandler { _, e ->
-        _state.update { it.copy(error = e.toErrorRes()) }
-        onCleanup()
-    }
+    private fun homeHandler(onCleanup: () -> Unit = {}) = createHandler(
+        onUpdateError = { errorRes -> _state.update { it.copy(error = errorRes) } },
+        onCleanup = onCleanup
+    )
 
     init {
-        _state.update {it.copy(isInternetAvailable = connectivityObserver.isConnected()) }
+        _state.update {
+            it.copy(isInternetAvailable = connectivityObserver.isConnected())
+        }
 
         observeConnectivity()
         observeMovieFavorites()
@@ -63,13 +76,13 @@ class HomeViewModel @Inject constructor(
     private fun observeMovieFavorites() = viewModelScope.launch(mainDispatcher + homeHandler {
         _state.update { it.copy(isInitialLoading = false) }
     }) {
-        val userName = _userNameFlow.filterNotNull().first()
-
-        loadMovie.invokeGetMovieFavorites(userName)
-            .trackFlow(idlingResource) { _state.update { it.copy(userName = userName, isInitialLoading = false) } }
-            .onEach { movieList -> _state.update { it.copy(movies = movieList) } }
-            .catch { e -> _state.update { it.copy(userName = userName, isInitialLoading = false, error = e.toErrorRes()) } }
-            .launchIn(this)
+       _userNameFlow
+           .filterNotNull()
+           .flatMapLatest { userName ->
+               loadMovie.invokeGetMovieFavorites(userName)
+                   .trackFlow(idlingResource) { _state.update { it.copy(isInitialLoading = false) } }
+           }.onEach { movieList -> _state.update { it.copy(movies = movieList) } }
+           .collect()
     }
 
     private fun syncMoviesIfNecessary() {
@@ -82,8 +95,7 @@ class HomeViewModel @Inject constructor(
                         loadMovie.invokeGetAndInsertMovies(userName, refresh = true)
                     }
                 }
-            }.catch { e -> _state.update { it.copy(isInitialLoading = false, error = e.toErrorRes()) } }
-            .launchIn(viewModelScope)
+            }.launchIn(viewModelScope.plus(homeHandler { _state.update { it.copy(isInitialLoading = false) } }))
     }
 
     fun getAndInsertMovies(userName: String, refresh: Boolean = false) = viewModelScope.launch(mainDispatcher + homeHandler {
@@ -114,10 +126,6 @@ class HomeViewModel @Inject constructor(
             loadMovie.invokeUpdateMovieFavorite(userName, movie, !favorite)
         }
         _state.update { it.copy(isUpdatingMovies = false) }
-    }
-
-    fun setUserNameFlow(userName: String) {
-        _userNameFlow.value = userName
     }
 
     fun resetError() {

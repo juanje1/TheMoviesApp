@@ -14,9 +14,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.juanje.themoviesapp.R
@@ -28,25 +28,18 @@ import com.juanje.themoviesapp.ui.screens.common.others.MyTopAppBar
 fun DetailScreen(
     navController: NavHostController,
     onLogin: () -> Unit,
-    userName: String,
-    movieId: Int
+    detailViewModel: DetailViewModel = hiltViewModel()
 ) {
     var showLogoutAlertDialog by rememberSaveable { mutableStateOf(false) }
 
-    val detailViewModel: DetailViewModel = hiltViewModel()
     val detailState by detailViewModel.state.collectAsState()
-
-    val context = LocalContext.current
+    val errorMessage = detailState.error?.let { stringResource(it) }
     val coroutineScope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(Unit) {
-        detailViewModel.setArgsFlow(userName, movieId)
-    }
-
-    LaunchedEffect(detailState.error) {
-        detailState.error?.let { resId ->
-            showMessage(coroutineScope, snackBarHostState, context.getString(resId))
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let { message ->
+            showMessage(coroutineScope, snackBarHostState, message)
             detailViewModel.resetError()
         }
     }
@@ -62,15 +55,14 @@ fun DetailScreen(
     detailState.movie?.let { movieFavorite ->
         Scaffold(
             topBar = {
-                val titleMovie: String =
-                    if (movieFavorite.movie.title == null) context.getString(R.string.anonymous_title_movie_text)
-                    else movieFavorite.movie.title!!.ifEmpty { context.getString(R.string.anonymous_title_movie_text) }
+                val titleMovie: String = movieFavorite.movie.title
+                    .ifEmpty { stringResource(R.string.anonymous_title_movie_text) }
 
                 Surface(shadowElevation = dimensionResource(R.dimen.shadow_elevation_topBar)) {
                     MyTopAppBar(
-                        userName = userName,
+                        userName = detailState.userName,
                         titleMovie = titleMovie,
-                        origin = context.getString(R.string.origin_from_other),
+                        origin = stringResource(R.string.origin_from_other),
                         onBack = { navController.popBackStack() },
                         onLogout = { showLogoutAlertDialog = true }
                     )
@@ -79,13 +71,13 @@ fun DetailScreen(
             snackbarHost = {
                 SnackbarHost(
                     hostState = snackBarHostState,
-                    modifier = Modifier.testTag(context.getString(R.string.snack_bar_host_test))
+                    modifier = Modifier.testTag(stringResource(R.string.snack_bar_host_test))
                 )
             }
         ) { padding ->
             DetailItem(
-                padding = padding,
-                movieFavorite = movieFavorite
+                movieFavorite = movieFavorite,
+                padding = padding
             )
         }
     }

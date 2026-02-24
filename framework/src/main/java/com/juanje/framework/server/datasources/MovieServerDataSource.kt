@@ -11,7 +11,5 @@ class MovieServerDataSource @Inject constructor(
 ): MovieRemoteDataSource {
 
     override suspend fun getMovies(userName: String, apiKey: String, page: Int): List<Movie> =
-        movieService.getMovies(apiKey, page)
-            .results
-            .map { it.toMovie(userName) }
+        movieService.getMovies(apiKey, page).results.map { it.toMovie(userName) }
 }

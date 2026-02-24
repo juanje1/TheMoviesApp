@@ -1,7 +1,9 @@
 package com.juanje.themoviesapp.ui.screens.home
 
+import androidx.lifecycle.SavedStateHandle
 import com.juanje.data.repositories.MovieRepositoryImpl
 import com.juanje.themoviesapp.common.NetworkConnectivityObserver
+import com.juanje.themoviesapp.ui.navigation.Screen
 import com.juanje.themoviesapp.ui.screens.common.CoroutinesTestRule
 import com.juanje.themoviesapp.ui.screens.common.FakeAppIdlingResource
 import com.juanje.themoviesapp.ui.screens.common.FakeFavoriteLocalDataSource
@@ -16,16 +18,21 @@ import com.juanje.themoviesapp.ui.screens.common.fakeUserName
 import com.juanje.usecases.LoadMovie
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.*
-import org.junit.*
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert
 import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.whenever
+import org.robolectric.RobolectricTestRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(MockitoJUnitRunner::class)
+@RunWith(RobolectricTestRunner::class)
 class HomeViewModelTest {
     private val apiKey = "d30e1f350220f9aad6c4110df385d380"
     private lateinit var favoriteLocalDataSource: FakeFavoriteLocalDataSource
@@ -41,6 +48,11 @@ class HomeViewModelTest {
 
     @Before
     fun setUp() {
+        MockitoAnnotations.openMocks(this)
+        val savedStateHandle = SavedStateHandle(mapOf(
+            Screen.Home::userName.name to fakeUserName
+        ))
+
         whenever(networkConnectivityObserver.observe()).thenReturn(flowOf(true))
         favoriteLocalDataSource = FakeFavoriteLocalDataSource()
 
@@ -55,14 +67,14 @@ class HomeViewModelTest {
             loadMovie = loadMovie,
             idlingResource = FakeAppIdlingResource(),
             connectivityObserver = networkConnectivityObserver,
-            mainDispatcher = coroutinesTestRule.testDispatcher
+            mainDispatcher = coroutinesTestRule.testDispatcher,
+            savedStateHandle = savedStateHandle
         )
     }
 
     @Test
     fun `Listening to movies flow emits the list of movies from the server without favorites`() = runTest {
         // When
-        homeViewModel.setUserNameFlow(fakeUserName)
         advanceUntilIdle()
 
         // Then
@@ -75,7 +87,6 @@ class HomeViewModelTest {
         val movieFavoriteList = fakeFavoritesId.map { createFakeMovie(it, it) }
 
         // When
-        homeViewModel.setUserNameFlow(fakeUserName)
         advanceUntilIdle()
 
         movieFavoriteList.map { homeViewModel.updateMovie(it) }

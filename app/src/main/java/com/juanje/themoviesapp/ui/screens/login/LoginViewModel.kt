@@ -1,16 +1,18 @@
 package com.juanje.themoviesapp.ui.screens.login
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.toRoute
+import com.juanje.domain.MainDispatcher
 import com.juanje.domain.dataclasses.User
 import com.juanje.themoviesapp.common.AppIdlingResource
-import com.juanje.themoviesapp.common.toErrorRes
+import com.juanje.themoviesapp.common.createHandler
 import com.juanje.themoviesapp.common.trackLoading
-import com.juanje.domain.MainDispatcher
+import com.juanje.themoviesapp.ui.navigation.Screen
 import com.juanje.usecases.LoadUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -21,16 +23,20 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val loadUser: LoadUser,
     private val idlingResource: AppIdlingResource,
-    @MainDispatcher private val mainDispatcher: CoroutineDispatcher
+    @MainDispatcher private val mainDispatcher: CoroutineDispatcher,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    private val loginArgs = savedStateHandle.toRoute<Screen.Login>()
+    val registered = loginArgs.registered
 
     private val _state = MutableStateFlow(UiState())
     val state: StateFlow<UiState> = _state
 
-    private fun loginHandler(onCleanup: () -> Unit = {}) = CoroutineExceptionHandler { _, e ->
-        _state.update { it.copy(error = e.toErrorRes()) }
-        onCleanup()
-    }
+    private fun loginHandler(onCleanup: () -> Unit = {}) = createHandler(
+        onUpdateError = { errorRes -> _state.update { it.copy(error = errorRes) } },
+        onCleanup = onCleanup
+    )
 
     fun onLogin(email: String, password: String) = viewModelScope.launch(mainDispatcher + loginHandler {
         _state.update { it.copy(isLogging = false) }

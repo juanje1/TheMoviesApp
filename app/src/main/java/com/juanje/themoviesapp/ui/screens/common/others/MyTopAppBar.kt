@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
@@ -47,7 +48,7 @@ fun MyTopAppBar(
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (origin == context.getString(R.string.origin_from_other)) {
+                if (origin == stringResource(R.string.origin_from_other)) {
                     VerticalDivider()
                     Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacer_medium)))
                 }
@@ -57,7 +58,7 @@ fun MyTopAppBar(
                             .data(R.drawable.profile)
                             .crossfade(true)
                             .build(),
-                        contentDescription = context.getString(R.string.profile_default_image_description),
+                        contentDescription = stringResource(R.string.profile_default_image_description),
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .clip(CircleShape)
@@ -66,9 +67,9 @@ fun MyTopAppBar(
                     Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacer_medium)))
                     Column {
                         Text(
-                            text = userName.ifEmpty { context.getString(R.string.anonymous_username_text) },
+                            text = userName.ifEmpty { stringResource(R.string.anonymous_username_text) },
                             fontSize = dimensionResource(R.dimen.font_size_medium).value.sp,
-                            maxLines = context.getString(R.string.max_lines).toInt(),
+                            maxLines = stringResource(R.string.max_lines).toInt(),
                             overflow = TextOverflow.Ellipsis
                         )
                     }
@@ -77,7 +78,7 @@ fun MyTopAppBar(
                         Text(
                             text = titleMovie,
                             fontSize = dimensionResource(R.dimen.font_size_medium).value.sp,
-                            maxLines = context.getString(R.string.max_lines).toInt(),
+                            maxLines = stringResource(R.string.max_lines).toInt(),
                             overflow = TextOverflow.Ellipsis
                         )
                     }
@@ -85,11 +86,11 @@ fun MyTopAppBar(
             }
         },
         navigationIcon = {
-            if (origin == context.getString(R.string.origin_from_other)) {
+            if (origin == stringResource(R.string.origin_from_other)) {
                 IconButton(onClick = { onBack() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = context.getString(R.string.arrow_back_content_description)
+                        contentDescription = stringResource(R.string.arrow_back_content_description)
                     )
                 }
             }

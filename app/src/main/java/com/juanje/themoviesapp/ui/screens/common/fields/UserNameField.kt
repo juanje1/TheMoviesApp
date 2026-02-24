@@ -12,16 +12,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
@@ -31,38 +23,23 @@ import androidx.compose.ui.text.input.KeyboardType
 import com.juanje.domain.common.RegistrationField
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.ui.screens.register.RegisterViewModel
-import kotlinx.coroutines.flow.filter
 
 @Composable
-fun lastName(registerViewModel: RegisterViewModel): String {
-    var lastNameText by rememberSaveable { mutableStateOf("") }
-    var isDirty by rememberSaveable { mutableStateOf(false) }
-
-    val stateRegister by registerViewModel.state.collectAsState()
-
+fun UserNameField(
+    onFieldChanged: (RegistrationField, String) -> Unit,
+    registerState: RegisterViewModel.UiState
+) {
     val focusManager = LocalFocusManager.current
-    val context = LocalContext.current
-
-    LaunchedEffect(Unit) {
-        snapshotFlow { lastNameText }
-            .filter { isDirty }
-            .collect { text ->
-                registerViewModel.onFieldChanged(RegistrationField.LAST_NAME, text)
-            }
-    }
 
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = dimensionResource(R.dimen.padding_small))
             .padding(horizontal = dimensionResource(R.dimen.padding_large))
-            .testTag(context.getString(R.string.register_last_name_test)),
-        value = lastNameText,
-        onValueChange = {
-            lastNameText = it
-            isDirty = true
-        },
-        label = { Text(text = context.getString(R.string.register_last_name_label)) },
+            .testTag(stringResource(R.string.register_user_name_test)),
+        value = registerState.user.userName,
+        onValueChange = { onFieldChanged(RegistrationField.USER_NAME, it) },
+        label = { Text(text = stringResource(R.string.register_user_name_label)) },
         shape = RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_small)),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Text,
@@ -72,22 +49,20 @@ fun lastName(registerViewModel: RegisterViewModel): String {
             onNext = { focusManager.moveFocus(FocusDirection.Down) }
         ),
         trailingIcon = {
-            if (stateRegister.errorMessages.containsKey(RegistrationField.LAST_NAME))
+            if (registerState.errorMessages.containsKey(RegistrationField.USER_NAME))
                 Icon(
                     imageVector = Icons.Filled.Error,
-                    contentDescription = context.getString(R.string.register_error_field_description),
+                    contentDescription = stringResource(R.string.register_error_field_description),
                     tint = MaterialTheme.colorScheme.error
                 )
         },
-        isError = stateRegister.errorMessages.containsKey(RegistrationField.LAST_NAME)
+        isError = registerState.errorMessages.containsKey(RegistrationField.USER_NAME)
     )
-    if (stateRegister.errorMessages.containsKey(RegistrationField.LAST_NAME)) {
+    if (registerState.errorMessages.containsKey(RegistrationField.USER_NAME)) {
         Text(
-            text = stateRegister.errorMessages[RegistrationField.LAST_NAME]?.let { stringResource(it) } ?: "",
+            text = registerState.errorMessages[RegistrationField.USER_NAME]?.let { stringResource(it) } ?: "",
             color = MaterialTheme.colorScheme.error,
             modifier = Modifier.padding(start = dimensionResource(R.dimen.padding_medium))
         )
     }
-
-    return lastNameText
 }

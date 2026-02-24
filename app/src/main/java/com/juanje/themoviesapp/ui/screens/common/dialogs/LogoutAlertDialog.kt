@@ -4,7 +4,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.juanje.themoviesapp.R
 
 @Composable
@@ -13,11 +13,9 @@ fun LogoutAlertDialog(
     onCancel: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    val context = LocalContext.current
-
     AlertDialog(
-        title = { Text(context.getString(R.string.logout_dialog_title)) },
-        text = { Text(context.getString(R.string.logout_dialog_message)) },
+        title = { Text(stringResource(R.string.logout_dialog_title)) },
+        text = { Text(stringResource(R.string.logout_dialog_message)) },
         onDismissRequest = { onDismiss() },
         confirmButton = {
             Button(
@@ -26,14 +24,14 @@ fun LogoutAlertDialog(
                     onDismiss()
                 }
             ) {
-                Text(context.getString(R.string.accept_button_dialog))
+                Text(stringResource(R.string.accept_button_dialog))
             }
         },
         dismissButton = {
             Button(
                 onClick = { onCancel() }
             ) {
-                Text(context.getString(R.string.cancel_button_dialog))
+                Text(stringResource(R.string.cancel_button_dialog))
             }
         }
     )

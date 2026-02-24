@@ -76,7 +76,7 @@ class MovieRepositoryImpl @Inject constructor(
 
                 val remoteMovies = movieRemoteDataSource.getMovies(userName, apiKey, nextPage)
                 val moviesToUpsert = remoteMovies.mapIndexed { index, remoteMovie ->
-                    remoteMovie.copy(id = 0, displayOrder = count + index + 1)
+                    remoteMovie.copy(displayOrder = count + index + 1)
                 }
 
                 if (refresh) {

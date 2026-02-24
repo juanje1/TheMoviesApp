@@ -1,6 +1,8 @@
 package com.juanje.themoviesapp.ui.screens.detail
 
+import androidx.lifecycle.SavedStateHandle
 import com.juanje.data.repositories.MovieRepositoryImpl
+import com.juanje.themoviesapp.ui.navigation.Screen
 import com.juanje.themoviesapp.ui.screens.common.CoroutinesTestRule
 import com.juanje.themoviesapp.ui.screens.common.FakeAppIdlingResource
 import com.juanje.themoviesapp.ui.screens.common.FakeFavoriteLocalDataSource
@@ -17,10 +19,11 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.MockitoAnnotations
+import org.robolectric.RobolectricTestRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(MockitoJUnitRunner::class)
+@RunWith(RobolectricTestRunner::class)
 class DetailViewModelTest {
     private val apiKey = "d30e1f350220f9aad6c4110df385d380"
 
@@ -33,6 +36,12 @@ class DetailViewModelTest {
 
     @Before
     fun setUp() {
+        MockitoAnnotations.openMocks(this)
+        val savedStateHandle = SavedStateHandle(mapOf(
+            Screen.Detail::userName.name to fakeUserName,
+            Screen.Detail::movieId.name to fakeId
+        ))
+
         movieRepository = MovieRepositoryImpl(
             movieLocalDataSource = FakeMovieLocalDataSource(),
             movieRemoteDataSource = FakeMovieRemoteDataSource(),
@@ -43,14 +52,14 @@ class DetailViewModelTest {
         detailViewModel = DetailViewModel(
             loadMovie = loadMovie,
             idlingResource = FakeAppIdlingResource(),
-            mainDispatcher = coroutinesTestRule.testDispatcher
+            mainDispatcher = coroutinesTestRule.testDispatcher,
+            savedStateHandle = savedStateHandle
         )
     }
 
     @Test
     fun `Listening to movie detail from the database`() = runTest {
         // When
-        detailViewModel.setArgsFlow(fakeUserName, fakeId)
         advanceUntilIdle()
 
         // Then

@@ -28,9 +28,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.common.PAGE_THRESHOLD
@@ -48,21 +48,15 @@ import kotlinx.coroutines.flow.map
 fun HomeScreen(
     onLogin: () -> Unit,
     onDetail: (String, Int) -> Unit,
-    userName: String
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     var showLogoutAlertDialog by rememberSaveable { mutableStateOf(false) }
 
-    val homeViewModel: HomeViewModel = hiltViewModel()
     val homeState by homeViewModel.state.collectAsState()
-
+    val errorMessage = homeState.error?.let { stringResource(it) }
     val listState = rememberLazyGridState()
-    val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(Unit) {
-        homeViewModel.setUserNameFlow(userName)
-    }
 
     LaunchedEffect(listState, homeState.isGettingMovies) {
         snapshotFlow { listState.firstVisibleItemIndex }
@@ -73,12 +67,12 @@ fun HomeScreen(
                 totalItemsCount > 0 && index >= threshold && !homeState.isGettingMovies
             }.distinctUntilChanged()
             .filter { shouldLoad -> shouldLoad }
-            .collect { homeViewModel.getAndInsertMovies(userName) }
+            .collect { homeViewModel.getAndInsertMovies(homeState.userName) }
     }
 
-    LaunchedEffect(homeState.error) {
-        homeState.error?.let { resId ->
-            showMessage(coroutineScope, snackBarHostState, context.getString(resId))
+    LaunchedEffect(errorMessage) {
+        errorMessage?.let { message ->
+            showMessage(coroutineScope, snackBarHostState, message)
             homeViewModel.resetError()
         }
     }
@@ -95,8 +89,8 @@ fun HomeScreen(
         topBar = {
             Surface(shadowElevation = dimensionResource(R.dimen.shadow_elevation_topBar)) {
                 MyTopAppBar(
-                    userName = userName,
-                    origin = context.getString(R.string.origin_from_home),
+                    userName = homeState.userName,
+                    origin = stringResource(R.string.origin_from_home),
                     onLogout = { showLogoutAlertDialog = true }
                 )
             }
@@ -104,20 +98,20 @@ fun HomeScreen(
         snackbarHost = {
             SnackbarHost(
                 hostState = snackBarHostState,
-                modifier = Modifier.testTag(context.getString(R.string.snack_bar_host_test))
+                modifier = Modifier.testTag(stringResource(R.string.snack_bar_host_test))
             )
         }
     ) { padding ->
         PullToRefreshBox(
             isRefreshing = homeState.isRefreshingMovies,
-            onRefresh = { homeViewModel.getAndInsertMovies(userName, true) },
+            onRefresh = { homeViewModel.getAndInsertMovies(homeState.userName, true) },
             modifier = Modifier.padding(padding)
         ) {
             if (homeState.isInitialLoading) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .testTag(context.getString(R.string.home_loading_spinner_text)),
+                        .testTag(stringResource(R.string.home_loading_spinner_text)),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
@@ -126,7 +120,7 @@ fun HomeScreen(
                 LazyVerticalGrid(
                     state = listState,
                     columns = GridCells.Adaptive(dimensionResource(R.dimen.column_min_width)),
-                    modifier = Modifier.testTag(context.getString(R.string.home_movie_list_test)),
+                    modifier = Modifier.testTag(stringResource(R.string.home_movie_list_test)),
                     horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xsmall)),
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xsmall)),
                     contentPadding = PaddingValues(dimensionResource(R.dimen.padding_xsmall))

@@ -1,6 +1,6 @@
 package com.juanje.domain.dataclasses
 
 data class MovieFavorite (
-    val movie: Movie,
-    val isFavorite: Boolean
+    val movie: Movie = Movie(),
+    val isFavorite: Boolean = false
 )

@@ -17,9 +17,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
@@ -34,22 +34,21 @@ fun HomeItem(
     onFavourite: () -> Unit,
     movieFavorite: MovieFavorite
 ) {
-    val context = LocalContext.current
-
     Column(
         modifier = Modifier
+            .fillMaxWidth()
             .clickable { onDetail(movieFavorite.movie.userName, movieFavorite.movie.id) }
             .background(MaterialTheme.colorScheme.secondary)
-            .testTag(context.getString(R.string.home_movie_list_test)+"_${movieFavorite.movie.id}"),
+            .testTag(stringResource(R.string.home_movie_list_test) +"_${movieFavorite.movie.id}"),
     ) {
         Box {
             AsyncImage(
-                model = context.getString(R.string.image_url)+movieFavorite.movie.posterPath,
+                model = stringResource(R.string.image_url) +movieFavorite.movie.posterPath,
                 contentDescription = movieFavorite.movie.title,
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(IMAGE_ASPECT_RATIO)
-                    .testTag(context.getString(R.string.home_movie_image_test)+"_${movieFavorite.movie.id}")
+                    .testTag(stringResource(R.string.home_movie_image_test) +"_${movieFavorite.movie.id}")
             )
             var color: Color = Color.White
             if (movieFavorite.isFavorite) color = Color.Red
@@ -60,7 +59,7 @@ fun HomeItem(
                     .align(Alignment.TopEnd)
                     .padding(dimensionResource(R.dimen.padding_xsmall))
                     .clickable { onFavourite() }
-                    .testTag(context.getString(R.string.home_movie_favourite_test)+"_${movieFavorite.movie.id}"),
+                    .testTag(stringResource(R.string.home_movie_favourite_test) +"_${movieFavorite.movie.id}"),
                 tint = color
             )
         }
@@ -69,8 +68,8 @@ fun HomeItem(
                 .padding(dimensionResource(R.dimen.padding_xsmall))
                 .height(dimensionResource(R.dimen.cell_title_height))
                 .align(Alignment.CenterHorizontally)
-                .testTag(context.getString(R.string.home_movie_title_test)+"_${movieFavorite.movie.id}"),
-            text = movieFavorite.movie.title ?: "",
+                .testTag(stringResource(R.string.home_movie_title_test) +"_${movieFavorite.movie.id}"),
+            text = movieFavorite.movie.title,
             textAlign = TextAlign.Center,
             fontSize = dimensionResource(R.dimen.font_size_small).value.sp,
             color = MaterialTheme.colorScheme.background,

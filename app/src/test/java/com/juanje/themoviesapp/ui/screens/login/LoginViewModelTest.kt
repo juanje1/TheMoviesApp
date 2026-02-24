@@ -1,5 +1,7 @@
 package com.juanje.themoviesapp.ui.screens.login
 
+import androidx.lifecycle.SavedStateHandle
+import com.juanje.themoviesapp.ui.navigation.Screen
 import com.juanje.themoviesapp.ui.screens.common.CoroutinesTestRule
 import com.juanje.themoviesapp.ui.screens.common.FakeAppIdlingResource
 import com.juanje.themoviesapp.ui.screens.common.UserMother
@@ -14,13 +16,14 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.junit.MockitoJUnitRunner
+import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import org.robolectric.RobolectricTestRunner
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@RunWith(MockitoJUnitRunner::class)
+@RunWith(RobolectricTestRunner::class)
 class LoginViewModelTest {
     private lateinit var loginViewModel: LoginViewModel
 
@@ -32,10 +35,16 @@ class LoginViewModelTest {
 
     @Before
     fun setUp() {
+        MockitoAnnotations.openMocks(this)
+        val savedStateHandle = SavedStateHandle(mapOf(
+            Screen.Login::registered.name to true
+        ))
+
         loginViewModel = LoginViewModel(
             loadUser = loadUser,
             idlingResource = FakeAppIdlingResource(),
-            mainDispatcher = coroutinesTestRule.testDispatcher
+            mainDispatcher = coroutinesTestRule.testDispatcher,
+            savedStateHandle = savedStateHandle
         )
     }
 

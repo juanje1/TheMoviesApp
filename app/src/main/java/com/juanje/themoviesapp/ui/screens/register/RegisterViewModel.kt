@@ -2,17 +2,16 @@ package com.juanje.themoviesapp.ui.screens.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.juanje.domain.MainDispatcher
 import com.juanje.domain.common.RegistrationField
 import com.juanje.domain.dataclasses.User
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.common.AppIdlingResource
-import com.juanje.themoviesapp.common.toErrorRes
+import com.juanje.themoviesapp.common.createHandler
 import com.juanje.themoviesapp.common.trackLoading
-import com.juanje.domain.MainDispatcher
 import com.juanje.usecases.LoadUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,28 +32,28 @@ class RegisterViewModel @Inject constructor(
 
     private var searchJob: Job? = null
 
-    private fun registerHandler(onCleanup: () -> Unit = {}) = CoroutineExceptionHandler { _, e ->
-        _state.update { it.copy(error = e.toErrorRes()) }
-        onCleanup()
-    }
+    private fun registerHandler(onCleanup: () -> Unit = {}) = createHandler(
+        onUpdateError = { errorRes -> _state.update { it.copy(error = errorRes) } },
+        onCleanup = onCleanup
+    )
 
-    fun onRegister(user: User) = viewModelScope.launch(mainDispatcher + registerHandler {
+    fun onRegister() = viewModelScope.launch(mainDispatcher + registerHandler {
         _state.update { it.copy(isRegistering = false) }
     }) {
         if (_state.value.isRegistering) return@launch
 
         _state.update { it.copy(isRegistering = true, actionFinished = false) }
 
-        val localErrors = validateLocalErrors(user)
+        val localErrors = validateLocalErrors(_state.value.user)
         _state.update { it.copy(errorMessages = localErrors, userValid = localErrors.isEmpty()) }
 
         trackLoading(idlingResource = idlingResource) {
             if (_state.value.userValid) {
-                val remoteErrors = validateRemoteErrors(user)
+                val remoteErrors = validateRemoteErrors(_state.value.user)
                 _state.update { it.copy(errorMessages = remoteErrors, userValid = remoteErrors.isEmpty()) }
 
                 if (_state.value.userValid) {
-                    loadUser.invokeInsertUser(user)
+                    loadUser.invokeInsertUser(_state.value.user)
                 }
             }
         }
@@ -62,6 +61,7 @@ class RegisterViewModel @Inject constructor(
     }
 
     fun onFieldChanged(field: RegistrationField, text: String) {
+        setFieldChanged(field, text)
         searchJob?.cancel()
 
         val localError = when (field) {
@@ -74,13 +74,16 @@ class RegisterViewModel @Inject constructor(
             return
         }
 
-        searchJob = viewModelScope.launch(mainDispatcher + registerHandler()) {
-            delay(200)
+        clearFieldError(field)
 
-            when (field) {
-                RegistrationField.USER_NAME -> existsUserName(field, text)
-                RegistrationField.EMAIL -> existsEmail(field, text)
-                else -> { clearFieldError(field) }
+        if (field == RegistrationField.USER_NAME || field == RegistrationField.EMAIL) {
+            searchJob = viewModelScope.launch(mainDispatcher + registerHandler()) {
+                delay(400)
+                if (field == RegistrationField.USER_NAME) {
+                    existsUserName(field, text)
+                } else {
+                    existsEmail(field, text)
+                }
             }
         }
     }
@@ -152,6 +155,20 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
+    private fun setFieldChanged(field: RegistrationField, text: String) {
+        _state.update { state ->
+            state.copy(
+                user = when (field) {
+                    RegistrationField.USER_NAME -> state.user.copy(userName = text)
+                    RegistrationField.FIRST_NAME -> state.user.copy(firstName = text)
+                    RegistrationField.LAST_NAME -> state.user.copy(lastName = text)
+                    RegistrationField.EMAIL -> state.user.copy(email = text)
+                    RegistrationField.PASSWORD -> state.user.copy(password = text)
+                }
+            )
+        }
+    }
+
     fun resetActionFinished() {
         _state.update { it.copy(actionFinished = false) }
     }
@@ -161,6 +178,7 @@ class RegisterViewModel @Inject constructor(
     }
 
     data class UiState(
+        val user: User = User(),
         val actionFinished: Boolean = false,
         val userValid: Boolean = false,
         val isRegistering: Boolean = false,

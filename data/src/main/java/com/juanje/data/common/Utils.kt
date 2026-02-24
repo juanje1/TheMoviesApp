@@ -12,21 +12,8 @@ import java.net.UnknownHostException
 suspend fun <T> safeCall(call: suspend () -> T): T {
     return try {
         call()
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
         if (e is CancellationException) throw e
-
-        throw when (e) {
-            is UnknownHostException -> AppError.Network
-            is SocketTimeoutException -> AppError.Network
-            is IOException -> AppError.Network
-            is SQLiteException -> AppError.Database
-            else -> AppError.Unexpected(e.message ?: "Unknown error")
-        }
-    }
-}
-
-fun <T> Flow<T>.asAppError(): Flow<T> =
-    this.catch { e ->
         if (e is AppError) throw e
 
         throw when (e) {
@@ -34,6 +21,21 @@ fun <T> Flow<T>.asAppError(): Flow<T> =
             is SocketTimeoutException -> AppError.Network
             is IOException -> AppError.Network
             is SQLiteException -> AppError.Database
-            else -> AppError.Unexpected(e.message ?: "Unknown error")
+            else -> AppError.Unexpected(e.message ?: AppError.UNKNOWN_MESSAGE)
+        }
+    }
+}
+
+fun <T> Flow<T>.asAppError(): Flow<T> =
+    this.catch { e ->
+        if (e is CancellationException) throw e
+        if (e is AppError) throw e
+
+        throw when (e) {
+            is UnknownHostException -> AppError.Network
+            is SocketTimeoutException -> AppError.Network
+            is IOException -> AppError.Network
+            is SQLiteException -> AppError.Database
+            else -> AppError.Unexpected(e.message ?: AppError.UNKNOWN_MESSAGE)
         }
     }
