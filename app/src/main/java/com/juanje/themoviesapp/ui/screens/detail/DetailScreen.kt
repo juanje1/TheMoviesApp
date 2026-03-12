@@ -52,7 +52,7 @@ fun DetailScreen(
         )
     }
 
-    detailState.movie?.let { movieFavorite ->
+    detailState.movieFavorite?.let { movieFavorite ->
         Scaffold(
             topBar = {
                 val titleMovie: String = movieFavorite.movie.title

@@ -1,13 +1,12 @@
 package com.juanje.data.datasources
 
+import androidx.paging.PagingSource
 import com.juanje.domain.dataclasses.Movie
 import kotlinx.coroutines.flow.Flow
 
 interface MovieLocalDataSource {
-    fun getMovies(userName: String): Flow<List<Movie>>
-    fun getMovie(userName: String, movieId: Int): Flow<Movie>
-    suspend fun count(userName: String): Int
-    suspend fun deleteAll(userName: String)
+    fun <T : Any> getMovies(userName: String, category: String): PagingSource<Int, T>
+    fun getMovie(businessId: String, userName: String, category: String): Flow<Movie>
+    suspend fun deleteAll(userName: String, category: String)
     suspend fun insertAll(movies: List<Movie>)
-    suspend fun refreshMoviesTx(userName: String, movies: List<Movie>)
 }

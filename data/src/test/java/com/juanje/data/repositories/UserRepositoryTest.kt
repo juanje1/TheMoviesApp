@@ -1,6 +1,8 @@
 package com.juanje.data.repositories
 
 import android.database.sqlite.SQLiteException
+import com.juanje.data.common.UserTestConstants.WRONG_EMAIL
+import com.juanje.data.common.UserTestConstants.WRONG_PASSWORD
 import com.juanje.data.datasources.UserLocalDataSource
 import com.juanje.domain.common.AppError
 import com.juanje.domain.dataclasses.User
@@ -23,15 +25,9 @@ import kotlin.test.assertFailsWith
 
 @RunWith(MockitoJUnitRunner::class)
 class UserRepositoryTest {
-    companion object {
-        private const val WRONG_EMAIL: String = "wrong@email.com"
-        private const val WRONG_PASSWORD: String = "1234"
-    }
+    @Mock private lateinit var userLocalDataSource: UserLocalDataSource
 
     private lateinit var userRepository: UserRepositoryImpl
-
-    @Mock
-    private lateinit var userLocalDataSource: UserLocalDataSource
 
     @Before
     fun setup() {

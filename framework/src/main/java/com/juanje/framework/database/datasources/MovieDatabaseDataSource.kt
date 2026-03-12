@@ -1,5 +1,6 @@
 package com.juanje.framework.database.datasources
 
+import androidx.paging.PagingSource
 import com.juanje.data.datasources.MovieLocalDataSource
 import com.juanje.domain.IoDispatcher
 import com.juanje.domain.dataclasses.Movie
@@ -12,34 +13,25 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+@Suppress("UNCHECKED_CAST")
 class MovieDatabaseDataSource @Inject constructor(
     private val movieDao: MovieDao,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher
 ): MovieLocalDataSource {
 
-    override fun getMovies(userName: String): Flow<List<Movie>> =
-        movieDao.getMovies(userName).map { movies -> movies.map { it.toMovie() } }
+    override fun <T : Any> getMovies(userName: String, category: String): PagingSource<Int, T> =
+        movieDao.getMovies(userName, category) as PagingSource<Int, T>
 
-    override fun getMovie(userName: String, movieId: Int): Flow<Movie> =
-        movieDao.getMovie(userName, movieId).map { it.toMovie() }
+    override fun getMovie(businessId: String, userName: String, category: String): Flow<Movie> =
+        movieDao.getMovie(businessId, userName, category).map { it.toMovie() }
 
-    override suspend fun count(userName: String): Int =
+    override suspend fun deleteAll(userName: String, category: String) =
         withContext(ioDispatcher) {
-            movieDao.count(userName)
-        }
-
-    override suspend fun deleteAll(userName: String) =
-        withContext(ioDispatcher) {
-            movieDao.deleteAll(userName)
+            movieDao.deleteAll(userName, category)
         }
 
     override suspend fun insertAll(movies: List<Movie>) =
         withContext(ioDispatcher) {
             movieDao.insertAll(movies.map { it.toMovieDatabase() })
-        }
-
-    override suspend fun refreshMoviesTx(userName: String, movies: List<Movie>) =
-        withContext(ioDispatcher) {
-            movieDao.refreshMoviesTx(userName, movies.map { it.toMovieDatabase() })
         }
 }

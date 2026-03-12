@@ -19,12 +19,20 @@ data class MovieResultServer(
     val vote_count: Int? = 0
 )
 
-fun MovieResultServer.toMovie(userName: String) = Movie(
-    id = 0,
-    title = title ?: "",
-    overview = overview ?: "",
-    posterPath = poster_path ?: "",
-    releaseDate = release_date ?: "",
-    userName = userName,
-    displayOrder = 0
-)
+fun MovieResultServer.toMovie(userName: String, category: String): Movie {
+    val rawTitle = (title ?: "").trim().lowercase()
+    val rawDate = (release_date ?: "").trim().lowercase()
+    val cleanTitle = if (rawTitle == "null") "" else rawTitle
+    val cleanDate = if (rawDate == "null") "" else rawDate
+
+    return Movie(
+        businessId = "${userName.lowercase()}|${category.lowercase()}|$cleanTitle|$cleanDate",
+        title = title ?: "",
+        overview = overview ?: "",
+        posterPath = poster_path ?: "",
+        releaseDate = release_date ?: "",
+        userName = userName,
+        category = category,
+        displayOrder = 0
+    )
+}

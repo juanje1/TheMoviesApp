@@ -89,7 +89,8 @@ fun LoginItem(
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.weight(0.5f))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacer_large)))
+            Spacer(modifier = Modifier.weight(0.7f))
             Text(
                 text = stringResource(R.string.login_title_text),
                 style = MaterialTheme.typography.headlineLarge.copy(
@@ -98,7 +99,7 @@ fun LoginItem(
                     textAlign = TextAlign.Center
                 )
             )
-            Spacer(modifier = Modifier.weight(0.2f))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacer_large)))
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -166,7 +167,7 @@ fun LoginItem(
                         else PasswordVisualTransformation()
                 )
             }
-            Spacer(modifier = Modifier.weight(0.4f))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacer_large)))
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -187,7 +188,8 @@ fun LoginItem(
                     )
                 }
             }
-            Spacer(modifier = Modifier.weight(0.5f))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacer_large)))
+            Spacer(modifier = Modifier.weight(1f))
             Text(
                 modifier = Modifier
                     .clickable { onRegister() }

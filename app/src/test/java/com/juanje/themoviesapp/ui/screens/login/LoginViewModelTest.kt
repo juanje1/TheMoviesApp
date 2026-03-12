@@ -1,6 +1,7 @@
 package com.juanje.themoviesapp.ui.screens.login
 
 import androidx.lifecycle.SavedStateHandle
+import com.juanje.domain.dataclasses.User
 import com.juanje.themoviesapp.ui.navigation.Screen
 import com.juanje.themoviesapp.ui.screens.common.CoroutinesTestRule
 import com.juanje.themoviesapp.ui.screens.common.FakeAppIdlingResource
@@ -25,13 +26,13 @@ import org.robolectric.RobolectricTestRunner
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 class LoginViewModelTest {
-    private lateinit var loginViewModel: LoginViewModel
-
     @get:Rule
     val coroutinesTestRule = CoroutinesTestRule()
 
-    @Mock
-    private lateinit var loadUser: LoadUser
+    @Mock private lateinit var loadUser: LoadUser
+
+    private lateinit var validUser: User
+    private lateinit var loginViewModel: LoginViewModel
 
     @Before
     fun setUp() {
@@ -39,6 +40,8 @@ class LoginViewModelTest {
         val savedStateHandle = SavedStateHandle(mapOf(
             Screen.Login::registered.name to true
         ))
+
+        validUser = UserMother.createUser()
 
         loginViewModel = LoginViewModel(
             loadUser = loadUser,
@@ -51,7 +54,6 @@ class LoginViewModelTest {
     @Test
     fun `Correct login with valid credentials`() = runTest {
         // Given
-        val validUser = UserMother.createUser()
         whenever(loadUser.invokeGetUser(any(), any())).thenReturn(validUser)
 
         // When
@@ -66,9 +68,8 @@ class LoginViewModelTest {
     @Test
     fun `Incorrect login with invalid credentials`() = runTest {
         // Given
-        val validUser = UserMother.createUser()
         val emptyUser = UserMother.createUser(email = "", password = "")
-        whenever(loadUser.invokeGetUser(any(), any())).thenReturn(validUser)
+        whenever(loadUser.invokeGetUser(any(), any())).thenReturn(null)
 
         // When
         loginViewModel.onLogin(emptyUser.email, emptyUser.password)

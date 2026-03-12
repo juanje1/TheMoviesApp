@@ -1,95 +1,77 @@
 package com.juanje.themoviesapp.ui.screens.common
 
+import androidx.paging.PagingSource
+import androidx.paging.testing.asPagingSourceFactory
 import com.juanje.data.datasources.FavoriteLocalDataSource
 import com.juanje.data.datasources.MovieLocalDataSource
-import com.juanje.data.datasources.MovieRemoteDataSource
+import com.juanje.domain.MovieFactory.FAKE_CATEGORY
+import com.juanje.domain.MovieFactory.FAKE_USER_NAME
 import com.juanje.domain.dataclasses.Favorite
 import com.juanje.domain.dataclasses.Movie
 import com.juanje.domain.dataclasses.MovieFavorite
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
-const val fakeUserName = "Juan"
-const val fakeId = 5
+val fakeMoviesList = (1..10).map {
+    createFakeMovie(index = it, order = it)
+}
+val fakeMovieWithFavoritesList = (1..10).map {
+    index -> createFakeMovieFavorite(index, favorite = index <= 2)
+}
+val fakeMovieWithoutFavoritesList = (1..10).map {
+    index -> createFakeMovieFavorite(index, favorite = false)
+}
 
-val fakeMovie = createFakeMovie(5, 5)
-val fakeMovies = (1..10).map { createFakeMovie(id = it, order = it) }
-
-val fakeFavorites = (1..2).map { createFakeFavorite(it) }
-
-val fakeMovieFavorite = (1..10).map { createFakeMovieFavorite(it, false) }
-val fakeMovieFavoriteNoFavorite = (1..10).map { createFakeMovieFavorite(it, true) }
-
-val fakeFavoritesId = listOf(1, 2)
-
-fun createFakeMovie(id: Int, order: Int) = Movie(
-    id = id,
-    title = "Title $id",
-    overview = "Overview $id",
-    posterPath = "Path $id",
-    releaseDate = "Date $id",
-    userName = fakeUserName,
+fun createFakeMovie(index: Int, order: Int)  = Movie(
+    businessId = generateBusinessId(index),
+    title = "Title $index",
+    overview = "Overview $index",
+    posterPath = "Path $index",
+    releaseDate = "Date $index",
+    userName = FAKE_USER_NAME,
+    category = FAKE_CATEGORY,
     displayOrder = order
 )
 
-fun createFakeFavorite(id: Int) = Favorite(
-    businessId = "$fakeUserName|Title $id|Date $id"
+fun createFakeMovieFavorite(index: Int, favorite: Boolean) = MovieFavorite(
+    movie = fakeMoviesList[index-1],
+    isFavorite = favorite
 )
 
-fun createFakeMovieFavorite(id: Int, noFavorite: Boolean) = MovieFavorite(
-    movie = fakeMovies[id-1],
-    isFavorite = if (noFavorite) false else fakeFavorites.contains(createFakeFavorite(id))
-)
+fun generateBusinessId(index: Int): String {
+    val title = "Title $index".trim().lowercase()
+    val releaseDate = "Date $index".trim().lowercase()
+
+    return "${FAKE_USER_NAME.lowercase()}|${FAKE_CATEGORY.lowercase()}|$title|$releaseDate"
+}
 
 class FakeMovieLocalDataSource : MovieLocalDataSource {
-    private var moviesFlow = MutableStateFlow<List<Movie>>(emptyList())
-    private var movieFlow = MutableStateFlow(fakeMovie)
+    private var moviesInDb = mutableListOf<Movie>()
 
-    override fun getMovies(userName: String) = moviesFlow
+    @Suppress("UNCHECKED_CAST")
+    override fun <T : Any> getMovies(userName: String, category: String): PagingSource<Int, T> =
+        moviesInDb.asPagingSourceFactory().invoke() as PagingSource<Int, T>
 
-    override fun getMovie(userName: String, movieId: Int) = movieFlow
+    override fun getMovie(businessId: String, userName: String, category: String): Flow<Movie> = flow {
+        val movie = moviesInDb.firstOrNull {
+            it.businessId == businessId && it.userName == userName && it.category == category
+        } ?: throw NoSuchElementException("Movie with businessId $businessId not found")
+        emit(movie)
+    }
 
-    override suspend fun count(userName: String): Int = moviesFlow.value.size
-
-    override suspend fun deleteAll(userName: String) {
-        moviesFlow.value = emptyList()
+    override suspend fun deleteAll(userName: String, category: String) {
+        moviesInDb.clear()
     }
 
     override suspend fun insertAll(movies: List<Movie>) {
-        val currentMovies = moviesFlow.value.toMutableList()
-
-        movies.forEach { movie ->
-            val existingIndex = movies.find {
-                it.userName == movie.userName &&
-                it.title == movie.title &&
-                it.releaseDate == movie.releaseDate
-            }
-
-            if (existingIndex != null)
-                currentMovies.remove(movie)
-
-            val nextId = if (currentMovies.isEmpty()) 1 else currentMovies.maxOf { it.id } + 1
-            currentMovies.add(movie.copy(id = nextId))
-        }
-        moviesFlow.value = currentMovies
+        moviesInDb.addAll(movies)
     }
-
-    override suspend fun refreshMoviesTx(userName: String, movies: List<Movie>) {
-        deleteAll(userName)
-        insertAll(movies)
-    }
-}
-
-class FakeMovieRemoteDataSource : MovieRemoteDataSource {
-    override suspend fun getMovies(userName: String, apiKey: String, page: Int) = fakeMovies
 }
 
 class FakeFavoriteLocalDataSource : FavoriteLocalDataSource {
     private var favorites = MutableStateFlow<List<Favorite>>(emptyList())
-
-    override fun getFavorites(userName: String): Flow<List<Favorite>> =
-        favorites.map { list -> list.filter { it.businessId.startsWith("$userName|") } }
 
     override fun getFavorite(businessId: String): Flow<Boolean> =
         favorites.map { list -> list.any { it.businessId == businessId } }
@@ -106,7 +88,4 @@ class FakeFavoriteLocalDataSource : FavoriteLocalDataSource {
     override suspend fun deleteFavorite(businessId: String) {
         favorites.value = favorites.value.filterNot { it.businessId == businessId }
     }
-
-    fun isFavorite(businessId: String): Boolean =
-        favorites.value.any { it.businessId == businessId }
 }

@@ -41,8 +41,12 @@ android {
 dependencies {
     implementation(project(":data"))
     implementation(project(":domain"))
+    testImplementation(testFixtures(project(":domain")))
 
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.paging.common)
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.room.paging)
 
     api(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
@@ -57,6 +61,10 @@ dependencies {
     api(libs.retrofit.converter.gson)
 
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.androidx.test.core.ktx)
+    testImplementation(libs.robolectric)
 
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.espresso.core)

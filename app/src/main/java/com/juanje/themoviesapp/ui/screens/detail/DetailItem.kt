@@ -1,5 +1,7 @@
 package com.juanje.themoviesapp.ui.screens.detail
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,9 +20,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -35,28 +39,42 @@ fun DetailItem(
     movieFavorite: MovieFavorite,
     padding: PaddingValues
 ) {
+    val imageModifier = Modifier
+        .padding(top = dimensionResource(R.dimen.padding_medium))
+        .height(dimensionResource(R.dimen.cell_image_medium))
+        .aspectRatio(IMAGE_ASPECT_RATIO)
+        .clip(RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_small)))
+        .border(
+            width = dimensionResource(R.dimen.border_medium),
+            color = MaterialTheme.colorScheme.primary,
+            shape = RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_small))
+        )
+        .background(Color.White)
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
             .verticalScroll(rememberScrollState())
     ) {
-        AsyncImage(
-            model = stringResource(R.string.image_url) +movieFavorite.movie.posterPath,
-            contentDescription = movieFavorite.movie.title,
-            modifier = Modifier
-                .padding(top = dimensionResource(R.dimen.padding_medium))
-                .height(dimensionResource(R.dimen.cell_image_medium))
-                .border(
-                    width = dimensionResource(R.dimen.border_medium),
-                    color = MaterialTheme.colorScheme.primary,
-                    shape = RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_small)))
-                .clip(RoundedCornerShape(dimensionResource(R.dimen.shape_rounded_corner_small)))
-                .aspectRatio(IMAGE_ASPECT_RATIO)
-                .align(Alignment.CenterHorizontally)
-                .testTag(stringResource(R.string.detail_movie_image_test) +"_${movieFavorite.movie.id}"),
-            contentScale = ContentScale.Crop
-        )
+        if (movieFavorite.movie.posterPath.isEmpty()) {
+            Image(
+                painter = painterResource(R.drawable.no_image),
+                contentDescription = movieFavorite.movie.title,
+                contentScale = ContentScale.Fit,
+                modifier = imageModifier.align(Alignment.CenterHorizontally)
+            )
+        } else {
+            AsyncImage(
+                model = stringResource(R.string.image_url) + movieFavorite.movie.posterPath,
+                error = painterResource(R.drawable.no_image),
+                contentDescription = movieFavorite.movie.title,
+                contentScale = ContentScale.Crop,
+                modifier = imageModifier
+                    .align(Alignment.CenterHorizontally)
+                    .testTag(stringResource(R.string.detail_movie_image_test) + "_${movieFavorite.movie.businessId}")
+            )
+        }
         HorizontalDivider(
             modifier = Modifier.padding(dimensionResource(R.dimen.padding_large)),
             thickness = dimensionResource(R.dimen.divider_height)
@@ -67,7 +85,7 @@ fun DetailItem(
                 .padding(horizontal = dimensionResource(R.dimen.padding_xlarge))
         ) {
             Text(
-                modifier = Modifier.testTag(stringResource(R.string.detail_movie_title_test) +"_${movieFavorite.movie.id}"),
+                modifier = Modifier.testTag(stringResource(R.string.detail_movie_title_test) +"_${movieFavorite.movie.businessId}"),
                 text = stringResource(R.string.detail_title),
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold,
@@ -81,7 +99,7 @@ fun DetailItem(
             Text(
                 modifier = Modifier
                     .padding(top = dimensionResource(R.dimen.padding_medium))
-                    .testTag(stringResource(R.string.detail_movie_overview_test) +"_${movieFavorite.movie.id}"),
+                    .testTag(stringResource(R.string.detail_movie_overview_test) +"_${movieFavorite.movie.businessId}"),
                 text = stringResource(R.string.detail_overview),
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold,
@@ -95,7 +113,7 @@ fun DetailItem(
             Text(
                 modifier = Modifier
                     .padding(top = dimensionResource(R.dimen.padding_medium))
-                    .testTag(stringResource(R.string.detail_movie_favourite_test) +"_${movieFavorite.movie.id}"),
+                    .testTag(stringResource(R.string.detail_movie_favourite_test) +"_${movieFavorite.movie.businessId}"),
                 text = stringResource(R.string.detail_favourite_not_favourite),
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold,

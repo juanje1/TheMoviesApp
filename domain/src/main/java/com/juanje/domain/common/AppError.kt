@@ -6,6 +6,7 @@ sealed class AppError(message: String? = null): Throwable(message) {
     data class Unexpected(val errorMessage: String): AppError(errorMessage)
 
     companion object {
-        const val UNKNOWN_MESSAGE = "Unknown error"
+        const val EAI_NODATA_ERROR = "EAI_NODATA"
+        const val UNKNOWN_ERROR = "Unknown error"
     }
 }

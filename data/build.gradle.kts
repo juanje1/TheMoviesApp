@@ -36,12 +36,18 @@ android {
 
 dependencies {
     implementation(project(":domain"))
+    testImplementation(testFixtures(project(":domain")))
+
+    implementation(libs.androidx.paging.common)
 
     implementation(libs.hilt.android)
+
     ksp(libs.hilt.compiler)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.kotlin.test)
+    testImplementation(libs.androidx.paging.testing)
+    testImplementation(libs.robolectric)
 }

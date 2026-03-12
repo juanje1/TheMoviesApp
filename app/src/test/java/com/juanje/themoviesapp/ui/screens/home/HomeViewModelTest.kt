@@ -1,66 +1,72 @@
 package com.juanje.themoviesapp.ui.screens.home
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.paging.ExperimentalPagingApi
+import androidx.paging.testing.asSnapshot
 import com.juanje.data.repositories.MovieRepositoryImpl
+import com.juanje.domain.MovieFactory.FAKE_USER_NAME
+import com.juanje.domain.dataclasses.Movie
+import com.juanje.domain.dataclasses.MovieFavorite
+import com.juanje.domain.interfaces.Mapper
+import com.juanje.domain.interfaces.MovieRemoteMediatorProvider
 import com.juanje.themoviesapp.common.NetworkConnectivityObserver
 import com.juanje.themoviesapp.ui.navigation.Screen
 import com.juanje.themoviesapp.ui.screens.common.CoroutinesTestRule
 import com.juanje.themoviesapp.ui.screens.common.FakeAppIdlingResource
 import com.juanje.themoviesapp.ui.screens.common.FakeFavoriteLocalDataSource
 import com.juanje.themoviesapp.ui.screens.common.FakeMovieLocalDataSource
-import com.juanje.themoviesapp.ui.screens.common.FakeMovieRemoteDataSource
 import com.juanje.themoviesapp.ui.screens.common.createFakeMovie
-import com.juanje.themoviesapp.ui.screens.common.fakeFavorites
-import com.juanje.themoviesapp.ui.screens.common.fakeFavoritesId
-import com.juanje.themoviesapp.ui.screens.common.fakeMovieFavorite
-import com.juanje.themoviesapp.ui.screens.common.fakeMovieFavoriteNoFavorite
-import com.juanje.themoviesapp.ui.screens.common.fakeUserName
+import com.juanje.themoviesapp.ui.screens.common.fakeMovieWithFavoritesList
+import com.juanje.themoviesapp.ui.screens.common.fakeMovieWithoutFavoritesList
 import com.juanje.usecases.LoadMovie
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
-import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalPagingApi::class, ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 class HomeViewModelTest {
-    private val apiKey = "d30e1f350220f9aad6c4110df385d380"
-    private lateinit var favoriteLocalDataSource: FakeFavoriteLocalDataSource
+    @get:Rule
+    val coroutinesTestRule = CoroutinesTestRule()
+
+    @Mock private lateinit var mediatorProvider: MovieRemoteMediatorProvider
+    @Mock private lateinit var mapper: Mapper<Any, MovieFavorite>
+    @Mock private lateinit var networkConnectivityObserver: NetworkConnectivityObserver
+
+    private lateinit var movieLocalDataSource: FakeMovieLocalDataSource
     private lateinit var movieRepository: MovieRepositoryImpl
     private lateinit var loadMovie: LoadMovie
     private lateinit var homeViewModel: HomeViewModel
 
-    @get:Rule
-    val coroutinesTestRule = CoroutinesTestRule()
-
-    @Mock
-    private lateinit var networkConnectivityObserver: NetworkConnectivityObserver
-
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        val savedStateHandle = SavedStateHandle(mapOf(
-            Screen.Home::userName.name to fakeUserName
-        ))
+        val savedStateHandle = SavedStateHandle(mapOf(Screen.Home::userName.name to FAKE_USER_NAME))
 
         whenever(networkConnectivityObserver.observe()).thenReturn(flowOf(true))
-        favoriteLocalDataSource = FakeFavoriteLocalDataSource()
+        whenever(mediatorProvider.getMediator<Any>(anyString(), anyString())).thenReturn(null)
+
+        movieLocalDataSource = FakeMovieLocalDataSource()
 
         movieRepository = MovieRepositoryImpl(
-            movieLocalDataSource = FakeMovieLocalDataSource(),
-            movieRemoteDataSource = FakeMovieRemoteDataSource(),
-            favoriteLocalDataSource = favoriteLocalDataSource,
-            apiKey = apiKey
+            movieLocalDataSource = movieLocalDataSource,
+            mediatorProvider = mediatorProvider,
+            favoriteLocalDataSource = FakeFavoriteLocalDataSource(),
+            mapper = mapper
         )
         loadMovie = LoadMovie(movieRepository)
         homeViewModel = HomeViewModel(
@@ -74,26 +80,47 @@ class HomeViewModelTest {
 
     @Test
     fun `Listening to movies flow emits the list of movies from the server without favorites`() = runTest {
+        // Given
+        val fakeMovies = fakeMovieWithoutFavoritesList.map { it.movie }
+        movieLocalDataSource.insertAll(fakeMovies)
+
+        whenever(mapper.map(any())).thenAnswer { inv ->
+            val movieIn = inv.arguments[0] as Movie
+            fakeMovieWithoutFavoritesList.first { it.movie.businessId == movieIn.businessId }
+        }
+
         // When
         advanceUntilIdle()
+        val movieFavoriteList = homeViewModel.movies.asSnapshot()
 
         // Then
-        Assert.assertEquals(fakeMovieFavoriteNoFavorite, homeViewModel.state.value.movies)
+        assertEquals(fakeMovieWithoutFavoritesList, movieFavoriteList)
+        movieFavoriteList.forEachIndexed { i, movieFavorite ->
+            assertEquals(fakeMovies[i].businessId, movieFavorite.movie.businessId)
+            assertFalse(movieFavorite.isFavorite)
+        }
     }
 
     @Test
-    fun `Updating a movie in the local database`() = runTest {
+    fun `Updating the movies in the local database`() = runTest {
         // Given
-        val movieFavoriteList = fakeFavoritesId.map { createFakeMovie(it, it) }
+        val movieList = (1..2).map { createFakeMovie(it, it) }
+        movieLocalDataSource.insertAll(movieList)
+
+        whenever(mapper.map(any())).thenAnswer { invocation ->
+            val input = invocation.getArgument<Movie>(0)
+            val originalMovie = fakeMovieWithFavoritesList.find { it.movie.businessId == input.businessId }
+            originalMovie?.copy(isFavorite = true) ?: throw Exception("No found")
+        }
 
         // When
         advanceUntilIdle()
-
-        movieFavoriteList.map { homeViewModel.updateMovie(it) }
+        movieList.forEach { movie -> homeViewModel.updateMovie(movie, true) }
         advanceUntilIdle()
+        val movieFavoriteList = homeViewModel.movies.asSnapshot()
 
         // Then
-        Assert.assertEquals(fakeMovieFavorite, homeViewModel.state.value.movies)
-        fakeFavorites.map { assertTrue(favoriteLocalDataSource.isFavorite(it.businessId)) }
+        assertEquals(movieList, movieFavoriteList.map { it.movie })
+        movieFavoriteList.forEach { assertTrue(it.isFavorite) }
     }
 }

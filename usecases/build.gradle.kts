@@ -5,5 +5,7 @@ plugins {
 dependencies {
     implementation(project(":domain"))
 
+    implementation(libs.androidx.paging.common)
+
     implementation(libs.javax.inject)
 }

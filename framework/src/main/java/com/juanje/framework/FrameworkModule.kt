@@ -6,14 +6,22 @@ import androidx.room.Room
 import com.juanje.data.datasources.FavoriteLocalDataSource
 import com.juanje.data.datasources.MovieLocalDataSource
 import com.juanje.data.datasources.MovieRemoteDataSource
+import com.juanje.data.datasources.PageLocalDataSource
 import com.juanje.data.datasources.UserLocalDataSource
+import com.juanje.domain.dataclasses.MovieFavorite
+import com.juanje.domain.interfaces.Mapper
+import com.juanje.domain.interfaces.MovieRemoteMediatorProvider
 import com.juanje.framework.database.TheMoviesAppDatabase
 import com.juanje.framework.database.daos.FavoriteDao
 import com.juanje.framework.database.daos.MovieDao
+import com.juanje.framework.database.daos.PageDao
 import com.juanje.framework.database.daos.UserDao
 import com.juanje.framework.database.datasources.FavoriteDatabaseDataSource
 import com.juanje.framework.database.datasources.MovieDatabaseDataSource
+import com.juanje.framework.database.datasources.PageDatabaseDataSource
 import com.juanje.framework.database.datasources.UserDatabaseDataSource
+import com.juanje.framework.database.implementations.MovieMapperImpl
+import com.juanje.framework.database.implementations.MovieRemoteMediatorProviderImpl
 import com.juanje.framework.server.datasources.MovieServerDataSource
 import com.juanje.framework.server.services.MovieService
 import dagger.Binds
@@ -75,6 +83,11 @@ abstract class FrameworkModule {
 
         @Provides
         @Singleton
+        fun pageDaoProvider(theMoviesAppDatabase: TheMoviesAppDatabase): PageDao =
+            theMoviesAppDatabase.pageDao()
+
+        @Provides
+        @Singleton
         fun favoriteDaoProvider(theMoviesAppDatabase: TheMoviesAppDatabase): FavoriteDao =
             theMoviesAppDatabase.favoriteDao()
 
@@ -94,5 +107,14 @@ abstract class FrameworkModule {
     abstract fun bindMovieServerDataSource(movieServerDataSource: MovieServerDataSource): MovieRemoteDataSource
 
     @Binds
+    abstract fun bindRemoteMediatorProvider(movieRemoteMediatorProviderImpl: MovieRemoteMediatorProviderImpl): MovieRemoteMediatorProvider
+
+    @Binds
+    abstract fun bindPageLocalDataSource(pageDatabaseDataSource: PageDatabaseDataSource): PageLocalDataSource
+
+    @Binds
     abstract fun bindFavoriteLocalDataSource(favoriteDatabaseDataSource: FavoriteDatabaseDataSource): FavoriteLocalDataSource
+
+    @Binds
+    abstract fun bindMovieMapper(movieMapperImpl: MovieMapperImpl): Mapper<Any, MovieFavorite>
 }

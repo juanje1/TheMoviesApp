@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 import kotlin.coroutines.cancellation.CancellationException
 
 const val IMAGE_ASPECT_RATIO = 2/3f
-const val PAGE_THRESHOLD = 14
 
 fun showMessage(coroutineScope: CoroutineScope, snackBarHostState: SnackbarHostState, message: String) {
     coroutineScope.launch {

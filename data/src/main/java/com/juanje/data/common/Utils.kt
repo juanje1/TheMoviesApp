@@ -21,7 +21,7 @@ suspend fun <T> safeCall(call: suspend () -> T): T {
             is SocketTimeoutException -> AppError.Network
             is IOException -> AppError.Network
             is SQLiteException -> AppError.Database
-            else -> AppError.Unexpected(e.message ?: AppError.UNKNOWN_MESSAGE)
+            else -> AppError.Unexpected(e.message ?: AppError.UNKNOWN_ERROR)
         }
     }
 }
@@ -36,6 +36,25 @@ fun <T> Flow<T>.asAppError(): Flow<T> =
             is SocketTimeoutException -> AppError.Network
             is IOException -> AppError.Network
             is SQLiteException -> AppError.Database
-            else -> AppError.Unexpected(e.message ?: AppError.UNKNOWN_MESSAGE)
+            else -> AppError.Unexpected(e.message ?: AppError.UNKNOWN_ERROR)
         }
     }
+
+fun Throwable.toAppError(): AppError {
+    val rootCause = generateSequence(this) { it.cause }.last()
+
+    return when (rootCause) {
+        is AppError -> rootCause
+        is UnknownHostException -> AppError.Network
+        is SocketTimeoutException -> AppError.Network
+        is IOException -> AppError.Network
+        is SQLiteException -> AppError.Database
+        else -> {
+            if (rootCause.message?.contains(AppError.EAI_NODATA_ERROR) == true) {
+                AppError.Network
+            } else {
+                AppError.Unexpected(rootCause.message ?: AppError.UNKNOWN_ERROR)
+            }
+        }
+    }
+}

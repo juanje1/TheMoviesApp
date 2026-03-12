@@ -9,8 +9,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavoriteDao {
-    @Query("SELECT * FROM FavoriteDatabase WHERE businessId LIKE :userName || '|%'")
-    fun getFavorites(userName: String): Flow<List<FavoriteDatabase>>
 
     @Query("SELECT EXISTS(SELECT 1 FROM FavoriteDatabase WHERE businessId = :businessId)")
     fun getFavorite(businessId: String): Flow<Boolean>

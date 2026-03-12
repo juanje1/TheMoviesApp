@@ -19,6 +19,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.plus
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,6 +32,7 @@ class DetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val detailArgs = savedStateHandle.toRoute<Screen.Detail>()
+    private val decodedBusinessId = URLDecoder.decode(detailArgs.businessId, StandardCharsets.UTF_8.toString())
 
     private val _state = MutableStateFlow(UiState(userName = detailArgs.userName))
     val state: StateFlow<UiState> = _state
@@ -44,9 +47,9 @@ class DetailViewModel @Inject constructor(
     }
 
     private fun observeMovieFavorite() {
-        loadMovie.invokeGetMovieFavorite(detailArgs.userName, detailArgs.movieId)
+        loadMovie.invokeGetMovie(decodedBusinessId, detailArgs.userName, "popular")
             .trackFlow(idlingResource)
-            .onEach { movieFavorite -> _state.update { it.copy(movie = movieFavorite) } }
+            .onEach { movieFavorite -> _state.update { it.copy(movieFavorite = movieFavorite) } }
             .launchIn(viewModelScope.plus(mainDispatcher + detailHandler()))
     }
 
@@ -56,7 +59,7 @@ class DetailViewModel @Inject constructor(
 
     data class UiState(
         val userName: String = "",
-        val movie: MovieFavorite?= null,
+        val movieFavorite: MovieFavorite?= null,
         val error: Int? = null
     )
 }

@@ -6,9 +6,7 @@ import com.juanje.domain.dataclasses.User
 import com.juanje.domain.repositories.UserRepository
 import javax.inject.Inject
 
-class UserRepositoryImpl @Inject constructor(
-    private val userLocalDataSource: UserLocalDataSource
-): UserRepository {
+class UserRepositoryImpl @Inject constructor(private val userLocalDataSource: UserLocalDataSource): UserRepository {
 
     override suspend fun getUser(email: String, password: String): User? {
         return safeCall {

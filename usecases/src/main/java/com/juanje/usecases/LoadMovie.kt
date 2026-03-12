@@ -1,25 +1,20 @@
 package com.juanje.usecases
 
+import androidx.paging.PagingData
 import com.juanje.domain.dataclasses.Movie
+import com.juanje.domain.dataclasses.MovieFavorite
 import com.juanje.domain.repositories.MovieRepository
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class LoadMovie @Inject constructor(
-    private val movieRepository: MovieRepository
-) {
+class LoadMovie @Inject constructor(private val movieRepository: MovieRepository) {
 
-    fun invokeGetMovieFavorites(userName: String) =
-        movieRepository.getMovieFavorites(userName)
+    fun invokeGetMovies(userName: String, category: String): Flow<PagingData<MovieFavorite>> =
+        movieRepository.getMovies(userName, category)
 
-    fun invokeGetMovieFavorite(userName: String, movieId: Int) =
-        movieRepository.getMovieFavorite(userName, movieId)
+    fun invokeGetMovie(businessId: String, userName: String, category: String): Flow<MovieFavorite> =
+        movieRepository.getMovie(businessId, userName, category)
 
-    suspend fun invokeCount(userName: String) =
-        movieRepository.count(userName)
-
-    suspend fun invokeGetAndInsertMovies(userName: String, refresh: Boolean) =
-        movieRepository.getAndInsertMovies(userName, refresh)
-
-    suspend fun invokeUpdateMovieFavorite(userName: String, movie: Movie, isFavorite: Boolean) =
-        movieRepository.updateMovieFavorite(userName, movie, isFavorite)
+    suspend fun invokeUpdateMovie(movie: Movie, isFavorite: Boolean): Unit =
+        movieRepository.updateMovie(movie, isFavorite)
 }

@@ -4,10 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,32 +25,31 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.common.PAGE_THRESHOLD
 import com.juanje.themoviesapp.common.showMessage
 import com.juanje.themoviesapp.ui.screens.common.dialogs.LogoutAlertDialog
 import com.juanje.themoviesapp.ui.screens.common.others.MyTopAppBar
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
 
-@OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onLogin: () -> Unit,
-    onDetail: (String, Int) -> Unit,
+    onDetail: (String, String) -> Unit,
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     var showLogoutAlertDialog by rememberSaveable { mutableStateOf(false) }
+
+    val movies = remember { homeViewModel.movies }.collectAsLazyPagingItems()
+    val isRefreshing = movies.loadState.refresh is LoadState.Loading
 
     val homeState by homeViewModel.state.collectAsState()
     val errorMessage = homeState.error?.let { stringResource(it) }
@@ -58,16 +57,20 @@ fun HomeScreen(
     val coroutineScope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(listState, homeState.isGettingMovies) {
-        snapshotFlow { listState.firstVisibleItemIndex }
-            .debounce(300)
-            .map { index ->
-                val totalItemsCount = listState.layoutInfo.totalItemsCount
-                val threshold = totalItemsCount - PAGE_THRESHOLD
-                totalItemsCount > 0 && index >= threshold && !homeState.isGettingMovies
-            }.distinctUntilChanged()
-            .filter { shouldLoad -> shouldLoad }
-            .collect { homeViewModel.getAndInsertMovies(homeState.userName) }
+    LaunchedEffect(homeState.isInternetAvailable) {
+        if (homeState.isInternetAvailable && movies.loadState.hasError) {
+            movies.retry()
+        }
+    }
+
+    LaunchedEffect(movies.loadState) {
+        val errorState = movies.loadState.refresh as? LoadState.Error
+            ?: movies.loadState.append as? LoadState.Error
+            ?: movies.loadState.prepend as? LoadState.Error
+
+        errorState?.let {
+            homeViewModel.handlePagingError(it.error)
+        }
     }
 
     LaunchedEffect(errorMessage) {
@@ -103,9 +106,11 @@ fun HomeScreen(
         }
     ) { padding ->
         PullToRefreshBox(
-            isRefreshing = homeState.isRefreshingMovies,
-            onRefresh = { homeViewModel.getAndInsertMovies(homeState.userName, true) },
-            modifier = Modifier.padding(padding)
+            isRefreshing = isRefreshing,
+            onRefresh = { movies.refresh() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(padding)
         ) {
             if (homeState.isInitialLoading) {
                 Box(
@@ -125,12 +130,20 @@ fun HomeScreen(
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.padding_xsmall)),
                     contentPadding = PaddingValues(dimensionResource(R.dimen.padding_xsmall))
                 ) {
-                    items(homeState.movies) { movieFavorite ->
-                        HomeItem(
-                            onDetail = onDetail,
-                            onFavourite = { homeViewModel.updateMovie(movieFavorite.movie) },
-                            movieFavorite = movieFavorite
-                        )
+                    items(
+                        movies.itemCount,
+                        key = movies.itemKey { it.movie.businessId },
+                        contentType = { "movie" }
+                    ) { index ->
+                        val movieFavorite = movies[index]
+
+                        if (movieFavorite != null) {
+                            HomeItem(
+                                onDetail = onDetail,
+                                onFavourite = { homeViewModel.updateMovie(movieFavorite.movie, movieFavorite.isFavorite) },
+                                movieFavorite = movieFavorite
+                            )
+                        }
                     }
                 }
             }

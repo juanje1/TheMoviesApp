@@ -65,10 +65,11 @@ android {
 }
 
 dependencies {
-    implementation(project(":framework"))
+    runtimeOnly(project(":framework"))
     implementation(project(":data"))
     implementation(project(":usecases"))
     implementation(project(":domain"))
+    testImplementation(testFixtures(project(":domain")))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
@@ -87,6 +88,8 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.runtime.livedata)
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
 
     implementation(libs.coil.compose)
     implementation(libs.kotlinx.coroutines.android)
@@ -99,6 +102,7 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.kotlin.test)
+    testImplementation(libs.androidx.paging.testing)
     testImplementation(libs.robolectric)
 
     androidTestImplementation(libs.androidx.test.ext.junit)
