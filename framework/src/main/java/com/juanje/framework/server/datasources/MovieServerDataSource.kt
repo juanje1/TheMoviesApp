@@ -9,5 +9,5 @@ import javax.inject.Inject
 class MovieServerDataSource @Inject constructor(private val movieService: MovieService): MovieRemoteDataSource {
 
     override suspend fun getMovies(userName: String, category: String, apiKey: String, page: Int): List<Movie> =
-        movieService.getMovies(apiKey, page).results.map { it.toMovie(userName, category) }
+        movieService.getMovies(apiKey, page, category).results.map { it.toMovie(userName, category) }
 }

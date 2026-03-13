@@ -31,18 +31,18 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.juanje.domain.dataclasses.MovieFavorite
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.common.IMAGE_ASPECT_RATIO
+import com.juanje.themoviesapp.common.constants.IMAGE_ASPECT_RATIO
 
 @Composable
 fun HomeItem(
-    onDetail: (String, String) -> Unit,
+    onDetail: (String, String, String) -> Unit,
     onFavourite: () -> Unit,
     movieFavorite: MovieFavorite
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onDetail(movieFavorite.movie.businessId, movieFavorite.movie.userName) }
+            .clickable { onDetail(movieFavorite.movie.businessId, movieFavorite.movie.userName, movieFavorite.movie.category) }
             .background(MaterialTheme.colorScheme.secondary)
             .testTag(stringResource(R.string.home_movie_list_test) +"_${movieFavorite.movie.businessId}"),
     ) {

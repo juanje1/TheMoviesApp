@@ -8,6 +8,7 @@ interface MovieService {
     @GET("discover/movie")
     suspend fun getMovies(
         @Query("api_key") apikey: String,
-        @Query("page") page: Int
+        @Query("page") page: Int,
+        @Query("sort_by") sortBy: String
     ): MovieServer
 }

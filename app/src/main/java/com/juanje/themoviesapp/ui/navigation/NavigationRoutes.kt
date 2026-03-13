@@ -22,6 +22,6 @@ fun navToHome(navController: NavHostController): (String) -> Unit = { userName -
     navController.navigate(Screen.Home(userName = userName))
 }
 
-fun navToDetail(navController: NavHostController): (String, String) -> Unit = { businessId, userName ->
-    navController.navigate(Screen.Detail(businessId = businessId, userName = userName))
+fun navToDetail(navController: NavHostController): (String, String, String) -> Unit = { businessId, userName, category ->
+    navController.navigate(Screen.Detail(businessId = businessId, userName = userName, category = category))
 }

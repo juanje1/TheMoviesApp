@@ -6,9 +6,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.juanje.domain.MainDispatcher
 import com.juanje.domain.dataclasses.MovieFavorite
-import com.juanje.themoviesapp.common.AppIdlingResource
-import com.juanje.themoviesapp.common.createHandler
-import com.juanje.themoviesapp.common.trackFlow
+import com.juanje.themoviesapp.common.extensions.createHandler
+import com.juanje.themoviesapp.common.extensions.trackFlow
+import com.juanje.themoviesapp.common.utils.AppIdlingResource
 import com.juanje.themoviesapp.ui.navigation.Screen
 import com.juanje.usecases.LoadMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,7 +47,7 @@ class DetailViewModel @Inject constructor(
     }
 
     private fun observeMovieFavorite() {
-        loadMovie.invokeGetMovie(decodedBusinessId, detailArgs.userName, "popular")
+        loadMovie.invokeGetMovie(decodedBusinessId, detailArgs.userName, detailArgs.category)
             .trackFlow(idlingResource)
             .onEach { movieFavorite -> _state.update { it.copy(movieFavorite = movieFavorite) } }
             .launchIn(viewModelScope.plus(mainDispatcher + detailHandler()))

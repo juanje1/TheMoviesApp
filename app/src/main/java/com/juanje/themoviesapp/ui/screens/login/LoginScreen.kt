@@ -19,7 +19,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.common.showMessage
+import com.juanje.themoviesapp.common.extensions.showMessage
 
 @Composable
 fun LoginScreen(

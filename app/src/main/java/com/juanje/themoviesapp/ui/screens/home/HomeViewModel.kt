@@ -10,11 +10,12 @@ import com.juanje.data.common.toAppError
 import com.juanje.domain.MainDispatcher
 import com.juanje.domain.dataclasses.Movie
 import com.juanje.domain.dataclasses.MovieFavorite
-import com.juanje.themoviesapp.common.AppIdlingResource
-import com.juanje.themoviesapp.common.ConnectivityObserver
-import com.juanje.themoviesapp.common.createHandler
-import com.juanje.themoviesapp.common.trackFlow
-import com.juanje.themoviesapp.common.trackLoading
+import com.juanje.themoviesapp.common.enums.MovieCategory
+import com.juanje.themoviesapp.common.extensions.createHandler
+import com.juanje.themoviesapp.common.extensions.trackFlow
+import com.juanje.themoviesapp.common.extensions.trackLoading
+import com.juanje.themoviesapp.common.network.ConnectivityObserver
+import com.juanje.themoviesapp.common.utils.AppIdlingResource
 import com.juanje.themoviesapp.ui.navigation.Screen
 import com.juanje.usecases.LoadMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +24,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -48,18 +49,19 @@ class HomeViewModel @Inject constructor(
         key = Screen.Home::userName.name,
         initialValue = homeArgs.userName
     )
+    private val _categoryFlow = MutableStateFlow(MovieCategory.POPULAR)
 
     private val _state = MutableStateFlow(UiState(userName = homeArgs.userName))
     val state: StateFlow<UiState> = _state
 
-    val movies: Flow<PagingData<MovieFavorite>> =
-        _userNameFlow
-            .filterNotNull()
-            .distinctUntilChanged()
-            .flatMapLatest { userName ->
-                loadMovie.invokeGetMovies(userName, "popular")
-                    .trackFlow(idlingResource) { _state.update { it.copy(isInitialLoading = false) } }
-            }.cachedIn(viewModelScope)
+    val movies: Flow<PagingData<MovieFavorite>> = combine(
+        _userNameFlow.filterNotNull(),
+        _categoryFlow
+    ) { userName, category ->
+        loadMovie.invokeGetMovies(userName, category.queryValue)
+            .trackFlow(idlingResource) { _state.update { it.copy(isInitialLoading = false) } }
+    }.flatMapLatest { it }
+    .cachedIn(viewModelScope)
 
     private fun homeHandler(onCleanup: () -> Unit = {}) = createHandler(
         onUpdateError = { errorRes -> _state.update { it.copy(error = errorRes) } },

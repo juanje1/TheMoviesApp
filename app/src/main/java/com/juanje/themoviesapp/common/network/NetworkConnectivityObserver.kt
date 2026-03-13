@@ -1,4 +1,4 @@
-package com.juanje.themoviesapp.common
+package com.juanje.themoviesapp.common.network
 
 import android.content.Context
 import android.net.ConnectivityManager

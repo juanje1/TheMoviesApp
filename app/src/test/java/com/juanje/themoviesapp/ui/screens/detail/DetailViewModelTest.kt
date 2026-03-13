@@ -3,6 +3,7 @@ package com.juanje.themoviesapp.ui.screens.detail
 import androidx.lifecycle.SavedStateHandle
 import androidx.paging.ExperimentalPagingApi
 import com.juanje.data.repositories.MovieRepositoryImpl
+import com.juanje.domain.MovieFactory.FAKE_CATEGORY
 import com.juanje.domain.MovieFactory.FAKE_ID_DETAIL
 import com.juanje.domain.MovieFactory.FAKE_USER_NAME
 import com.juanje.domain.dataclasses.MovieFavorite
@@ -49,8 +50,9 @@ class DetailViewModelTest {
     fun setUp() {
         MockitoAnnotations.openMocks(this)
         val savedStateHandle = SavedStateHandle(mapOf(
+            Screen.Detail::businessId.name to generateBusinessId(FAKE_ID_DETAIL),
             Screen.Detail::userName.name to FAKE_USER_NAME,
-            Screen.Detail::businessId.name to generateBusinessId(FAKE_ID_DETAIL)
+            Screen.Detail::category.name to FAKE_CATEGORY,
         ))
 
         whenever(mediatorProvider.getMediator<Any>(anyString(), anyString())).thenReturn(null)
@@ -95,8 +97,9 @@ class DetailViewModelTest {
         // Given
         val nonExistentId = generateBusinessId(999)
         val savedStateHandle = SavedStateHandle(mapOf(
+            Screen.Detail::businessId.name to nonExistentId,
             Screen.Detail::userName.name to FAKE_USER_NAME,
-            Screen.Detail::businessId.name to nonExistentId
+            Screen.Detail::category.name to FAKE_CATEGORY,
         ))
         detailViewModel = DetailViewModel(
             loadMovie = loadMovie,

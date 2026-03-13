@@ -32,7 +32,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import coil.compose.AsyncImage
 import com.juanje.domain.dataclasses.MovieFavorite
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.common.IMAGE_ASPECT_RATIO
+import com.juanje.themoviesapp.common.constants.IMAGE_ASPECT_RATIO
 
 @Composable
 fun DetailItem(

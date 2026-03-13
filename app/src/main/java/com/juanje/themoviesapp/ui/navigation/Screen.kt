@@ -14,5 +14,5 @@ sealed interface Screen {
     data class Home(val userName: String) : Screen
 
     @Serializable
-    data class Detail(val businessId: String, val userName: String) : Screen
+    data class Detail(val businessId: String, val userName: String, val category: String) : Screen
 }

@@ -1,4 +1,4 @@
-package com.juanje.themoviesapp.common
+package com.juanje.themoviesapp.common.utils
 
 import com.juanje.themoviesapp.utils.IdlingResourceProvider
 import javax.inject.Inject

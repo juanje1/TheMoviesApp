@@ -20,7 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.common.showMessage
+import com.juanje.themoviesapp.common.extensions.showMessage
 import com.juanje.themoviesapp.ui.screens.common.dialogs.LogoutAlertDialog
 import com.juanje.themoviesapp.ui.screens.common.others.MyTopAppBar
 

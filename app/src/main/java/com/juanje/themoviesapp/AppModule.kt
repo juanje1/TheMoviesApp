@@ -4,10 +4,10 @@ package com.juanje.themoviesapp
 import android.content.Context
 import com.juanje.domain.IoDispatcher
 import com.juanje.domain.MainDispatcher
-import com.juanje.themoviesapp.common.AppIdlingResource
-import com.juanje.themoviesapp.common.ConnectivityObserver
-import com.juanje.themoviesapp.common.EspressoAppIdlingResource
-import com.juanje.themoviesapp.common.NetworkConnectivityObserver
+import com.juanje.themoviesapp.common.utils.AppIdlingResource
+import com.juanje.themoviesapp.common.network.ConnectivityObserver
+import com.juanje.themoviesapp.common.utils.EspressoAppIdlingResource
+import com.juanje.themoviesapp.common.network.NetworkConnectivityObserver
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

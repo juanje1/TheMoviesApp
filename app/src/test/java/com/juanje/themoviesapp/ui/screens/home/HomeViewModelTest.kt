@@ -9,7 +9,7 @@ import com.juanje.domain.dataclasses.Movie
 import com.juanje.domain.dataclasses.MovieFavorite
 import com.juanje.domain.interfaces.Mapper
 import com.juanje.domain.interfaces.MovieRemoteMediatorProvider
-import com.juanje.themoviesapp.common.NetworkConnectivityObserver
+import com.juanje.themoviesapp.common.network.NetworkConnectivityObserver
 import com.juanje.themoviesapp.ui.navigation.Screen
 import com.juanje.themoviesapp.ui.screens.common.CoroutinesTestRule
 import com.juanje.themoviesapp.ui.screens.common.FakeAppIdlingResource

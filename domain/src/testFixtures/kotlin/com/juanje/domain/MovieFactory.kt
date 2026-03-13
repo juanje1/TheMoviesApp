@@ -4,7 +4,7 @@ import com.juanje.domain.dataclasses.Movie
 
 object MovieFactory {
     const val FAKE_USER_NAME = "Juan"
-    const val FAKE_CATEGORY = "popular"
+    const val FAKE_CATEGORY = "popularity.desc"
     const val FAKE_ID_DETAIL = 5
     const val FAKE_ID_FAVORITE = 5
     const val FAKE_LAST_ID_PAGE_1 = 19

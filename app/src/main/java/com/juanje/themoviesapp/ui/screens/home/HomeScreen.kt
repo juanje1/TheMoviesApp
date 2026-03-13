@@ -35,7 +35,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.juanje.themoviesapp.R
-import com.juanje.themoviesapp.common.showMessage
+import com.juanje.themoviesapp.common.extensions.showMessage
 import com.juanje.themoviesapp.ui.screens.common.dialogs.LogoutAlertDialog
 import com.juanje.themoviesapp.ui.screens.common.others.MyTopAppBar
 
@@ -43,7 +43,7 @@ import com.juanje.themoviesapp.ui.screens.common.others.MyTopAppBar
 @Composable
 fun HomeScreen(
     onLogin: () -> Unit,
-    onDetail: (String, String) -> Unit,
+    onDetail: (String, String, String) -> Unit,
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
     var showLogoutAlertDialog by rememberSaveable { mutableStateOf(false) }

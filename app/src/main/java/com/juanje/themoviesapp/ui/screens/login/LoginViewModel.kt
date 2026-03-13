@@ -6,9 +6,9 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.juanje.domain.MainDispatcher
 import com.juanje.domain.dataclasses.User
-import com.juanje.themoviesapp.common.AppIdlingResource
-import com.juanje.themoviesapp.common.createHandler
-import com.juanje.themoviesapp.common.trackLoading
+import com.juanje.themoviesapp.common.extensions.createHandler
+import com.juanje.themoviesapp.common.extensions.trackLoading
+import com.juanje.themoviesapp.common.utils.AppIdlingResource
 import com.juanje.themoviesapp.ui.navigation.Screen
 import com.juanje.usecases.LoadUser
 import dagger.hilt.android.lifecycle.HiltViewModel
