@@ -1,36 +1,39 @@
 package com.juanje.themoviesapp
 
 import android.content.Context
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.semantics.getOrNull
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onChildren
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextInput
-import androidx.lifecycle.ViewModelProvider
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import coil.annotation.ExperimentalCoilApi
 import com.juanje.themoviesapp.ui.MainActivity
-import com.juanje.themoviesapp.ui.screens.detail.DetailViewModel
-import com.juanje.themoviesapp.ui.screens.home.HomeViewModel
 import com.juanje.themoviesapp.utils.CheckDetailRobot
 import com.juanje.themoviesapp.utils.CheckHomeRobot
-import com.juanje.themoviesapp.utils.IdlingResourceProvider
 import com.juanje.themoviesapp.utils.CheckLoginRobot
 import com.juanje.themoviesapp.utils.CheckRegisterRobot
 import com.juanje.themoviesapp.utils.FillLoginRobot
 import com.juanje.themoviesapp.utils.FillRegisterRobot
+import com.juanje.themoviesapp.utils.IdlingResourceProvider
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.After
+import org.junit.Assume.assumeTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -48,19 +51,14 @@ class InstrumentedTest {
     @get:Rule(order = 1)
     val composeTestRule = createAndroidComposeRule<MainActivity>()
 
-    private lateinit var homeViewModel: HomeViewModel
-    private lateinit var detailViewModel: DetailViewModel
-
-    private val id: Int = (0..100000).random()
-    private val movieId: Int = (1..6).random()
+    private val userId: Int = (0..100000).random()
     private val timeoutMillis = TimeUnit.SECONDS.toMillis(20)
     private val context: Context = ApplicationProvider.getApplicationContext()
 
+    private lateinit var businessId: String
+
     @Before
     fun setUp() {
-        homeViewModel = ViewModelProvider(composeTestRule.activity)[HomeViewModel::class.java]
-        detailViewModel = ViewModelProvider(composeTestRule.activity)[DetailViewModel::class.java]
-
         IdlingRegistry.getInstance().register(IdlingResourceProvider.countingIdlingResource)
     }
 
@@ -91,16 +89,16 @@ class InstrumentedTest {
         composeTestRule.waitForIdle()
 
         // 4. Home
-        if (!checkHomeFields(movieId)) return
+        val movieTitle = checkHomeFields()
 
         // 5. Home -> Detail
-        composeTestRule.onTag(context.getString(R.string.home_movie_list_test)+"_$movieId").performScrollTo()
+        composeTestRule.onTag(context.getString(R.string.home_movie_list_test)+"_$businessId").performScrollTo()
         composeTestRule.waitForIdle()
-        composeTestRule.onTag(context.getString(R.string.home_movie_list_test)+"_$movieId").performClick()
+        composeTestRule.onTag(context.getString(R.string.home_movie_list_test)+"_$businessId").performClick()
         composeTestRule.waitForIdle()
 
         // 6. Detail
-        checkDetailFields(movieId)
+        checkDetailFields(businessId, movieTitle)
     }
 
     private fun checkLoginFields() {
@@ -130,7 +128,7 @@ class InstrumentedTest {
     }
 
     private fun fillLoginFields() {
-        val tags = FillLoginRobot.getFields(context, id)
+        val tags = FillLoginRobot.getFields(context, userId)
 
         tags.forEach { (tag, value) ->
             composeTestRule.onTag(tag).scrollToAndType(composeTestRule, value)
@@ -141,7 +139,7 @@ class InstrumentedTest {
     }
 
     private fun fillRegisterFields() {
-        val tags = FillRegisterRobot.getFields(context, id)
+        val tags = FillRegisterRobot.getFields(context, userId)
 
         tags.forEach { (tag, value) ->
             composeTestRule.onTag(tag).scrollToAndType(composeTestRule, value)
@@ -151,13 +149,10 @@ class InstrumentedTest {
         composeTestRule.waitForIdle()
     }
 
-    private fun checkHomeFields(movieId: Int): Boolean {
+    private fun checkHomeFields(): String {
         val loadingSpinner = context.getString(R.string.home_loading_spinner_text)
         val movieListHome = context.getString(R.string.home_movie_list_test)
         val snackBarHost = context.getString(R.string.snack_bar_host_test)
-        val tags = CheckHomeRobot.getFields(context, movieId)
-
-        var hasErrorEncountered = false
 
         composeTestRule.waitUntil(timeoutMillis) {
             composeTestRule.onAllTags(loadingSpinner).fetchSemanticsNodes().isEmpty()
@@ -168,46 +163,47 @@ class InstrumentedTest {
             val homeLoaded = composeTestRule.onAllTags(movieListHome).fetchSemanticsNodes().isNotEmpty()
             val hasError = composeTestRule.onTag(snackBarHost).onChildren().fetchSemanticsNodes().isNotEmpty()
 
-            hasErrorEncountered = hasError
-            homeLoaded || hasError
+            setError(hasError, snackBarHost)
+            homeLoaded
         }
         composeTestRule.waitForIdle()
-
-        if (hasErrorEncountered) {
-            composeTestRule.onTag(snackBarHost).assertIsDisplayed()
-            return false
-        }
 
         composeTestRule.onTag(movieListHome).assertIsDisplayed()
         composeTestRule.waitForIdle()
 
-        tags.forEach { tag -> waitAndAssertItem(tag) }
-        return true
+        val movieTag = getHomeMovieTag()
+        if (movieTag.isEmpty()) error(context.getString(R.string.error_movie_list_test))
+        businessId = movieTag.substringAfter(context.getString(R.string.home_movie_list_test)+"_")
+
+        val tags = CheckHomeRobot.getFields(context, businessId)
+        tags.forEach { tag -> waitAndAssertHomeItem(tag) }
+
+        val titleTag = "${context.getString(R.string.home_movie_title_test)}_$businessId"
+        val movieTitle = composeTestRule.onTag(titleTag).fetchSemanticsNode().config
+            .getOrNull(SemanticsProperties.Text)?.firstOrNull()?.text ?: ""
+
+        return movieTitle
     }
 
-    private fun checkDetailFields(movieId: Int) {
+    private fun checkDetailFields(businessId: String, movieTitle: String) {
         val snackBarHost = context.getString(R.string.snack_bar_host_test)
-        val tags = CheckDetailRobot.getFields(context, movieId)
-
-        var hasErrorEncountered = false
+        val tags = CheckDetailRobot.getFields(context, businessId)
 
         composeTestRule.waitUntil(timeoutMillis) {
             val detailLoaded = composeTestRule.onAllTags(tags.first()).fetchSemanticsNodes().isNotEmpty()
             val hasError = composeTestRule.onTag(snackBarHost).onChildren().fetchSemanticsNodes().isNotEmpty()
 
-            hasErrorEncountered = hasError
-            detailLoaded || hasError
+            setError(hasError, snackBarHost)
+            detailLoaded
         }
         composeTestRule.waitForIdle()
-
-        if (hasErrorEncountered) {
-            composeTestRule.onTag(snackBarHost).assertIsDisplayed()
-            return
-        }
 
         tags.forEach { tag ->
             composeTestRule.onTag(tag).scrollToAndAssertDisplayed(composeTestRule)
         }
+
+        composeTestRule.onTag(context.getString(R.string.detail_movie_title_test)+"_${businessId}")
+            .assertIsDisplayed().assertTextEquals(movieTitle)
     }
 
     private fun SemanticsNodeInteraction.scrollToAndAssertDisplayed(
@@ -233,14 +229,49 @@ class InstrumentedTest {
         composeTestRule.waitForIdle()
     }
 
-    private fun waitAndAssertItem(tag: String) {
+    private fun getHomeMovieTag(): String {
+        val snackBarHost = context.getString(R.string.snack_bar_host_test)
+        val prefix = context.getString(R.string.home_movie_list_test)+"_"
+        val description = context.getString(R.string.description_matcher_movie_test)
+        val movieMatcher = SemanticsMatcher(description) { node ->
+            node.config.getOrNull(SemanticsProperties.TestTag)?.startsWith(prefix) == true
+        }
+
         composeTestRule.waitUntil(timeoutMillis) {
-            composeTestRule.onAllTags(tag).fetchSemanticsNodes().isNotEmpty()
+            val movieLoaded = composeTestRule.onAllNodes(movieMatcher, useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty()
+            val hasError = composeTestRule.onTag(snackBarHost).onChildren().fetchSemanticsNodes().isNotEmpty()
+
+            setError(hasError, snackBarHost)
+            movieLoaded
+        }
+        composeTestRule.waitForIdle()
+
+        val movieNode = composeTestRule.onAllNodes(movieMatcher, useUnmergedTree = true).onFirst()
+
+        return movieNode.fetchSemanticsNode().config.getOrNull(SemanticsProperties.TestTag) ?: ""
+    }
+
+    private fun waitAndAssertHomeItem(tag: String) {
+        val snackBarHost = context.getString(R.string.snack_bar_host_test)
+
+        composeTestRule.waitUntil(timeoutMillis) {
+            val itemLoaded = composeTestRule.onAllTags(tag).fetchSemanticsNodes().isNotEmpty()
+            val hasError = composeTestRule.onTag(snackBarHost).onChildren().fetchSemanticsNodes().isNotEmpty()
+
+            setError(hasError, snackBarHost)
+            itemLoaded
         }
         composeTestRule.waitForIdle()
 
         composeTestRule.onTag(tag).assertIsDisplayed()
         composeTestRule.waitForIdle()
+    }
+
+    private fun setError(hasError: Boolean, snackBarHost: String) {
+        if (hasError) {
+            composeTestRule.onTag(snackBarHost).assertIsDisplayed()
+            assumeTrue(context.getString(R.string.assume_internet_test), false)
+        }
     }
 }
 

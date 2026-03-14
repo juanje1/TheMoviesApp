@@ -62,6 +62,11 @@
     <string name="snack_bar_host_test">snackBarHost</string>
     <string name="combined_loading_idling_resource">combinedLoadingIdlingResource</string>
 
+    <!-- Test Info Strings -->
+    <string name="assume_internet_test">Test Skipped: A network/interface error was detected in Home</string>
+    <string name="error_movie_list_test">Critical Fail: The Home list loaded, but no movie was found with the tag movie_</string>
+    <string name="description_matcher_movie_test">Nodes starting with the movie tag prefix</string>
+
     <!-- TopAppBar Strings -->
     <string name="profile_default_image_description">Default Profile Picture</string>
     <string name="anonymous_username_text">Welcome</string>

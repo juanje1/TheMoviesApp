@@ -58,6 +58,7 @@ class HomeViewModel @Inject constructor(
         _userNameFlow.filterNotNull(),
         _categoryFlow
     ) { userName, category ->
+        _state.update { it.copy(userName = userName, category = category) }
         loadMovie.invokeGetMovies(userName, category.queryValue)
             .trackFlow(idlingResource) { _state.update { it.copy(isInitialLoading = false) } }
     }.flatMapLatest { it }
@@ -103,6 +104,7 @@ class HomeViewModel @Inject constructor(
 
     data class UiState(
         val userName: String = "",
+        val category: MovieCategory = MovieCategory.POPULAR,
         val isInternetAvailable: Boolean = false,
         val isInitialLoading: Boolean = true,
         val isUpdatingMovies: Boolean = false,

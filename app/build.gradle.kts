@@ -66,10 +66,10 @@ android {
 
 dependencies {
     runtimeOnly(project(":framework"))
+
     implementation(project(":data"))
     implementation(project(":usecases"))
     implementation(project(":domain"))
-    testImplementation(testFixtures(project(":domain")))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
@@ -98,6 +98,7 @@ dependencies {
 
     ksp(libs.hilt.compiler)
 
+    testImplementation(testFixtures(project(":domain")))
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockito.kotlin)
@@ -105,6 +106,8 @@ dependencies {
     testImplementation(libs.androidx.paging.testing)
     testImplementation(libs.robolectric)
 
+    androidTestImplementation(testFixtures(project(":domain")))
+    androidTestImplementation(project(":framework"))
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.espresso.contrib)

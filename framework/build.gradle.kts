@@ -47,7 +47,6 @@ android {
 dependencies {
     implementation(project(":data"))
     implementation(project(":domain"))
-    testImplementation(testFixtures(project(":domain")))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.paging.common)
@@ -66,6 +65,7 @@ dependencies {
     api(libs.retrofit)
     api(libs.retrofit.converter.gson)
 
+    testImplementation(testFixtures(project(":domain")))
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockito.kotlin)

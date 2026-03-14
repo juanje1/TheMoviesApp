@@ -85,45 +85,46 @@ fun DetailItem(
                 .padding(horizontal = dimensionResource(R.dimen.padding_xlarge))
         ) {
             Text(
-                modifier = Modifier.testTag(stringResource(R.string.detail_movie_title_test) +"_${movieFavorite.movie.businessId}"),
                 text = stringResource(R.string.detail_title),
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleLarge
             )
             Text(
-                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_xsmall)),
+                modifier = Modifier
+                    .padding(top = dimensionResource(R.dimen.padding_xsmall))
+                    .testTag(stringResource(R.string.detail_movie_title_test) +"_${movieFavorite.movie.businessId}"),
                 text = movieFavorite.movie.title,
                 textAlign = TextAlign.Justify
             )
             Text(
-                modifier = Modifier
-                    .padding(top = dimensionResource(R.dimen.padding_medium))
-                    .testTag(stringResource(R.string.detail_movie_overview_test) +"_${movieFavorite.movie.businessId}"),
+                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_medium)),
                 text = stringResource(R.string.detail_overview),
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleLarge
             )
             Text(
-                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_xsmall)),
+                modifier = Modifier
+                    .padding(top = dimensionResource(R.dimen.padding_xsmall))
+                    .testTag(stringResource(R.string.detail_movie_overview_test) +"_${movieFavorite.movie.businessId}"),
                 text = movieFavorite.movie.overview,
                 textAlign = TextAlign.Justify
             )
             Text(
-                modifier = Modifier
-                    .padding(top = dimensionResource(R.dimen.padding_medium))
-                    .testTag(stringResource(R.string.detail_movie_favourite_test) +"_${movieFavorite.movie.businessId}"),
+                modifier = Modifier.padding(top = dimensionResource(R.dimen.padding_medium)),
                 text = stringResource(R.string.detail_favourite_not_favourite),
                 textDecoration = TextDecoration.Underline,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.titleLarge
             )
             Text(
-                modifier = Modifier.padding(
-                    top = dimensionResource(R.dimen.padding_xsmall),
-                    bottom = dimensionResource(R.dimen.padding_large)
-                ),
+                modifier = Modifier
+                    .padding(
+                        top = dimensionResource(R.dimen.padding_xsmall),
+                        bottom = dimensionResource(R.dimen.padding_large)
+                    )
+                    .testTag(stringResource(R.string.detail_movie_favourite_test) +"_${movieFavorite.movie.businessId}"),
                 text =
                     if (movieFavorite.isFavorite) stringResource(R.string.detail_favourite)
                     else stringResource(R.string.detail_not_favourite),

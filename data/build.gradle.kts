@@ -42,7 +42,6 @@ android {
 
 dependencies {
     implementation(project(":domain"))
-    testImplementation(testFixtures(project(":domain")))
 
     implementation(libs.androidx.paging.common)
 
@@ -50,6 +49,7 @@ dependencies {
 
     ksp(libs.hilt.compiler)
 
+    testImplementation(testFixtures(project(":domain")))
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.mockito.kotlin)
