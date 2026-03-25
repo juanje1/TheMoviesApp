@@ -50,7 +50,7 @@ fun HomeItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(IMAGE_ASPECT_RATIO)
-                .background(Color.White),
+                .background(Color(0xFFCACACA)),
             contentAlignment = Alignment.Center
         ) {
             if (movieFavorite.movie.posterPath.isEmpty()) {

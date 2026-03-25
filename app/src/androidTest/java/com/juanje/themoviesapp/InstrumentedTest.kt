@@ -178,7 +178,7 @@ class InstrumentedTest {
         val tags = CheckHomeRobot.getFields(context, businessId)
         tags.forEach { tag -> waitAndAssertHomeItem(tag) }
 
-        val titleTag = "${context.getString(R.string.home_movie_title_test)}_$businessId"
+        val titleTag = context.getString(R.string.home_movie_title_test)+"_$businessId"
         val movieTitle = composeTestRule.onTag(titleTag).fetchSemanticsNode().config
             .getOrNull(SemanticsProperties.Text)?.firstOrNull()?.text ?: ""
 
@@ -203,12 +203,13 @@ class InstrumentedTest {
         }
 
         composeTestRule.onTag(context.getString(R.string.detail_movie_title_test)+"_${businessId}")
-            .assertIsDisplayed().assertTextEquals(movieTitle)
+            .scrollToAndAssertDisplayed(composeTestRule).assertTextEquals(movieTitle)
     }
 
     private fun SemanticsNodeInteraction.scrollToAndAssertDisplayed(
         composeTestRule: ComposeContentTestRule
-    ) {
+    ) = apply {
+
         this.performScrollTo()
         composeTestRule.waitForIdle()
 
@@ -218,7 +219,8 @@ class InstrumentedTest {
 
     private fun SemanticsNodeInteraction.scrollToAndType(
         composeTestRule: ComposeContentTestRule, text: String
-    ) {
+    ) = apply {
+
         this.performScrollTo()
         composeTestRule.waitForIdle()
 
