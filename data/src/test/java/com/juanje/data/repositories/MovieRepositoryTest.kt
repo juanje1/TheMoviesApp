@@ -11,8 +11,8 @@ import com.juanje.domain.MovieFactory.generateBusinessId
 import com.juanje.domain.common.AppError
 import com.juanje.domain.dataclasses.Favorite
 import com.juanje.domain.dataclasses.MovieFavorite
-import com.juanje.domain.interfaces.Mapper
-import com.juanje.domain.interfaces.MovieRemoteMediatorProvider
+import com.juanje.data.interfaces.MovieMapper
+import com.juanje.data.interfaces.MovieRemoteMediatorProvider
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -34,7 +34,7 @@ class MovieRepositoryTest {
     @Mock private lateinit var movieLocalDataSource: MovieLocalDataSource
     @Mock private lateinit var mediatorProvider: MovieRemoteMediatorProvider
     @Mock private lateinit var favoriteLocalDataSource: FavoriteLocalDataSource
-    @Mock private lateinit var mapper: Mapper<Any, MovieFavorite>
+    @Mock private lateinit var movieMapper: MovieMapper<Any, MovieFavorite>
 
     private lateinit var movieRepository: MovieRepositoryImpl
 
@@ -44,7 +44,7 @@ class MovieRepositoryTest {
             movieLocalDataSource = movieLocalDataSource,
             mediatorProvider = mediatorProvider,
             favoriteLocalDataSource = favoriteLocalDataSource,
-            mapper = mapper
+            movieMapper = movieMapper
         )
     }
 

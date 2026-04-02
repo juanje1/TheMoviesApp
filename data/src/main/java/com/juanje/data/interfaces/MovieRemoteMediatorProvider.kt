@@ -1,4 +1,4 @@
-package com.juanje.domain.interfaces
+package com.juanje.data.interfaces
 
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.RemoteMediator

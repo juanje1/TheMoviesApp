@@ -35,14 +35,14 @@ import com.juanje.themoviesapp.common.constants.IMAGE_ASPECT_RATIO
 
 @Composable
 fun HomeItem(
-    onDetail: (String, String, String) -> Unit,
+    onDetail: () -> Unit,
     onFavourite: () -> Unit,
     movieFavorite: MovieFavorite
 ) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onDetail(movieFavorite.movie.businessId, movieFavorite.movie.userName, movieFavorite.movie.category) }
+            .clickable { onDetail() }
             .background(MaterialTheme.colorScheme.secondary)
             .testTag(stringResource(R.string.home_movie_list_test) +"_${movieFavorite.movie.businessId}"),
     ) {
@@ -88,7 +88,7 @@ fun HomeItem(
                 .height(dimensionResource(R.dimen.cell_title_height))
                 .align(Alignment.CenterHorizontally)
                 .testTag(stringResource(R.string.home_movie_title_test) +"_${movieFavorite.movie.businessId}"),
-            text = movieFavorite.movie.title,
+            text = movieFavorite.movie.title.ifEmpty { stringResource(R.string.anonymous_title_movie_text) },
             textAlign = TextAlign.Center,
             fontSize = dimensionResource(R.dimen.font_size_small).value.sp,
             color = MaterialTheme.colorScheme.background,

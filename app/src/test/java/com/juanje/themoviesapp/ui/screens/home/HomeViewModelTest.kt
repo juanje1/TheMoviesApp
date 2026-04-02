@@ -7,8 +7,8 @@ import com.juanje.data.repositories.MovieRepositoryImpl
 import com.juanje.domain.MovieFactory.FAKE_USER_NAME
 import com.juanje.domain.dataclasses.Movie
 import com.juanje.domain.dataclasses.MovieFavorite
-import com.juanje.domain.interfaces.Mapper
-import com.juanje.domain.interfaces.MovieRemoteMediatorProvider
+import com.juanje.data.interfaces.MovieMapper
+import com.juanje.data.interfaces.MovieRemoteMediatorProvider
 import com.juanje.themoviesapp.common.network.NetworkConnectivityObserver
 import com.juanje.themoviesapp.ui.navigation.Screen
 import com.juanje.themoviesapp.ui.screens.common.CoroutinesTestRule
@@ -44,7 +44,7 @@ class HomeViewModelTest {
     val coroutinesTestRule = CoroutinesTestRule()
 
     @Mock private lateinit var mediatorProvider: MovieRemoteMediatorProvider
-    @Mock private lateinit var mapper: Mapper<Any, MovieFavorite>
+    @Mock private lateinit var movieMapper: MovieMapper<Any, MovieFavorite>
     @Mock private lateinit var networkConnectivityObserver: NetworkConnectivityObserver
 
     private lateinit var movieLocalDataSource: FakeMovieLocalDataSource
@@ -66,7 +66,7 @@ class HomeViewModelTest {
             movieLocalDataSource = movieLocalDataSource,
             mediatorProvider = mediatorProvider,
             favoriteLocalDataSource = FakeFavoriteLocalDataSource(),
-            mapper = mapper
+            movieMapper = movieMapper
         )
         loadMovie = LoadMovie(movieRepository)
         homeViewModel = HomeViewModel(
@@ -84,7 +84,7 @@ class HomeViewModelTest {
         val fakeMovies = fakeMovieWithoutFavoritesList.map { it.movie }
         movieLocalDataSource.insertAll(fakeMovies)
 
-        whenever(mapper.map(any())).thenAnswer { inv ->
+        whenever(movieMapper.map(any())).thenAnswer { inv ->
             val movieIn = inv.arguments[0] as Movie
             fakeMovieWithoutFavoritesList.first { it.movie.businessId == movieIn.businessId }
         }
@@ -107,7 +107,7 @@ class HomeViewModelTest {
         val movieList = (1..2).map { createFakeMovie(it, it) }
         movieLocalDataSource.insertAll(movieList)
 
-        whenever(mapper.map(any())).thenAnswer { invocation ->
+        whenever(movieMapper.map(any())).thenAnswer { invocation ->
             val input = invocation.getArgument<Movie>(0)
             val originalMovie = fakeMovieWithFavoritesList.find { it.movie.businessId == input.businessId }
             originalMovie?.copy(isFavorite = true) ?: throw Exception("No found")

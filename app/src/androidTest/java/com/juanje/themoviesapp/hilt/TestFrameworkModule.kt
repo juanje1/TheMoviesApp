@@ -8,8 +8,8 @@ import com.juanje.data.datasources.MovieRemoteDataSource
 import com.juanje.data.datasources.PageLocalDataSource
 import com.juanje.data.datasources.UserLocalDataSource
 import com.juanje.domain.dataclasses.MovieFavorite
-import com.juanje.domain.interfaces.Mapper
-import com.juanje.domain.interfaces.MovieRemoteMediatorProvider
+import com.juanje.data.interfaces.MovieMapper
+import com.juanje.data.interfaces.MovieRemoteMediatorProvider
 import com.juanje.framework.FrameworkModule
 import com.juanje.framework.database.TheMoviesAppDatabase
 import com.juanje.framework.database.daos.FavoriteDao
@@ -116,5 +116,5 @@ abstract class TestFrameworkModule {
     abstract fun bindFavoriteLocalDataSource(favoriteDatabaseDataSource: FavoriteDatabaseDataSource): FavoriteLocalDataSource
 
     @Binds
-    abstract fun bindMovieMapper(movieMapperImpl: MovieMapperImpl): Mapper<Any, MovieFavorite>
+    abstract fun bindMovieMapper(movieMapperImpl: MovieMapperImpl): MovieMapper<Any, MovieFavorite>
 }

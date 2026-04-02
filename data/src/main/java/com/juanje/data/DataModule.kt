@@ -2,10 +2,8 @@
 package com.juanje.data
 
 import com.juanje.data.repositories.MovieRepositoryImpl
-import com.juanje.data.repositories.PageRepositoryImpl
 import com.juanje.data.repositories.UserRepositoryImpl
 import com.juanje.domain.repositories.MovieRepository
-import com.juanje.domain.repositories.PageRepository
 import com.juanje.domain.repositories.UserRepository
 import dagger.Binds
 import dagger.Module
@@ -23,8 +21,4 @@ abstract class DataModule {
     @Binds
     @Singleton
     abstract fun bindMovieRepository(movieRepositoryImpl: MovieRepositoryImpl): MovieRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindPageRepository(pageRepositoryImpl: PageRepositoryImpl): PageRepository
 }

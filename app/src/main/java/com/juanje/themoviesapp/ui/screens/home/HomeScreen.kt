@@ -133,13 +133,13 @@ fun HomeScreen(
                     items(
                         movies.itemCount,
                         key = movies.itemKey { it.movie.businessId },
-                        contentType = { "movie" }
+                        contentType = { stringResource(R.string.home_items_content_type) }
                     ) { index ->
                         val movieFavorite = movies[index]
 
                         if (movieFavorite != null) {
                             HomeItem(
-                                onDetail = onDetail,
+                                onDetail = { onDetail(movieFavorite.movie.businessId, movieFavorite.movie.userName, movieFavorite.movie.category) },
                                 onFavourite = { homeViewModel.updateMovie(movieFavorite.movie, movieFavorite.isFavorite) },
                                 movieFavorite = movieFavorite
                             )

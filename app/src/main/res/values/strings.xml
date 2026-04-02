@@ -26,6 +26,9 @@
     <string name="register_password_hide">Hide Password</string>
     <string name="register_password_show">Show Password</string>
 
+    <!-- Home Screen Strings -->
+    <string name="home_items_content_type">movie</string>
+
     <!-- Detail Screen Strings -->
     <string name="detail_title">Title</string>
     <string name="detail_overview">Overview</string>

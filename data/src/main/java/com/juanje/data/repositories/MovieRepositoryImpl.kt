@@ -12,8 +12,8 @@ import com.juanje.data.datasources.MovieLocalDataSource
 import com.juanje.domain.dataclasses.Favorite
 import com.juanje.domain.dataclasses.Movie
 import com.juanje.domain.dataclasses.MovieFavorite
-import com.juanje.domain.interfaces.Mapper
-import com.juanje.domain.interfaces.MovieRemoteMediatorProvider
+import com.juanje.data.interfaces.MovieMapper
+import com.juanje.data.interfaces.MovieRemoteMediatorProvider
 import com.juanje.domain.repositories.MovieRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +27,7 @@ class MovieRepositoryImpl @Inject constructor(
     private val movieLocalDataSource: MovieLocalDataSource,
     private val mediatorProvider: MovieRemoteMediatorProvider,
     private val favoriteLocalDataSource: FavoriteLocalDataSource,
-    private val mapper: Mapper<Any, MovieFavorite>
+    private val movieMapper: MovieMapper<Any, MovieFavorite>
 ): MovieRepository {
 
     companion object {
@@ -44,7 +44,7 @@ class MovieRepositoryImpl @Inject constructor(
             ),
             remoteMediator = mediatorProvider.getMediator(userName, category),
             pagingSourceFactory = { movieLocalDataSource.getMovies(userName, category) }
-        ).flow.map { pagingData -> pagingData.map { mapper.map(it) } }
+        ).flow.map { pagingData -> pagingData.map { movieMapper.map(it) } }
     }
 
     override fun getMovie(businessId: String, userName: String, category: String): Flow<MovieFavorite> {

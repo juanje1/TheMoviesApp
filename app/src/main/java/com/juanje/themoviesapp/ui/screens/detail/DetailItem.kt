@@ -94,7 +94,7 @@ fun DetailItem(
                 modifier = Modifier
                     .padding(top = dimensionResource(R.dimen.padding_xsmall))
                     .testTag(stringResource(R.string.detail_movie_title_test) +"_${movieFavorite.movie.businessId}"),
-                text = movieFavorite.movie.title,
+                text = movieFavorite.movie.title.ifEmpty { stringResource(R.string.anonymous_title_movie_text) },
                 textAlign = TextAlign.Justify
             )
             Text(
@@ -108,7 +108,7 @@ fun DetailItem(
                 modifier = Modifier
                     .padding(top = dimensionResource(R.dimen.padding_xsmall))
                     .testTag(stringResource(R.string.detail_movie_overview_test) +"_${movieFavorite.movie.businessId}"),
-                text = movieFavorite.movie.overview,
+                text = movieFavorite.movie.overview.ifEmpty { stringResource(R.string.anonymous_title_movie_text) },
                 textAlign = TextAlign.Justify
             )
             Text(

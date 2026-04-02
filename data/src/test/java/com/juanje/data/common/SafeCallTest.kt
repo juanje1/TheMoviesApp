@@ -1,7 +1,6 @@
-package com.juanje.data.repositories
+package com.juanje.data.common
 
 import android.database.sqlite.SQLiteException
-import com.juanje.data.common.safeCall
 import com.juanje.domain.common.AppError
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -13,7 +12,7 @@ import kotlin.test.Test
 import kotlin.test.assertFailsWith
 
 @RunWith(RobolectricTestRunner::class)
-class PageRepositoryTest {
+class SafeCallTest {
 
     @Test
     fun `When call is successful, should return value`() = runTest {

@@ -7,8 +7,8 @@ import com.juanje.domain.MovieFactory.FAKE_CATEGORY
 import com.juanje.domain.MovieFactory.FAKE_ID_DETAIL
 import com.juanje.domain.MovieFactory.FAKE_USER_NAME
 import com.juanje.domain.dataclasses.MovieFavorite
-import com.juanje.domain.interfaces.Mapper
-import com.juanje.domain.interfaces.MovieRemoteMediatorProvider
+import com.juanje.data.interfaces.MovieMapper
+import com.juanje.data.interfaces.MovieRemoteMediatorProvider
 import com.juanje.themoviesapp.ui.navigation.Screen
 import com.juanje.themoviesapp.ui.screens.common.CoroutinesTestRule
 import com.juanje.themoviesapp.ui.screens.common.FakeAppIdlingResource
@@ -40,7 +40,7 @@ class DetailViewModelTest {
     val coroutinesTestRule = CoroutinesTestRule()
 
     @Mock private lateinit var mediatorProvider: MovieRemoteMediatorProvider
-    @Mock private lateinit var mapper: Mapper<Any, MovieFavorite>
+    @Mock private lateinit var movieMapper: MovieMapper<Any, MovieFavorite>
 
     private lateinit var movieRepository: MovieRepositoryImpl
     private lateinit var loadMovie: LoadMovie
@@ -65,7 +65,7 @@ class DetailViewModelTest {
                 movieLocalDataSource = fakeMovieLocalDataSource,
                 mediatorProvider = mediatorProvider,
                 favoriteLocalDataSource = FakeFavoriteLocalDataSource(),
-                mapper = mapper
+                movieMapper = movieMapper
             )
             loadMovie = LoadMovie(movieRepository)
             detailViewModel = DetailViewModel(
