@@ -9,10 +9,6 @@ data class FavoriteDatabase (
     @PrimaryKey val businessId: String
 )
 
-fun FavoriteDatabase.toFavorite() = Favorite(
-    businessId = businessId
-)
-
 fun Favorite.toFavoriteDatabase() = FavoriteDatabase(
     businessId = businessId
 )
