@@ -53,6 +53,7 @@ fun HomeScreen(
 
     val homeState by homeViewModel.state.collectAsState()
     val errorMessage = homeState.error?.let { stringResource(it) }
+    val itemsContentType = stringResource(R.string.home_items_content_type)
     val listState = rememberLazyGridState()
     val coroutineScope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }
@@ -133,7 +134,7 @@ fun HomeScreen(
                     items(
                         movies.itemCount,
                         key = movies.itemKey { it.movie.businessId },
-                        contentType = { stringResource(R.string.home_items_content_type) }
+                        contentType = { itemsContentType }
                     ) { index ->
                         val movieFavorite = movies[index]
 
