@@ -5,10 +5,10 @@ import com.juanje.domain.dataclasses.MovieFavorite
 
 object MovieFactory {
     private const val FAKE_TOTAL_MOVIES = 10
-    private const val FAKE_TOTAL_MOVIES_FAVORITES = 2
 
     const val FAKE_USER_NAME = "Juan"
     const val FAKE_CATEGORY = "popularity.desc"
+    const val FAKE_TOTAL_MOVIES_FAVORITES = 2
     const val FAKE_ID_DETAIL = 5
     const val FAKE_ID_FAVORITE = 5
     const val FAKE_LAST_ID_PAGE_1 = 19

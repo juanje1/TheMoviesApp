@@ -3,15 +3,16 @@ package com.juanje.themoviesapp.ui.screens.home
 import androidx.lifecycle.SavedStateHandle
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.testing.asSnapshot
-import com.juanje.data.repositories.MovieRepositoryImpl
-import com.juanje.domain.MovieFactory.FAKE_USER_NAME
-import com.juanje.domain.dataclasses.Movie
-import com.juanje.domain.dataclasses.MovieFavorite
 import com.juanje.data.interfaces.MovieMapper
 import com.juanje.data.interfaces.MovieRemoteMediatorProvider
-import com.juanje.domain.MovieFactory.createFakeMovie
+import com.juanje.data.repositories.MovieRepositoryImpl
+import com.juanje.domain.MovieFactory.FAKE_TOTAL_MOVIES_FAVORITES
+import com.juanje.domain.MovieFactory.FAKE_USER_NAME
+import com.juanje.domain.MovieFactory.createFakeMovies
 import com.juanje.domain.MovieFactory.fakeMovieWithFavoritesList
 import com.juanje.domain.MovieFactory.fakeMovieWithoutFavoritesList
+import com.juanje.domain.MovieFactory.fakeMoviesList
+import com.juanje.domain.dataclasses.MovieFavorite
 import com.juanje.themoviesapp.common.network.NetworkConnectivityObserver
 import com.juanje.themoviesapp.ui.navigation.Screen
 import com.juanje.themoviesapp.ui.screens.common.CoroutinesTestRule
@@ -83,12 +84,11 @@ class HomeViewModelTest {
     @Test
     fun `Listening to movies flow emits the list of movies from the server without favorites`() = runTest {
         // Given
-        val fakeMovies = fakeMovieWithoutFavoritesList.map { it.movie }
-        movieLocalDataSource.insertAll(fakeMovies)
+        movieLocalDataSource.insertAll(fakeMoviesList)
 
         whenever(movieMapper.map(any())).thenAnswer { inv ->
-            val movieIn = inv.arguments[0] as Movie
-            fakeMovieWithoutFavoritesList.first { it.movie.businessId == movieIn.businessId }
+            val movieIn = inv.arguments[0] as MovieFavorite
+            fakeMovieWithoutFavoritesList.first { it.movie.businessId == movieIn.movie.businessId }
         }
 
         // When
@@ -98,7 +98,7 @@ class HomeViewModelTest {
         // Then
         assertEquals(fakeMovieWithoutFavoritesList, movieFavoriteList)
         movieFavoriteList.forEachIndexed { i, movieFavorite ->
-            assertEquals(fakeMovies[i].businessId, movieFavorite.movie.businessId)
+            assertEquals(fakeMoviesList[i].businessId, movieFavorite.movie.businessId)
             assertFalse(movieFavorite.isFavorite)
         }
     }
@@ -106,12 +106,12 @@ class HomeViewModelTest {
     @Test
     fun `Updating the movies in the local database`() = runTest {
         // Given
-        val movieList = (1..2).map { createFakeMovie(it, it) }
+        val movieList = createFakeMovies(quantity = FAKE_TOTAL_MOVIES_FAVORITES)
         movieLocalDataSource.insertAll(movieList)
 
         whenever(movieMapper.map(any())).thenAnswer { invocation ->
-            val input = invocation.getArgument<Movie>(0)
-            val originalMovie = fakeMovieWithFavoritesList.find { it.movie.businessId == input.businessId }
+            val input = invocation.getArgument<MovieFavorite>(0)
+            val originalMovie = fakeMovieWithFavoritesList.find { it.movie.businessId == input.movie.businessId }
             originalMovie?.copy(isFavorite = true) ?: throw Exception("No found")
         }
 
