@@ -9,13 +9,13 @@ import com.juanje.domain.MovieFactory.FAKE_USER_NAME
 import com.juanje.domain.dataclasses.MovieFavorite
 import com.juanje.data.interfaces.MovieMapper
 import com.juanje.data.interfaces.MovieRemoteMediatorProvider
+import com.juanje.domain.MovieFactory.fakeMoviesList
+import com.juanje.domain.MovieFactory.generateBusinessId
 import com.juanje.themoviesapp.ui.navigation.Screen
 import com.juanje.themoviesapp.ui.screens.common.CoroutinesTestRule
 import com.juanje.themoviesapp.ui.screens.common.FakeAppIdlingResource
 import com.juanje.themoviesapp.ui.screens.common.FakeFavoriteLocalDataSource
 import com.juanje.themoviesapp.ui.screens.common.FakeMovieLocalDataSource
-import com.juanje.themoviesapp.ui.screens.common.fakeMoviesList
-import com.juanje.themoviesapp.ui.screens.common.generateBusinessId
 import com.juanje.usecases.LoadMovie
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle

@@ -13,12 +13,12 @@ import androidx.test.core.app.ApplicationProvider
 import com.juanje.data.datasources.MovieLocalDataSource
 import com.juanje.data.datasources.MovieRemoteDataSource
 import com.juanje.data.datasources.PageLocalDataSource
-import com.juanje.domain.MovieFactory.API_KEY
+import com.juanje.domain.MovieFactory.FAKE_API_KEY
 import com.juanje.domain.MovieFactory.FAKE_CATEGORY
 import com.juanje.domain.MovieFactory.FAKE_LAST_ID_PAGE_1
 import com.juanje.domain.MovieFactory.FAKE_LAST_ID_PAGE_2
 import com.juanje.domain.MovieFactory.FAKE_USER_NAME
-import com.juanje.domain.MovieFactory.createMovies
+import com.juanje.domain.MovieFactory.createFakeMovies
 import com.juanje.domain.dataclasses.Movie
 import com.juanje.domain.dataclasses.Page
 import com.juanje.framework.database.TheMoviesAppDatabase
@@ -68,7 +68,7 @@ class MovieRepositoryTest {
             pageLocalDataSource = pageLocalDataSource,
             userName = FAKE_USER_NAME,
             category = FAKE_CATEGORY,
-            apiKey = API_KEY
+            apiKey = FAKE_API_KEY
         )
     }
 
@@ -80,9 +80,9 @@ class MovieRepositoryTest {
     @Test
     fun `When DB is empty, Mediator should request page 1`() = runTest {
         // Given
-        val movies = createMovies()
+        val movies = createFakeMovies()
 
-        whenever(movieRemoteDataSource.getMovies(any(), any(), eq(API_KEY), eq(1)))
+        whenever(movieRemoteDataSource.getMovies(any(), any(), eq(FAKE_API_KEY), eq(1)))
             .thenReturn(movies)
 
         val pagingState = PagingState<Int, MovieDatabase>(
@@ -96,7 +96,7 @@ class MovieRepositoryTest {
         val result = movieRemoteMediator.load(LoadType.REFRESH, pagingState)
 
         // Then
-        verify(movieRemoteDataSource).getMovies(any(), any(), eq(API_KEY), eq(1))
+        verify(movieRemoteDataSource).getMovies(any(), any(), eq(FAKE_API_KEY), eq(1))
         verify(movieLocalDataSource).insertAll(any())
         assertTrue(result is RemoteMediator.MediatorResult.Success)
         assertFalse((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
@@ -105,13 +105,13 @@ class MovieRepositoryTest {
     @Test
     fun `When loading more and last movie exists, request next page`() = runTest {
         // Given
-        val lastMovie = createMovies()[FAKE_LAST_ID_PAGE_1]
+        val lastMovie = createFakeMovies()[FAKE_LAST_ID_PAGE_1]
         val lastMovieDatabase = lastMovie.toMovieDatabase()
-        val movies = createMovies(init = 20)
+        val movies = createFakeMovies(init = 20)
 
         whenever(pageLocalDataSource.getPage(any(), any()))
             .thenReturn(Page(FAKE_USER_NAME, FAKE_CATEGORY, nextPage = 2))
-        whenever(movieRemoteDataSource.getMovies(any(), any(), eq(API_KEY), eq(2)))
+        whenever(movieRemoteDataSource.getMovies(any(), any(), eq(FAKE_API_KEY), eq(2)))
             .thenReturn(movies)
 
         val pagingState = PagingState(
@@ -126,7 +126,7 @@ class MovieRepositoryTest {
 
         // Then
         verify(pageLocalDataSource).getPage(any(), any())
-        verify(movieRemoteDataSource).getMovies(any(), any(), eq(API_KEY), eq(2))
+        verify(movieRemoteDataSource).getMovies(any(), any(), eq(FAKE_API_KEY), eq(2))
         verify(movieLocalDataSource).insertAll(any())
         assertTrue(result is RemoteMediator.MediatorResult.Success)
         assertFalse((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
@@ -135,11 +135,11 @@ class MovieRepositoryTest {
     @Test
     fun `When LoadType is refresh, database should be cleared and repopulated`() = runTest {
         // Given
-        val lastMovie = createMovies()[FAKE_LAST_ID_PAGE_1]
+        val lastMovie = createFakeMovies()[FAKE_LAST_ID_PAGE_1]
         val lastMovieDatabase = lastMovie.toMovieDatabase()
-        val movies = createMovies()
+        val movies = createFakeMovies()
 
-        whenever(movieRemoteDataSource.getMovies(any(), any(), eq(API_KEY), eq(1)))
+        whenever(movieRemoteDataSource.getMovies(any(), any(), eq(FAKE_API_KEY), eq(1)))
             .thenReturn(movies)
 
         val pagingState = PagingState(
@@ -162,13 +162,13 @@ class MovieRepositoryTest {
     @Test
     fun `Mediator should assign correct displayOrder based on current count`() = runTest {
         // Given
-        val lastMovie = createMovies(quantity = 40)[FAKE_LAST_ID_PAGE_2]
+        val lastMovie = createFakeMovies(quantity = 40)[FAKE_LAST_ID_PAGE_2]
         val lastMovieDatabase = lastMovie.toMovieDatabase()
-        val movies = createMovies(init = 40)
+        val movies = createFakeMovies(init = 40)
 
         whenever(pageLocalDataSource.getPage(any(), any()))
             .thenReturn(Page(FAKE_USER_NAME, FAKE_CATEGORY, nextPage = 3))
-        whenever(movieRemoteDataSource.getMovies(any(), any(), eq(API_KEY), eq(3)))
+        whenever(movieRemoteDataSource.getMovies(any(), any(), eq(FAKE_API_KEY), eq(3)))
             .thenReturn(movies)
 
         val pagingState = PagingState(
@@ -215,7 +215,7 @@ class MovieRepositoryTest {
     @Test
     fun `When SQLiteException is thrown in insertAll, the exception is retrieved`() = runTest {
         // Given
-        val movies = createMovies()
+        val movies = createFakeMovies()
 
         whenever(movieRemoteDataSource.getMovies(any(), any(), any(), any()))
             .thenReturn(movies)

@@ -9,15 +9,15 @@ import com.juanje.domain.dataclasses.Movie
 import com.juanje.domain.dataclasses.MovieFavorite
 import com.juanje.data.interfaces.MovieMapper
 import com.juanje.data.interfaces.MovieRemoteMediatorProvider
+import com.juanje.domain.MovieFactory.createFakeMovie
+import com.juanje.domain.MovieFactory.fakeMovieWithFavoritesList
+import com.juanje.domain.MovieFactory.fakeMovieWithoutFavoritesList
 import com.juanje.themoviesapp.common.network.NetworkConnectivityObserver
 import com.juanje.themoviesapp.ui.navigation.Screen
 import com.juanje.themoviesapp.ui.screens.common.CoroutinesTestRule
 import com.juanje.themoviesapp.ui.screens.common.FakeAppIdlingResource
 import com.juanje.themoviesapp.ui.screens.common.FakeFavoriteLocalDataSource
 import com.juanje.themoviesapp.ui.screens.common.FakeMovieLocalDataSource
-import com.juanje.themoviesapp.ui.screens.common.createFakeMovie
-import com.juanje.themoviesapp.ui.screens.common.fakeMovieWithFavoritesList
-import com.juanje.themoviesapp.ui.screens.common.fakeMovieWithoutFavoritesList
 import com.juanje.usecases.LoadMovie
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
@@ -55,10 +55,12 @@ class HomeViewModelTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        val savedStateHandle = SavedStateHandle(mapOf(Screen.Home::userName.name to FAKE_USER_NAME))
+        val savedStateHandle = SavedStateHandle(mapOf(
+            Screen.Home::userName.name to FAKE_USER_NAME
+        ))
 
-        whenever(networkConnectivityObserver.observe()).thenReturn(flowOf(true))
         whenever(mediatorProvider.getMediator<Any>(anyString(), anyString())).thenReturn(null)
+        whenever(networkConnectivityObserver.observe()).thenReturn(flowOf(true))
 
         movieLocalDataSource = FakeMovieLocalDataSource()
 

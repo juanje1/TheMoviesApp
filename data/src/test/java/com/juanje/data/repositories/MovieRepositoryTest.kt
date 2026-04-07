@@ -6,7 +6,7 @@ import com.juanje.data.datasources.MovieLocalDataSource
 import com.juanje.domain.MovieFactory.FAKE_CATEGORY
 import com.juanje.domain.MovieFactory.FAKE_ID_FAVORITE
 import com.juanje.domain.MovieFactory.FAKE_USER_NAME
-import com.juanje.domain.MovieFactory.createMovies
+import com.juanje.domain.MovieFactory.createFakeMovies
 import com.juanje.domain.MovieFactory.generateBusinessId
 import com.juanje.domain.common.AppError
 import com.juanje.domain.dataclasses.Favorite
@@ -51,7 +51,7 @@ class MovieRepositoryTest {
     @Test
     fun `When getMovie is called, should combine movie and favorite status correctly`() = runTest {
         // Given
-        val movie = createMovies()[FAKE_ID_FAVORITE - 1]
+        val movie = createFakeMovies()[FAKE_ID_FAVORITE - 1]
         val businessId = generateBusinessId(FAKE_ID_FAVORITE)
         val isFavorite = true
 
@@ -71,7 +71,7 @@ class MovieRepositoryTest {
     @Test
     fun `When isFavorite is true, must insert favorite with generated ID`() = runTest {
         // Given
-        val moviesList = createMovies()
+        val moviesList = createFakeMovies()
         val movieToFavorite = moviesList[FAKE_ID_FAVORITE - 1]
         val businessId = generateBusinessId(FAKE_ID_FAVORITE)
 
@@ -89,7 +89,7 @@ class MovieRepositoryTest {
     @Test
     fun `When isFavorite is false, must delete favorite`() = runTest {
         // Given
-        val moviesList = createMovies()
+        val moviesList = createFakeMovies()
         val movieToFavorite = moviesList[FAKE_ID_FAVORITE - 1]
         val businessId = generateBusinessId(FAKE_ID_FAVORITE)
 
@@ -104,7 +104,7 @@ class MovieRepositoryTest {
     @Test
     fun `When SQLiteException is thrown in updateMovie, evolve with AppError Database`() = runTest {
         // Given
-        val moviesList = createMovies()
+        val moviesList = createFakeMovies()
         val movieToFavorite = moviesList[FAKE_ID_FAVORITE - 1]
         whenever(favoriteLocalDataSource.deleteFavorite(any())).thenThrow(SQLiteException())
 
