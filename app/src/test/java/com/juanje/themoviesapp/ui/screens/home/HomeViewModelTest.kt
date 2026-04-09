@@ -6,11 +6,7 @@ import androidx.paging.testing.asSnapshot
 import com.juanje.data.interfaces.MovieMapper
 import com.juanje.data.interfaces.MovieRemoteMediatorProvider
 import com.juanje.data.repositories.MovieRepositoryImpl
-import com.juanje.domain.MovieFactory.FAKE_TOTAL_MOVIES_FAVORITES
 import com.juanje.domain.MovieFactory.FAKE_USER_NAME
-import com.juanje.domain.MovieFactory.createFakeMovies
-import com.juanje.domain.MovieFactory.fakeMovieWithFavoritesList
-import com.juanje.domain.MovieFactory.fakeMovieWithoutFavoritesList
 import com.juanje.domain.MovieFactory.fakeMoviesList
 import com.juanje.domain.dataclasses.MovieFavorite
 import com.juanje.themoviesapp.common.network.NetworkConnectivityObserver
@@ -49,6 +45,7 @@ class HomeViewModelTest {
     @Mock private lateinit var networkConnectivityObserver: NetworkConnectivityObserver
 
     private lateinit var movieLocalDataSource: FakeMovieLocalDataSource
+    private lateinit var favoriteLocalDataSource: FakeFavoriteLocalDataSource
     private lateinit var movieRepository: MovieRepositoryImpl
     private lateinit var loadMovie: LoadMovie
     private lateinit var homeViewModel: HomeViewModel
@@ -63,12 +60,17 @@ class HomeViewModelTest {
         whenever(mediatorProvider.getMediator<Any>(anyString(), anyString())).thenReturn(null)
         whenever(networkConnectivityObserver.observe()).thenReturn(flowOf(true))
 
-        movieLocalDataSource = FakeMovieLocalDataSource()
+        favoriteLocalDataSource = FakeFavoriteLocalDataSource()
+        movieLocalDataSource = FakeMovieLocalDataSource(favoriteLocalDataSource)
+
+        runTest(coroutinesTestRule.testDispatcher) {
+            movieLocalDataSource.insertAll(fakeMoviesList)
+        }
 
         movieRepository = MovieRepositoryImpl(
             movieLocalDataSource = movieLocalDataSource,
             mediatorProvider = mediatorProvider,
-            favoriteLocalDataSource = FakeFavoriteLocalDataSource(),
+            favoriteLocalDataSource = favoriteLocalDataSource,
             movieMapper = movieMapper
         )
         loadMovie = LoadMovie(movieRepository)
@@ -84,45 +86,31 @@ class HomeViewModelTest {
     @Test
     fun `Listening to movies flow emits the list of movies from the server without favorites`() = runTest {
         // Given
-        movieLocalDataSource.insertAll(fakeMoviesList)
-
-        whenever(movieMapper.map(any())).thenAnswer { inv ->
-            val movieIn = inv.arguments[0] as MovieFavorite
-            fakeMovieWithoutFavoritesList.first { it.movie.businessId == movieIn.movie.businessId }
-        }
+        whenever(movieMapper.map(any())).thenAnswer { it.getArgument<MovieFavorite>(0) }
 
         // When
         advanceUntilIdle()
         val movieFavoriteList = homeViewModel.movies.asSnapshot()
 
         // Then
-        assertEquals(fakeMovieWithoutFavoritesList, movieFavoriteList)
-        movieFavoriteList.forEachIndexed { i, movieFavorite ->
-            assertEquals(fakeMoviesList[i].businessId, movieFavorite.movie.businessId)
-            assertFalse(movieFavorite.isFavorite)
-        }
+        assertEquals(fakeMoviesList, movieFavoriteList.map { it.movie })
+        movieFavoriteList.forEach { assertFalse(it.isFavorite) }
     }
 
     @Test
     fun `Updating the movies in the local database`() = runTest {
         // Given
-        val movieList = createFakeMovies(quantity = FAKE_TOTAL_MOVIES_FAVORITES)
-        movieLocalDataSource.insertAll(movieList)
-
-        whenever(movieMapper.map(any())).thenAnswer { invocation ->
-            val input = invocation.getArgument<MovieFavorite>(0)
-            val originalMovie = fakeMovieWithFavoritesList.find { it.movie.businessId == input.movie.businessId }
-            originalMovie?.copy(isFavorite = true) ?: throw Exception("No found")
-        }
+        whenever(movieMapper.map(any())).thenAnswer { it.getArgument<MovieFavorite>(0) }
 
         // When
         advanceUntilIdle()
-        movieList.forEach { movie -> homeViewModel.updateMovie(movie, true) }
+        fakeMoviesList.forEach { movie -> homeViewModel.updateMovie(movie, true) }
+        
         advanceUntilIdle()
         val movieFavoriteList = homeViewModel.movies.asSnapshot()
 
         // Then
-        assertEquals(movieList, movieFavoriteList.map { it.movie })
+        assertEquals(fakeMoviesList, movieFavoriteList.map { it.movie })
         movieFavoriteList.forEach { assertTrue(it.isFavorite) }
     }
 }

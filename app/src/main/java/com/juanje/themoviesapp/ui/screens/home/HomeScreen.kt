@@ -141,7 +141,7 @@ fun HomeScreen(
                         if (movieFavorite != null) {
                             HomeItem(
                                 onDetail = { onDetail(movieFavorite.movie.businessId, movieFavorite.movie.userName, movieFavorite.movie.category) },
-                                onFavourite = { homeViewModel.updateMovie(movieFavorite.movie, movieFavorite.isFavorite) },
+                                onFavourite = { homeViewModel.updateMovie(movieFavorite.movie, !movieFavorite.isFavorite) },
                                 movieFavorite = movieFavorite
                             )
                         }

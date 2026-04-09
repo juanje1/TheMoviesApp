@@ -85,7 +85,7 @@ class HomeViewModel @Inject constructor(
         _state.update { it.copy(isUpdatingMovies = true, error = null) }
 
         trackLoading(idlingResource = idlingResource) {
-            loadMovie.invokeUpdateMovie(movie, !favorite)
+            loadMovie.invokeUpdateMovie(movie, favorite)
         }
         _state.update { it.copy(isUpdatingMovies = false) }
     }

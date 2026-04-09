@@ -42,6 +42,8 @@ class DetailViewModelTest {
     @Mock private lateinit var mediatorProvider: MovieRemoteMediatorProvider
     @Mock private lateinit var movieMapper: MovieMapper<Any, MovieFavorite>
 
+    private lateinit var movieLocalDataSource: FakeMovieLocalDataSource
+    private lateinit var favoriteLocalDataSource: FakeFavoriteLocalDataSource
     private lateinit var movieRepository: MovieRepositoryImpl
     private lateinit var loadMovie: LoadMovie
     private lateinit var detailViewModel: DetailViewModel
@@ -49,32 +51,35 @@ class DetailViewModelTest {
     @Before
     fun setUp() {
         MockitoAnnotations.openMocks(this)
-        val savedStateHandle = SavedStateHandle(mapOf(
-            Screen.Detail::businessId.name to generateBusinessId(FAKE_ID_DETAIL),
-            Screen.Detail::userName.name to FAKE_USER_NAME,
-            Screen.Detail::category.name to FAKE_CATEGORY,
-        ))
-
+        val savedStateHandle = SavedStateHandle(
+            mapOf(
+                Screen.Detail::businessId.name to generateBusinessId(FAKE_ID_DETAIL),
+                Screen.Detail::userName.name to FAKE_USER_NAME,
+                Screen.Detail::category.name to FAKE_CATEGORY,
+            )
+        )
         whenever(mediatorProvider.getMediator<Any>(anyString(), anyString())).thenReturn(null)
 
-        runTest {
-            val fakeMovieLocalDataSource = FakeMovieLocalDataSource()
-            fakeMovieLocalDataSource.insertAll(fakeMoviesList)
+        favoriteLocalDataSource = FakeFavoriteLocalDataSource()
+        movieLocalDataSource = FakeMovieLocalDataSource(favoriteLocalDataSource)
 
-            movieRepository = MovieRepositoryImpl(
-                movieLocalDataSource = fakeMovieLocalDataSource,
-                mediatorProvider = mediatorProvider,
-                favoriteLocalDataSource = FakeFavoriteLocalDataSource(),
-                movieMapper = movieMapper
-            )
-            loadMovie = LoadMovie(movieRepository)
-            detailViewModel = DetailViewModel(
-                loadMovie = loadMovie,
-                idlingResource = FakeAppIdlingResource(),
-                mainDispatcher = coroutinesTestRule.testDispatcher,
-                savedStateHandle = savedStateHandle
-            )
+        runTest(coroutinesTestRule.testDispatcher) {
+            movieLocalDataSource.insertAll(fakeMoviesList)
         }
+
+        movieRepository = MovieRepositoryImpl(
+            movieLocalDataSource = movieLocalDataSource,
+            mediatorProvider = mediatorProvider,
+            favoriteLocalDataSource = favoriteLocalDataSource,
+            movieMapper = movieMapper
+        )
+        loadMovie = LoadMovie(movieRepository)
+        detailViewModel = DetailViewModel(
+            loadMovie = loadMovie,
+            idlingResource = FakeAppIdlingResource(),
+            mainDispatcher = coroutinesTestRule.testDispatcher,
+            savedStateHandle = savedStateHandle
+        )
     }
 
     @Test

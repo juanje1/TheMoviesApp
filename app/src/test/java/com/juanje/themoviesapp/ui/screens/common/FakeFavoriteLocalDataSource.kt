@@ -4,10 +4,12 @@ import com.juanje.data.datasources.FavoriteLocalDataSource
 import com.juanje.domain.dataclasses.Favorite
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 
 class FakeFavoriteLocalDataSource : FavoriteLocalDataSource {
-    private var favorites = MutableStateFlow<List<Favorite>>(emptyList())
+    private val favorites = MutableStateFlow<List<Favorite>>(emptyList())
 
     override fun getFavorite(businessId: String): Flow<Boolean> =
         favorites.map { list -> list.any { it.businessId == businessId } }
@@ -24,4 +26,6 @@ class FakeFavoriteLocalDataSource : FavoriteLocalDataSource {
     override suspend fun deleteFavorite(businessId: String) {
         favorites.value = favorites.value.filterNot { it.businessId == businessId }
     }
+
+    fun getAllFavorites(): StateFlow<List<Favorite>> = favorites.asStateFlow()
 }
