@@ -51,12 +51,11 @@ class MovieRepositoryTest {
     @Test
     fun `When getMovie is called, should combine movie and favorite status correctly`() = runTest {
         // Given
-        val movie = createFakeMovies()[FAKE_ID_FAVORITE - 1]
+        val movie = createFakeMovies(init = FAKE_ID_FAVORITE, quantity = 1).first()
         val businessId = generateBusinessId(FAKE_ID_FAVORITE)
-        val isFavorite = true
 
         whenever(movieLocalDataSource.getMovie(any(), any(), any())).thenReturn(flowOf(movie))
-        whenever(favoriteLocalDataSource.getFavorite(movie.businessId)).thenReturn(flowOf(isFavorite))
+        whenever(favoriteLocalDataSource.getFavorite(movie.businessId)).thenReturn(flowOf(true))
 
         // When
         val result = movieRepository.getMovie(businessId, FAKE_USER_NAME, FAKE_CATEGORY).first()
@@ -65,18 +64,17 @@ class MovieRepositoryTest {
         verify(movieLocalDataSource).getMovie(businessId, FAKE_USER_NAME, FAKE_CATEGORY)
         verify(favoriteLocalDataSource).getFavorite(movie.businessId)
         assertEquals(movie, result.movie)
-        assertEquals(isFavorite, result.isFavorite)
+        assertEquals(true, result.isFavorite)
     }
 
     @Test
     fun `When isFavorite is true, must insert favorite with generated ID`() = runTest {
         // Given
-        val moviesList = createFakeMovies()
-        val movieToFavorite = moviesList[FAKE_ID_FAVORITE - 1]
+        val movie = createFakeMovies(init = FAKE_ID_FAVORITE, quantity = 1).first()
         val businessId = generateBusinessId(FAKE_ID_FAVORITE)
 
         // When
-        movieRepository.updateMovie(movieToFavorite, true)
+        movieRepository.updateMovie(movie, true)
 
         // Then
         val captor = argumentCaptor<Favorite>()
@@ -89,12 +87,11 @@ class MovieRepositoryTest {
     @Test
     fun `When isFavorite is false, must delete favorite`() = runTest {
         // Given
-        val moviesList = createFakeMovies()
-        val movieToFavorite = moviesList[FAKE_ID_FAVORITE - 1]
+        val movie = createFakeMovies(init = FAKE_ID_FAVORITE, quantity = 1).first()
         val businessId = generateBusinessId(FAKE_ID_FAVORITE)
 
         // When
-        movieRepository.updateMovie(movieToFavorite, false)
+        movieRepository.updateMovie(movie, false)
 
         // Then
         verify(favoriteLocalDataSource).deleteFavorite(businessId)
@@ -104,13 +101,12 @@ class MovieRepositoryTest {
     @Test
     fun `When SQLiteException is thrown in updateMovie, evolve with AppError Database`() = runTest {
         // Given
-        val moviesList = createFakeMovies()
-        val movieToFavorite = moviesList[FAKE_ID_FAVORITE - 1]
+        val movie = createFakeMovies(init = FAKE_ID_FAVORITE, quantity = 1).first()
         whenever(favoriteLocalDataSource.deleteFavorite(any())).thenThrow(SQLiteException())
 
         // When & Then
         assertFailsWith<AppError.Database> {
-            movieRepository.updateMovie(movieToFavorite, false)
+            movieRepository.updateMovie(movie, false)
         }
     }
 }

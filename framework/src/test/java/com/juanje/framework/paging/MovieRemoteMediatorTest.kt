@@ -15,8 +15,6 @@ import com.juanje.data.datasources.MovieRemoteDataSource
 import com.juanje.data.datasources.PageLocalDataSource
 import com.juanje.domain.MovieFactory.FAKE_API_KEY
 import com.juanje.domain.MovieFactory.FAKE_CATEGORY
-import com.juanje.domain.MovieFactory.FAKE_LAST_ID_PAGE_1
-import com.juanje.domain.MovieFactory.FAKE_LAST_ID_PAGE_2
 import com.juanje.domain.MovieFactory.FAKE_USER_NAME
 import com.juanje.domain.MovieFactory.createFakeMovies
 import com.juanje.domain.dataclasses.Movie
@@ -44,7 +42,7 @@ import java.net.UnknownHostException
 
 @OptIn(ExperimentalPagingApi::class)
 @RunWith(RobolectricTestRunner::class)
-class MovieRepositoryTest {
+class MovieRemoteMediatorTest {
     @Mock private lateinit var movieLocalDataSource: MovieLocalDataSource
     @Mock private lateinit var movieRemoteDataSource: MovieRemoteDataSource
     @Mock private lateinit var pageLocalDataSource: PageLocalDataSource
@@ -80,10 +78,10 @@ class MovieRepositoryTest {
     @Test
     fun `When DB is empty, Mediator should request page 1`() = runTest {
         // Given
-        val movies = createFakeMovies()
+        val newMovies = createFakeMovies()
 
         whenever(movieRemoteDataSource.getMovies(any(), any(), eq(FAKE_API_KEY), eq(1)))
-            .thenReturn(movies)
+            .thenReturn(newMovies)
 
         val pagingState = PagingState<Int, MovieDatabase>(
             pages = listOf(),
@@ -105,17 +103,16 @@ class MovieRepositoryTest {
     @Test
     fun `When loading more and last movie exists, request next page`() = runTest {
         // Given
-        val lastMovie = createFakeMovies()[FAKE_LAST_ID_PAGE_1]
-        val lastMovieDatabase = lastMovie.toMovieDatabase()
-        val movies = createFakeMovies(init = 20)
+        val lastMoviesDatabase = createFakeMovies().map { it.toMovieDatabase() }
+        val newMovies = createFakeMovies(init = 20)
 
         whenever(pageLocalDataSource.getPage(any(), any()))
             .thenReturn(Page(FAKE_USER_NAME, FAKE_CATEGORY, nextPage = 2))
         whenever(movieRemoteDataSource.getMovies(any(), any(), eq(FAKE_API_KEY), eq(2)))
-            .thenReturn(movies)
+            .thenReturn(newMovies)
 
         val pagingState = PagingState(
-            pages = listOf(PagingSource.LoadResult.Page(data = listOf(lastMovieDatabase), prevKey = null, nextKey = 2)),
+            pages = listOf(PagingSource.LoadResult.Page(data = lastMoviesDatabase, prevKey = null, nextKey = 2)),
             anchorPosition = 20,
             config = PagingConfig(pageSize = 20),
             leadingPlaceholderCount = 0
@@ -135,15 +132,14 @@ class MovieRepositoryTest {
     @Test
     fun `When LoadType is refresh, database should be cleared and repopulated`() = runTest {
         // Given
-        val lastMovie = createFakeMovies()[FAKE_LAST_ID_PAGE_1]
-        val lastMovieDatabase = lastMovie.toMovieDatabase()
-        val movies = createFakeMovies()
+        val lastMoviesDatabase = createFakeMovies().map { it.toMovieDatabase() }
+        val newMovies = createFakeMovies()
 
         whenever(movieRemoteDataSource.getMovies(any(), any(), eq(FAKE_API_KEY), eq(1)))
-            .thenReturn(movies)
+            .thenReturn(newMovies)
 
         val pagingState = PagingState(
-            pages = listOf(PagingSource.LoadResult.Page(data = listOf(lastMovieDatabase), prevKey = null, nextKey = 2)),
+            pages = listOf(PagingSource.LoadResult.Page(data = lastMoviesDatabase, prevKey = null, nextKey = 2)),
             anchorPosition = 20,
             config = PagingConfig(pageSize = 20),
             leadingPlaceholderCount = 0
@@ -162,8 +158,7 @@ class MovieRepositoryTest {
     @Test
     fun `Mediator should assign correct displayOrder based on current count`() = runTest {
         // Given
-        val lastMovie = createFakeMovies(quantity = 40)[FAKE_LAST_ID_PAGE_2]
-        val lastMovieDatabase = lastMovie.toMovieDatabase()
+        val lastMoviesDatabase = createFakeMovies(quantity = 40).map { it.toMovieDatabase() }
         val movies = createFakeMovies(init = 40)
 
         whenever(pageLocalDataSource.getPage(any(), any()))
@@ -172,7 +167,7 @@ class MovieRepositoryTest {
             .thenReturn(movies)
 
         val pagingState = PagingState(
-            pages = listOf(PagingSource.LoadResult.Page(data = listOf(lastMovieDatabase), prevKey = 1, nextKey = 3)),
+            pages = listOf(PagingSource.LoadResult.Page(data = lastMoviesDatabase, prevKey = 1, nextKey = 3)),
             anchorPosition = 20,
             config = PagingConfig(pageSize = 20),
             leadingPlaceholderCount = 0
@@ -215,10 +210,10 @@ class MovieRepositoryTest {
     @Test
     fun `When SQLiteException is thrown in insertAll, the exception is retrieved`() = runTest {
         // Given
-        val movies = createFakeMovies()
+        val newMovies = createFakeMovies()
 
         whenever(movieRemoteDataSource.getMovies(any(), any(), any(), any()))
-            .thenReturn(movies)
+            .thenReturn(newMovies)
         whenever(movieLocalDataSource.insertAll(any()))
             .thenAnswer { throw SQLiteException() }
 

@@ -26,10 +26,10 @@ object MovieFactory {
         displayOrder = order
     )
 
-    fun createFakeMovies(init: Int = 0, quantity: Int = 20): List<Movie> {
+    fun createFakeMovies(init: Int = 1, quantity: Int = 20): List<Movie> {
         val movies = mutableListOf<Movie>()
 
-        for(index in init + 1..init + quantity) {
+        for(index in init..init - 1 + quantity) {
             movies.add(createFakeMovie(index, index))
         }
 

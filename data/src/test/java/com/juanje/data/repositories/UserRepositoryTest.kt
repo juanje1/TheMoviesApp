@@ -3,6 +3,7 @@ package com.juanje.data.repositories
 import android.database.sqlite.SQLiteException
 import com.juanje.data.common.UserTestConstants.WRONG_EMAIL
 import com.juanje.data.common.UserTestConstants.WRONG_PASSWORD
+import com.juanje.data.common.createUser
 import com.juanje.data.datasources.UserLocalDataSource
 import com.juanje.domain.common.AppError
 import com.juanje.domain.dataclasses.User
@@ -27,10 +28,12 @@ import kotlin.test.assertFailsWith
 class UserRepositoryTest {
     @Mock private lateinit var userLocalDataSource: UserLocalDataSource
 
+    private lateinit var user: User
     private lateinit var userRepository: UserRepositoryImpl
 
     @Before
     fun setup() {
+        user = createUser()
         userRepository = UserRepositoryImpl(userLocalDataSource)
     }
 
@@ -50,7 +53,6 @@ class UserRepositoryTest {
     @Test
     fun `When call to existsUserName, the value returned must be the correct value`() = runTest {
         // Given
-        val user = createUser()
         whenever(userLocalDataSource.existsUserName(user.userName)).thenReturn(true)
 
         // When
@@ -64,7 +66,6 @@ class UserRepositoryTest {
     @Test
     fun `When call to existsEmail, the value returned must be the correct value`() = runTest {
         // Given
-        val user = createUser()
         whenever(userLocalDataSource.existsEmail(user.email)).thenReturn(false)
 
         // When
@@ -77,9 +78,6 @@ class UserRepositoryTest {
 
     @Test
     fun `When call to insertUser, the object User is passed to the DataSource`() = runTest {
-        // Given
-        val user = createUser()
-
         // When
         userRepository.insertUser(user)
 
@@ -97,8 +95,6 @@ class UserRepositoryTest {
     @Test
     fun `When SQLiteException is thrown, insertUser evolve with AppError Database`() = runTest {
         // Given
-        val user = createUser()
-
         doAnswer { throw SQLiteException() }
             .whenever(userLocalDataSource).insertUser(any())
 
@@ -107,13 +103,4 @@ class UserRepositoryTest {
             userRepository.insertUser(user)
         }
     }
-
-    private fun createUser() =
-        User(
-            userName = "juanje",
-            firstName = "Juan",
-            lastName = "Bonito",
-            email = "juanje@example.com",
-            password = "password123"
-        )
 }

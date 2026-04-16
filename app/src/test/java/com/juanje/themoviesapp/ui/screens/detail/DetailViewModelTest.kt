@@ -130,7 +130,8 @@ class DetailViewModelTest {
         advanceUntilIdle()
 
         // Then
-        assertEquals(FAKE_USER_NAME, detailViewModel.state.value.movieFavorite?.movie?.userName)
         assertEquals(fakeBusinessId, detailViewModel.state.value.movieFavorite?.movie?.businessId)
+        assertEquals(FAKE_USER_NAME, detailViewModel.state.value.movieFavorite?.movie?.userName)
+        assertEquals(FAKE_CATEGORY, detailViewModel.state.value.movieFavorite?.movie?.category)
     }
 }

@@ -6,6 +6,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import java.io.IOException
 import java.net.UnknownHostException
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.test.Test
@@ -60,5 +61,15 @@ class SafeCallTest {
             safeCall { throw RuntimeException(errorMessage) }
         }
         assertEquals(errorMessage, exception.message)
+    }
+
+    @Test
+    fun `When wrapped IOException occurs, should still throw AppError Network`() = runTest {
+        val originalError = IOException("No Internet")
+        val wrappedError = RuntimeException("Library error", originalError)
+
+        assertFailsWith<AppError.Network> {
+            safeCall { throw wrappedError }
+        }
     }
 }
