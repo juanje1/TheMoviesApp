@@ -8,7 +8,6 @@ import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertTextEquals
-import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onChildren
@@ -72,30 +71,25 @@ class InstrumentedTest {
         // 1. Login -> Register
         checkLoginFields()
         composeTestRule.onTag(context.getString(R.string.login_register_test)).performClick()
-        composeTestRule.waitForIdle()
 
         // 2. Register
         checkRegisterFields()
         fillRegisterFields()
         composeTestRule.onTag(context.getString(R.string.register_register_test)).performScrollTo()
-        composeTestRule.waitForIdle()
         composeTestRule.onTag(context.getString(R.string.register_register_test)).performClick()
-        composeTestRule.waitForIdle()
 
         // 3. Login
         checkLoginFields()
         fillLoginFields()
         composeTestRule.onTag(context.getString(R.string.login_login_test)).performClick()
-        composeTestRule.waitForIdle()
 
         // 4. Home
         val movieTitle = checkHomeFields()
 
         // 5. Home -> Detail
-        composeTestRule.onTag(context.getString(R.string.home_movie_list_test)+"_$businessId").performScrollTo()
-        composeTestRule.waitForIdle()
-        composeTestRule.onTag(context.getString(R.string.home_movie_list_test)+"_$businessId").performClick()
-        composeTestRule.waitForIdle()
+        val homeMovieTag = context.getString(R.string.home_movie_list_test) + "_$businessId"
+        composeTestRule.onTag(homeMovieTag).performScrollTo()
+        composeTestRule.onTag(homeMovieTag).performClick()
 
         // 6. Detail
         checkDetailFields(businessId, movieTitle)
@@ -104,26 +98,22 @@ class InstrumentedTest {
     private fun checkLoginFields() {
         val tags = CheckLoginRobot.getFields(context)
 
-        composeTestRule.waitUntil(timeoutMillis) {
-            composeTestRule.onAllTags(tags.first()).fetchSemanticsNodes().isNotEmpty()
-        }
-        composeTestRule.waitForIdle()
-
         tags.forEach { tag ->
-            composeTestRule.onTag(tag).scrollToAndAssertDisplayed(composeTestRule)
+            composeTestRule.waitUntil(timeoutMillis) {
+                composeTestRule.onAllTags(tag).fetchSemanticsNodes().isNotEmpty()
+            }
+            composeTestRule.onTag(tag).scrollToAndAssertDisplayed()
         }
     }
 
     private fun checkRegisterFields() {
         val tags = CheckRegisterRobot.getFields(context)
 
-        composeTestRule.waitUntil(timeoutMillis) {
-            composeTestRule.onAllTags(tags.first()).fetchSemanticsNodes().isNotEmpty()
-        }
-        composeTestRule.waitForIdle()
-
         tags.forEach { tag ->
-            composeTestRule.onTag(tag).scrollToAndAssertDisplayed(composeTestRule)
+            composeTestRule.waitUntil(timeoutMillis) {
+                composeTestRule.onAllTags(tag).fetchSemanticsNodes().isNotEmpty()
+            }
+            composeTestRule.onTag(tag).scrollToAndAssertDisplayed()
         }
     }
 
@@ -131,22 +121,18 @@ class InstrumentedTest {
         val tags = FillLoginRobot.getFields(context, userId)
 
         tags.forEach { (tag, value) ->
-            composeTestRule.onTag(tag).scrollToAndType(composeTestRule, value)
+            composeTestRule.onTag(tag).scrollToAndType(value)
         }
-
         composeTestRule.onTag(context.getString(R.string.login_password_test)).performImeAction()
-        composeTestRule.waitForIdle()
     }
 
     private fun fillRegisterFields() {
         val tags = FillRegisterRobot.getFields(context, userId)
 
         tags.forEach { (tag, value) ->
-            composeTestRule.onTag(tag).scrollToAndType(composeTestRule, value)
+            composeTestRule.onTag(tag).scrollToAndType(value)
         }
-
         composeTestRule.onTag(context.getString(R.string.register_password_test)).performImeAction()
-        composeTestRule.waitForIdle()
     }
 
     private fun checkHomeFields(): String {
@@ -157,7 +143,6 @@ class InstrumentedTest {
         composeTestRule.waitUntil(timeoutMillis) {
             composeTestRule.onAllTags(loadingSpinner).fetchSemanticsNodes().isEmpty()
         }
-        composeTestRule.waitForIdle()
 
         composeTestRule.waitUntil(timeoutMillis) {
             val homeLoaded = composeTestRule.onAllTags(movieListHome).fetchSemanticsNodes().isNotEmpty()
@@ -166,17 +151,14 @@ class InstrumentedTest {
             setError(hasError, snackBarHost)
             homeLoaded
         }
-        composeTestRule.waitForIdle()
-
         composeTestRule.onTag(movieListHome).assertIsDisplayed()
-        composeTestRule.waitForIdle()
 
         val movieTag = getHomeMovieTag()
         if (movieTag.isEmpty()) error(context.getString(R.string.error_movie_list_test))
         businessId = movieTag.substringAfter(context.getString(R.string.home_movie_list_test)+"_")
 
         val tags = CheckHomeRobot.getFields(context, businessId)
-        tags.forEach { tag -> waitAndAssertHomeItem(tag) }
+        tags.forEach { tag -> waitScrollToAndAssertDisplayed(tag) }
 
         val titleTag = context.getString(R.string.home_movie_title_test)+"_$businessId"
         val movieTitle = composeTestRule.onTag(titleTag).fetchSemanticsNode().config
@@ -186,50 +168,11 @@ class InstrumentedTest {
     }
 
     private fun checkDetailFields(businessId: String, movieTitle: String) {
-        val snackBarHost = context.getString(R.string.snack_bar_host_test)
         val tags = CheckDetailRobot.getFields(context, businessId)
-
-        composeTestRule.waitUntil(timeoutMillis) {
-            val detailLoaded = composeTestRule.onAllTags(tags.first()).fetchSemanticsNodes().isNotEmpty()
-            val hasError = composeTestRule.onAllTags(snackBarHost).onFirst().onChildren().fetchSemanticsNodes().isNotEmpty()
-
-            setError(hasError, snackBarHost)
-            detailLoaded
-        }
-        composeTestRule.waitForIdle()
-
-        tags.forEach { tag ->
-            composeTestRule.onTag(tag).scrollToAndAssertDisplayed(composeTestRule)
-        }
+        tags.forEach { tag -> waitScrollToAndAssertDisplayed(tag) }
 
         composeTestRule.onTag(context.getString(R.string.detail_movie_title_test)+"_${businessId}")
-            .scrollToAndAssertDisplayed(composeTestRule).assertTextEquals(movieTitle)
-    }
-
-    private fun SemanticsNodeInteraction.scrollToAndAssertDisplayed(
-        composeTestRule: ComposeContentTestRule
-    ) = apply {
-
-        this.performScrollTo()
-        composeTestRule.waitForIdle()
-
-        this.assertIsDisplayed()
-        composeTestRule.waitForIdle()
-    }
-
-    private fun SemanticsNodeInteraction.scrollToAndType(
-        composeTestRule: ComposeContentTestRule,
-        text: String
-    ) = apply {
-
-        this.performScrollTo()
-        composeTestRule.waitForIdle()
-
-        this.performClick()
-        composeTestRule.waitForIdle()
-
-        this.performTextInput(text)
-        composeTestRule.waitForIdle()
+            .performScrollTo().assertTextEquals(movieTitle)
     }
 
     private fun getHomeMovieTag(): String {
@@ -247,14 +190,12 @@ class InstrumentedTest {
             setError(hasError, snackBarHost)
             movieLoaded
         }
-        composeTestRule.waitForIdle()
 
         val movieNode = composeTestRule.onNodes(movieMatcher).onFirst()
-
         return movieNode.fetchSemanticsNode().config.getOrNull(SemanticsProperties.TestTag) ?: ""
     }
 
-    private fun waitAndAssertHomeItem(tag: String) {
+    private fun waitScrollToAndAssertDisplayed(tag: String) {
         val snackBarHost = context.getString(R.string.snack_bar_host_test)
 
         composeTestRule.waitUntil(timeoutMillis) {
@@ -264,10 +205,8 @@ class InstrumentedTest {
             setError(hasError, snackBarHost)
             itemLoaded
         }
-        composeTestRule.waitForIdle()
 
-        composeTestRule.onTag(tag).assertIsDisplayed()
-        composeTestRule.waitForIdle()
+        composeTestRule.onTag(tag).scrollToAndAssertDisplayed()
     }
 
     private fun setError(hasError: Boolean, snackBarHost: String) {
@@ -275,6 +214,17 @@ class InstrumentedTest {
             composeTestRule.onTag(snackBarHost).assertIsDisplayed()
             assumeTrue(context.getString(R.string.assume_internet_test), false)
         }
+    }
+
+    private fun SemanticsNodeInteraction.scrollToAndAssertDisplayed() = apply {
+        this.performScrollTo()
+        this.assertIsDisplayed()
+    }
+
+    private fun SemanticsNodeInteraction.scrollToAndType(text: String) = apply {
+        this.performScrollTo()
+        this.performClick()
+        this.performTextInput(text)
     }
 }
 
