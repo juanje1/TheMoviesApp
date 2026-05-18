@@ -161,7 +161,7 @@ class InstrumentedTest {
 
         composeTestRule.waitUntil(timeoutMillis) {
             val homeLoaded = composeTestRule.onAllTags(movieListHome).fetchSemanticsNodes().isNotEmpty()
-            val hasError = composeTestRule.onTag(snackBarHost).onChildren().fetchSemanticsNodes().isNotEmpty()
+            val hasError = composeTestRule.onAllTags(snackBarHost).onFirst().onChildren().fetchSemanticsNodes().isNotEmpty()
 
             setError(hasError, snackBarHost)
             homeLoaded
@@ -191,7 +191,7 @@ class InstrumentedTest {
 
         composeTestRule.waitUntil(timeoutMillis) {
             val detailLoaded = composeTestRule.onAllTags(tags.first()).fetchSemanticsNodes().isNotEmpty()
-            val hasError = composeTestRule.onTag(snackBarHost).onChildren().fetchSemanticsNodes().isNotEmpty()
+            val hasError = composeTestRule.onAllTags(snackBarHost).onFirst().onChildren().fetchSemanticsNodes().isNotEmpty()
 
             setError(hasError, snackBarHost)
             detailLoaded
@@ -218,7 +218,8 @@ class InstrumentedTest {
     }
 
     private fun SemanticsNodeInteraction.scrollToAndType(
-        composeTestRule: ComposeContentTestRule, text: String
+        composeTestRule: ComposeContentTestRule,
+        text: String
     ) = apply {
 
         this.performScrollTo()
@@ -240,15 +241,15 @@ class InstrumentedTest {
         }
 
         composeTestRule.waitUntil(timeoutMillis) {
-            val movieLoaded = composeTestRule.onAllNodes(movieMatcher, useUnmergedTree = true).fetchSemanticsNodes().isNotEmpty()
-            val hasError = composeTestRule.onTag(snackBarHost).onChildren().fetchSemanticsNodes().isNotEmpty()
+            val movieLoaded = composeTestRule.onNodes(movieMatcher).fetchSemanticsNodes().isNotEmpty()
+            val hasError = composeTestRule.onAllTags(snackBarHost).onFirst().onChildren().fetchSemanticsNodes().isNotEmpty()
 
             setError(hasError, snackBarHost)
             movieLoaded
         }
         composeTestRule.waitForIdle()
 
-        val movieNode = composeTestRule.onAllNodes(movieMatcher, useUnmergedTree = true).onFirst()
+        val movieNode = composeTestRule.onNodes(movieMatcher).onFirst()
 
         return movieNode.fetchSemanticsNode().config.getOrNull(SemanticsProperties.TestTag) ?: ""
     }
@@ -258,7 +259,7 @@ class InstrumentedTest {
 
         composeTestRule.waitUntil(timeoutMillis) {
             val itemLoaded = composeTestRule.onAllTags(tag).fetchSemanticsNodes().isNotEmpty()
-            val hasError = composeTestRule.onTag(snackBarHost).onChildren().fetchSemanticsNodes().isNotEmpty()
+            val hasError = composeTestRule.onAllTags(snackBarHost).onFirst().onChildren().fetchSemanticsNodes().isNotEmpty()
 
             setError(hasError, snackBarHost)
             itemLoaded
@@ -282,3 +283,6 @@ fun SemanticsNodeInteractionsProvider.onTag(tag: String) =
 
 fun SemanticsNodeInteractionsProvider.onAllTags(tag: String) =
     onAllNodesWithTag(tag, useUnmergedTree = true)
+
+fun SemanticsNodeInteractionsProvider.onNodes(matcher: SemanticsMatcher) =
+    onAllNodes(matcher, useUnmergedTree = true)

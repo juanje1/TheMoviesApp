@@ -22,6 +22,23 @@ object CheckRegisterRobot {
     )
 }
 
+object CheckHomeRobot {
+    fun getFields(context: Context, businessId: String) = listOf(
+        context.getString(R.string.home_movie_image_test) + "_$businessId",
+        context.getString(R.string.home_movie_favourite_test) + "_$businessId",
+        context.getString(R.string.home_movie_title_test) + "_$businessId"
+    )
+}
+
+object CheckDetailRobot {
+    fun getFields(context: Context, businessId: String) = listOf(
+        context.getString(R.string.detail_movie_image_test) + "_$businessId",
+        context.getString(R.string.detail_movie_title_test) + "_$businessId",
+        context.getString(R.string.detail_movie_overview_test) + "_$businessId",
+        context.getString(R.string.detail_movie_favourite_test) + "_$businessId"
+    )
+}
+
 object FillLoginRobot {
     fun getFields(context: Context, userId: Int) = listOf(
         context.getString(R.string.login_email_test) to (context.getString(R.string.register_example_email_init_test) + "_$userId@"
@@ -38,22 +55,5 @@ object FillRegisterRobot {
         context.getString(R.string.register_email_test) to (context.getString(R.string.register_example_email_init_test) + "_$userId@" +
                 context.getString(R.string.register_example_email_end_test)),
         context.getString(R.string.register_password_test) to (context.getString(R.string.register_example_password_test) + "_$userId")
-    )
-}
-
-object CheckHomeRobot {
-    fun getFields(context: Context, businessId: String) = listOf(
-        context.getString(R.string.home_movie_image_test) + "_$businessId",
-        context.getString(R.string.home_movie_favourite_test) + "_$businessId",
-        context.getString(R.string.home_movie_title_test) + "_$businessId"
-    )
-}
-
-object CheckDetailRobot {
-    fun getFields(context: Context, businessId: String) = listOf(
-        context.getString(R.string.detail_movie_image_test) + "_$businessId",
-        context.getString(R.string.detail_movie_title_test) + "_$businessId",
-        context.getString(R.string.detail_movie_overview_test) + "_$businessId",
-        context.getString(R.string.detail_movie_favourite_test) + "_$businessId"
     )
 }

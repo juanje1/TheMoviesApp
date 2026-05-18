@@ -104,16 +104,16 @@ abstract class FrameworkModule {
     abstract fun bindMovieLocalDataSource(movieDatabaseDataSource: MovieDatabaseDataSource): MovieLocalDataSource
 
     @Binds
-    abstract fun bindMovieServerDataSource(movieServerDataSource: MovieServerDataSource): MovieRemoteDataSource
-
-    @Binds
-    abstract fun bindRemoteMediatorProvider(movieRemoteMediatorProviderImpl: MovieRemoteMediatorProviderImpl): MovieRemoteMediatorProvider
-
-    @Binds
     abstract fun bindPageLocalDataSource(pageDatabaseDataSource: PageDatabaseDataSource): PageLocalDataSource
 
     @Binds
     abstract fun bindFavoriteLocalDataSource(favoriteDatabaseDataSource: FavoriteDatabaseDataSource): FavoriteLocalDataSource
+
+    @Binds
+    abstract fun bindMovieServerDataSource(movieServerDataSource: MovieServerDataSource): MovieRemoteDataSource
+
+    @Binds
+    abstract fun bindRemoteMediatorProvider(movieRemoteMediatorProviderImpl: MovieRemoteMediatorProviderImpl): MovieRemoteMediatorProvider
 
     @Binds
     abstract fun bindMovieMapper(movieMapperImpl: MovieMapperImpl): MovieMapper<Any, MovieFavorite>
