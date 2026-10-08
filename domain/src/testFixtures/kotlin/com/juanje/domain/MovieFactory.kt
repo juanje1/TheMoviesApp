@@ -9,8 +9,6 @@ object MovieFactory {
     const val FAKE_CATEGORY = "popularity.desc"
     const val FAKE_ID_DETAIL = 5
     const val FAKE_ID_FAVORITE = 5
-    const val FAKE_LAST_ID_PAGE_1 = 19
-    const val FAKE_LAST_ID_PAGE_2 = 39
     const val FAKE_API_KEY = "d30e1f350220f9aad6c4110df385d380"
 
     val fakeMoviesList = createFakeMovies(quantity = FAKE_TOTAL_MOVIES)

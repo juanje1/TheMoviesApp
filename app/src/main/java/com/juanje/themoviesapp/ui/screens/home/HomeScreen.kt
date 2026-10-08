@@ -18,7 +18,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,6 +30,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
@@ -51,7 +51,7 @@ fun HomeScreen(
     val movies = remember { homeViewModel.movies }.collectAsLazyPagingItems()
     val isRefreshing = movies.loadState.refresh is LoadState.Loading
 
-    val homeState by homeViewModel.state.collectAsState()
+    val homeState by homeViewModel.state.collectAsStateWithLifecycle()
     val errorMessage = homeState.error?.let { stringResource(it) }
     val itemsContentType = stringResource(R.string.home_items_content_type)
     val listState = rememberLazyGridState()

@@ -6,7 +6,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,6 +17,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.common.extensions.showMessage
@@ -32,7 +32,7 @@ fun DetailScreen(
 ) {
     var showLogoutAlertDialog by rememberSaveable { mutableStateOf(false) }
 
-    val detailState by detailViewModel.state.collectAsState()
+    val detailState by detailViewModel.state.collectAsStateWithLifecycle()
     val errorMessage = detailState.error?.let { stringResource(it) }
     val coroutineScope = rememberCoroutineScope()
     val snackBarHostState = remember { SnackbarHostState() }

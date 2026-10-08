@@ -10,7 +10,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -18,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.common.extensions.showMessage
 
@@ -27,7 +27,7 @@ fun LoginScreen(
     onRegister: () -> Unit,
     loginViewModel: LoginViewModel = hiltViewModel()
 ) {
-    val loginState by loginViewModel.state.collectAsState()
+    val loginState by loginViewModel.state.collectAsStateWithLifecycle()
     val infoRegisterMessage = stringResource(R.string.info_register_success)
     val errorLoginIncorrectMessage = stringResource(R.string.error_login_incorrect)
     val errorMessage = loginState.error?.let { stringResource(it) }

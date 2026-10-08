@@ -69,7 +69,7 @@ abstract class FrameworkModule {
             context = applicationContext,
             klass = TheMoviesAppDatabase::class.java,
             name = databaseName
-        ).build()
+        ).fallbackToDestructiveMigration().build()
 
         @Provides
         @Singleton

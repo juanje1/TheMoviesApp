@@ -1,5 +1,6 @@
 package com.juanje.themoviesapp.ui.screens.register
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.juanje.domain.MainDispatcher
@@ -45,14 +46,18 @@ class RegisterViewModel @Inject constructor(
         _state.update { it.copy(isRegistering = true, actionFinished = false) }
 
         val localErrors = validateLocalErrors(_state.value.user)
-        _state.update { it.copy(errorMessages = localErrors, userValid = localErrors.isEmpty()) }
+        val isLocalValid = localErrors.isEmpty()
 
-        trackLoading(idlingResource = idlingResource) {
-            if (_state.value.userValid) {
+        _state.update { it.copy(errorMessages = localErrors, userValid = isLocalValid) }
+
+        if (isLocalValid) {
+            trackLoading(idlingResource = idlingResource) {
                 val remoteErrors = validateRemoteErrors(_state.value.user)
-                _state.update { it.copy(errorMessages = remoteErrors, userValid = remoteErrors.isEmpty()) }
+                val isRemoteValid = remoteErrors.isEmpty()
 
-                if (_state.value.userValid) {
+                _state.update { it.copy(errorMessages = remoteErrors, userValid = isRemoteValid) }
+
+                if (isRemoteValid) {
                     loadUser.invokeInsertUser(_state.value.user)
                 }
             }
@@ -177,6 +182,7 @@ class RegisterViewModel @Inject constructor(
         _state.update { it.copy(error = null) }
     }
 
+    @Immutable
     data class UiState(
         val user: User = User(),
         val actionFinished: Boolean = false,

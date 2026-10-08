@@ -10,7 +10,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -18,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.juanje.themoviesapp.R
 import com.juanje.themoviesapp.common.extensions.showMessage
 
@@ -27,7 +27,7 @@ fun RegisterScreen(
     onLogin: () -> Unit,
     registerViewModel: RegisterViewModel = hiltViewModel()
 ) {
-    val registerState by registerViewModel.state.collectAsState()
+    val registerState by registerViewModel.state.collectAsStateWithLifecycle()
     val errorRegisterMessage = stringResource(R.string.error_register)
     val errorMessage = registerState.error?.let { stringResource(it) }
     val coroutineScope = rememberCoroutineScope()

@@ -1,5 +1,6 @@
 package com.juanje.themoviesapp.ui.screens.detail
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -57,6 +58,7 @@ class DetailViewModel @Inject constructor(
         _state.update { it.copy(error = null) }
     }
 
+    @Immutable
     data class UiState(
         val userName: String = "",
         val movieFavorite: MovieFavorite?= null,

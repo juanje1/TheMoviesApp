@@ -1,5 +1,6 @@
 package com.juanje.themoviesapp.ui.screens.login
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -69,6 +70,7 @@ class LoginViewModel @Inject constructor(
         _state.value = UiState()
     }
 
+    @Immutable
     data class UiState(
         val user: User?= null,
         val timeExecution: Int = 0,

@@ -1,5 +1,6 @@
 package com.juanje.themoviesapp.ui.screens.home
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -58,11 +59,12 @@ class HomeViewModel @Inject constructor(
         _userNameFlow.filterNotNull(),
         _categoryFlow
     ) { userName, category ->
+        userName to category
+    }.flatMapLatest { (userName, category) ->
         _state.update { it.copy(userName = userName, category = category) }
         loadMovie.invokeGetMovies(userName, category.queryValue)
             .trackFlow(idlingResource) { _state.update { it.copy(isInitialLoading = false) } }
-    }.flatMapLatest { it }
-    .cachedIn(viewModelScope)
+    }.cachedIn(viewModelScope)
 
     private fun homeHandler(onCleanup: () -> Unit = {}) = createHandler(
         onUpdateError = { errorRes -> _state.update { it.copy(error = errorRes) } },
@@ -102,6 +104,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    @Immutable
     data class UiState(
         val userName: String = "",
         val category: MovieCategory = MovieCategory.POPULAR,
