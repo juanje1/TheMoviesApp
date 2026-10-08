@@ -38,9 +38,9 @@ class MovieRepositoryImpl @Inject constructor(
         return Pager(
             config = PagingConfig(
                 pageSize = PAGE_SIZE,
-                initialLoadSize = PAGE_SIZE,
-                prefetchDistance = 5,
-                enablePlaceholders = false
+                initialLoadSize = 40,
+                prefetchDistance = 15,
+                enablePlaceholders = true
             ),
             remoteMediator = mediatorProvider.getMediator(userName, category),
             pagingSourceFactory = { movieLocalDataSource.getMovies(userName, category) }
