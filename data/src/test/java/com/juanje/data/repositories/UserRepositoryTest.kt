@@ -38,6 +38,19 @@ class UserRepositoryTest {
     }
 
     @Test
+    fun `When the user exist in the database, getUser returns the user`() = runTest {
+        // Given
+        whenever(userLocalDataSource.getUser(user.userName, user.password)).thenReturn(user)
+
+        // When
+        val result = userRepository.getUser(user.userName, user.password)
+
+        // Then
+        verify(userLocalDataSource).getUser(user.userName, user.password)
+        assertEquals(user, result)
+    }
+
+    @Test
     fun `When the user does not exist in the database, getUser returns null`() = runTest {
         // Given
         whenever(userLocalDataSource.getUser(WRONG_EMAIL, WRONG_PASSWORD)).thenReturn(null)
