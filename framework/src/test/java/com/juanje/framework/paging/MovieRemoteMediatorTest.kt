@@ -21,6 +21,7 @@ import com.juanje.domain.dataclasses.Movie
 import com.juanje.domain.dataclasses.Page
 import com.juanje.framework.database.TheMoviesAppDatabase
 import com.juanje.framework.database.dataclasses.MovieDatabase
+import com.juanje.framework.database.dataclasses.toMovieDatabase
 import com.juanje.framework.database.paging.MovieRemoteMediator
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -76,12 +77,12 @@ class MovieRemoteMediatorTest {
     }
 
     @Test
-    fun `When DB is empty, Mediator should request page 1`() = runTest {
+    fun `When DB is empty and append, Mediator should request page 1`() = runTest {
         // Given
         val newMovies = createFakeMovies()
 
-        whenever(movieRemoteDataSource.getMovies(any(), any(), eq(FAKE_API_KEY), eq(1)))
-            .thenReturn(newMovies)
+        whenever(pageLocalDataSource.getPage(any(), any())).thenReturn(null)
+        whenever(movieRemoteDataSource.getMovies(any(), any(), eq(FAKE_API_KEY), eq(1))).thenReturn(newMovies)
 
         val pagingState = PagingState<Int, MovieDatabase>(
             pages = listOf(),
@@ -91,25 +92,55 @@ class MovieRemoteMediatorTest {
         )
 
         // When
-        val result = movieRemoteMediator.load(LoadType.REFRESH, pagingState)
+        val result = movieRemoteMediator.load(LoadType.APPEND, pagingState)
 
         // Then
+        verify(pageLocalDataSource).getPage(any(), any())
         verify(movieRemoteDataSource).getMovies(any(), any(), eq(FAKE_API_KEY), eq(1))
         verify(movieLocalDataSource).insertAll(any())
+        verify(pageLocalDataSource).insertPage(any())
+
         assertTrue(result is RemoteMediator.MediatorResult.Success)
         assertFalse((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
     }
 
     @Test
-    fun `When loading more and last movie exists, request next page`() = runTest {
+    fun `When DB is not empty and refresh, Mediator should request page 1`() = runTest {
         // Given
         val lastMoviesDatabase = createFakeMovies().map { it.toMovieDatabase() }
-        val newMovies = createFakeMovies(init = 20)
+        val newMovies = createFakeMovies()
 
-        whenever(pageLocalDataSource.getPage(any(), any()))
-            .thenReturn(Page(FAKE_USER_NAME, FAKE_CATEGORY, nextPage = 2))
-        whenever(movieRemoteDataSource.getMovies(any(), any(), eq(FAKE_API_KEY), eq(2)))
-            .thenReturn(newMovies)
+        whenever(movieRemoteDataSource.getMovies(any(), any(), eq(FAKE_API_KEY), eq(1))).thenReturn(newMovies)
+
+        val pagingState = PagingState(
+            pages = listOf(PagingSource.LoadResult.Page(data = lastMoviesDatabase, prevKey = null, nextKey = 2)),
+            anchorPosition = 20,
+            config = PagingConfig(pageSize = 20),
+            leadingPlaceholderCount = 0
+        )
+
+        // When
+        val result = movieRemoteMediator.load(LoadType.REFRESH, pagingState)
+
+        // Then
+        verify(movieRemoteDataSource).getMovies(any(), any(), eq(FAKE_API_KEY), eq(1))
+        verify(movieLocalDataSource).deleteAll(any(), any())
+        verify(pageLocalDataSource).deletePage(any(), any())
+        verify(movieLocalDataSource).insertAll(any())
+        verify(pageLocalDataSource).insertPage(any())
+
+        assertTrue(result is RemoteMediator.MediatorResult.Success)
+        assertFalse((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
+    }
+
+    @Test
+    fun `When DB is not empty and append, request next page`() = runTest {
+        // Given
+        val lastMoviesDatabase = createFakeMovies().map { it.toMovieDatabase() }
+        val newMovies = createFakeMovies(init = 21)
+
+        whenever(pageLocalDataSource.getPage(any(), any())).thenReturn(Page(FAKE_USER_NAME, FAKE_CATEGORY, nextPage = 2))
+        whenever(movieRemoteDataSource.getMovies(any(), any(), eq(FAKE_API_KEY), eq(2))).thenReturn(newMovies)
 
         val pagingState = PagingState(
             pages = listOf(PagingSource.LoadResult.Page(data = lastMoviesDatabase, prevKey = null, nextKey = 2)),
@@ -125,32 +156,8 @@ class MovieRemoteMediatorTest {
         verify(pageLocalDataSource).getPage(any(), any())
         verify(movieRemoteDataSource).getMovies(any(), any(), eq(FAKE_API_KEY), eq(2))
         verify(movieLocalDataSource).insertAll(any())
-        assertTrue(result is RemoteMediator.MediatorResult.Success)
-        assertFalse((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
-    }
+        verify(pageLocalDataSource).insertPage(any())
 
-    @Test
-    fun `When LoadType is refresh, database should be cleared and repopulated`() = runTest {
-        // Given
-        val lastMoviesDatabase = createFakeMovies().map { it.toMovieDatabase() }
-        val newMovies = createFakeMovies()
-
-        whenever(movieRemoteDataSource.getMovies(any(), any(), eq(FAKE_API_KEY), eq(1)))
-            .thenReturn(newMovies)
-
-        val pagingState = PagingState(
-            pages = listOf(PagingSource.LoadResult.Page(data = lastMoviesDatabase, prevKey = null, nextKey = 2)),
-            anchorPosition = 20,
-            config = PagingConfig(pageSize = 20),
-            leadingPlaceholderCount = 0
-        )
-
-        // When
-        val result = movieRemoteMediator.load(LoadType.REFRESH, pagingState)
-
-        // Then
-        verify(movieLocalDataSource).deleteAll(any(), any())
-        verify(movieLocalDataSource).insertAll(any())
         assertTrue(result is RemoteMediator.MediatorResult.Success)
         assertFalse((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
     }
@@ -231,15 +238,4 @@ class MovieRemoteMediatorTest {
         assertTrue(result is RemoteMediator.MediatorResult.Error)
         assertTrue((result as RemoteMediator.MediatorResult.Error).throwable is SQLiteException)
     }
-
-    private fun Movie.toMovieDatabase() = MovieDatabase(
-        businessId = businessId,
-        title = title,
-        overview = overview,
-        posterPath = posterPath,
-        releaseDate = releaseDate,
-        userName = userName,
-        category = category,
-        displayOrder = displayOrder
-    )
 }
