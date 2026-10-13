@@ -32,6 +32,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.Mockito.never
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
@@ -160,6 +161,30 @@ class MovieRemoteMediatorTest {
 
         assertTrue(result is RemoteMediator.MediatorResult.Success)
         assertFalse((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
+    }
+
+    @Test
+    fun `When DB is not empty and prepend, endOfPaginationReached is true`() = runTest {
+        // Given
+        val lastMoviesDatabase = createFakeMovies().map { it.toMovieDatabase() }
+
+        val pagingState = PagingState(
+            pages = listOf(PagingSource.LoadResult.Page(data = lastMoviesDatabase, prevKey = null, nextKey = 2)),
+            anchorPosition = 20,
+            config = PagingConfig(pageSize = 20),
+            leadingPlaceholderCount = 0
+        )
+
+        // When
+        val result = movieRemoteMediator.load(LoadType.PREPEND, pagingState)
+
+        // Then
+        verify(movieRemoteDataSource, never()).getMovies(any(), any(), any(), any())
+        verify(movieLocalDataSource, never()).insertAll(any())
+        verify(pageLocalDataSource, never()).insertPage(any())
+
+        assertTrue(result is RemoteMediator.MediatorResult.Success)
+        assertTrue((result as RemoteMediator.MediatorResult.Success).endOfPaginationReached)
     }
 
     @Test
