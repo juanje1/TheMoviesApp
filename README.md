@@ -16,5 +16,6 @@ The application has the following characteristics:
 - Room
 - Navigation Compose
 - Unit Testing
+- Instrumentation Testing
 - Request to an API
 - Pagination
