@@ -95,14 +95,14 @@ class UserRepositoryTest {
         userRepository.insertUser(user)
 
         // Then
-        val captorUser = argumentCaptor<User>()
-        verify(userLocalDataSource).insertUser(captorUser.capture())
+        val captor = argumentCaptor<User>()
+        verify(userLocalDataSource).insertUser(captor.capture())
 
-        assertEquals(user.userName, captorUser.firstValue.userName)
-        assertEquals(user.firstName, captorUser.firstValue.firstName)
-        assertEquals(user.lastName, captorUser.firstValue.lastName)
-        assertEquals(user.email, captorUser.firstValue.email)
-        assertEquals(user.password, captorUser.firstValue.password)
+        assertEquals(user.userName, captor.firstValue.userName)
+        assertEquals(user.firstName, captor.firstValue.firstName)
+        assertEquals(user.lastName, captor.firstValue.lastName)
+        assertEquals(user.email, captor.firstValue.email)
+        assertEquals(user.password, captor.firstValue.password)
     }
 
     @Test

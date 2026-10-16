@@ -191,12 +191,10 @@ class MovieRemoteMediatorTest {
     fun `Mediator should assign correct displayOrder based on current count`() = runTest {
         // Given
         val lastMoviesDatabase = createFakeMovies(quantity = 40).map { it.toMovieDatabase() }
-        val movies = createFakeMovies(init = 40)
+        val movies = createFakeMovies(init = 41)
 
-        whenever(pageLocalDataSource.getPage(any(), any()))
-            .thenReturn(Page(FAKE_USER_NAME, FAKE_CATEGORY, nextPage = 3))
-        whenever(movieRemoteDataSource.getMovies(any(), any(), eq(FAKE_API_KEY), eq(3)))
-            .thenReturn(movies)
+        whenever(pageLocalDataSource.getPage(any(), any())).thenReturn(Page(FAKE_USER_NAME, FAKE_CATEGORY, nextPage = 3))
+        whenever(movieRemoteDataSource.getMovies(any(), any(), eq(FAKE_API_KEY), eq(3))).thenReturn(movies)
 
         val pagingState = PagingState(
             pages = listOf(PagingSource.LoadResult.Page(data = lastMoviesDatabase, prevKey = 1, nextKey = 3)),
@@ -211,7 +209,11 @@ class MovieRemoteMediatorTest {
         // Then
         val captor = argumentCaptor<List<Movie>>()
 
+        verify(pageLocalDataSource).getPage(any(), any())
+        verify(movieRemoteDataSource).getMovies(any(), any(), eq(FAKE_API_KEY), eq(3))
         verify(movieLocalDataSource).insertAll(captor.capture())
+        verify(pageLocalDataSource).insertPage(any())
+
         assertEquals(41, captor.firstValue[0].displayOrder)
         assertEquals(42, captor.firstValue[1].displayOrder)
         assertTrue(result is RemoteMediator.MediatorResult.Success)
@@ -221,8 +223,8 @@ class MovieRemoteMediatorTest {
     @Test
     fun `When UnknownHostException is thrown in getMovies, the exception is retrieved`() = runTest {
         // Given
-        whenever(movieRemoteDataSource.getMovies(any(), any(), any(), any()))
-            .thenAnswer { throw UnknownHostException() }
+        whenever(pageLocalDataSource.getPage(any(), any())).thenReturn(null)
+        whenever(movieRemoteDataSource.getMovies(any(), any(), eq(FAKE_API_KEY), eq(1))).thenAnswer { throw UnknownHostException() }
 
         val pagingState = PagingState<Int, MovieDatabase>(
             pages = listOf(),
@@ -232,9 +234,14 @@ class MovieRemoteMediatorTest {
         )
 
         // When
-        val result = movieRemoteMediator.load(LoadType.REFRESH, pagingState)
+        val result = movieRemoteMediator.load(LoadType.APPEND, pagingState)
 
         // Then
+        verify(pageLocalDataSource).getPage(any(), any())
+        verify(movieRemoteDataSource).getMovies(any(), any(), eq(FAKE_API_KEY), eq(1))
+        verify(movieLocalDataSource, never()).insertAll(any())
+        verify(pageLocalDataSource, never()).insertPage(any())
+
         assertTrue(result is RemoteMediator.MediatorResult.Error)
         assertTrue((result as RemoteMediator.MediatorResult.Error).throwable is UnknownHostException)
     }
@@ -244,10 +251,9 @@ class MovieRemoteMediatorTest {
         // Given
         val newMovies = createFakeMovies()
 
-        whenever(movieRemoteDataSource.getMovies(any(), any(), any(), any()))
-            .thenReturn(newMovies)
-        whenever(movieLocalDataSource.insertAll(any()))
-            .thenAnswer { throw SQLiteException() }
+        whenever(pageLocalDataSource.getPage(any(), any())).thenReturn(null)
+        whenever(movieRemoteDataSource.getMovies(any(), any(), eq(FAKE_API_KEY), eq(1))).thenReturn(newMovies)
+        whenever(movieLocalDataSource.insertAll(any())).thenAnswer { throw SQLiteException() }
 
         val pagingState = PagingState<Int, MovieDatabase>(
             pages = listOf(),
@@ -257,9 +263,14 @@ class MovieRemoteMediatorTest {
         )
 
         // When
-        val result = movieRemoteMediator.load(LoadType.REFRESH, pagingState)
+        val result = movieRemoteMediator.load(LoadType.APPEND, pagingState)
 
         // Then
+        verify(pageLocalDataSource).getPage(any(), any())
+        verify(movieRemoteDataSource).getMovies(any(), any(), eq(FAKE_API_KEY), eq(1))
+        verify(movieLocalDataSource).insertAll(any())
+        verify(pageLocalDataSource, never()).insertPage(any())
+
         assertTrue(result is RemoteMediator.MediatorResult.Error)
         assertTrue((result as RemoteMediator.MediatorResult.Error).throwable is SQLiteException)
     }
